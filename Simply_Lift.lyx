@@ -235,12 +235,151 @@ smack in the face
 The ubiquitous Chat app
 \end_layout
 
+\begin_layout Standard
+Writing a multi-user chat application in Lift is super-simple and illustrates
+ many of Lift's core concepts.
+\end_layout
+
+\begin_layout Standard
+When writing a Lift app, it's often best to start off with the user interface...
+ build what the user will see and then add behavior to the HTML page.
+ So, let's look at the Lift template that will make up our chat application.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "chat/src/main/webapp/index.html"
+lstparams "caption={index.html}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It's a valid HTML page, but there are some hinky looking class attributes.
+ The first one is 
+\family typewriter
+<body class="lift:content_id=main">
+\family default
+.
+ The class in this case says 
+\begin_inset Quotes eld
+\end_inset
+
+the actual page content is contained by the element with id='main'.
+\begin_inset Quotes erd
+\end_inset
+
+ This allows you to have valid HTML pages for each of your templates, but
+ dynamically add 
+\begin_inset Quotes eld
+\end_inset
+
+chrome
+\begin_inset Quotes erd
+\end_inset
+
+ around the content based on one or more chrome templates.
+\end_layout
+
+\begin_layout Standard
+Let's look at the 
+\family typewriter
+<div id="main">
+\family default
+.
+ It's got a funky class as well: 
+\family typewriter
+lift:surround?with=default;at=content
+\family default
+.
+ This class invokes a snippet which surrounds the 
+\family typewriter
+<div>
+\family default
+ with the default template and inserts the 
+\family typewriter
+<div>
+\family default
+ and its children at the element with id 
+\begin_inset Quotes eld
+\end_inset
+
+content
+\begin_inset Quotes erd
+\end_inset
+
+ in the default template.
+ Or, it wraps the default chrome around the 
+\family typewriter
+<div>
+\family default
+.
+ For more on snippets, see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Snippets"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Chapter
 Core Concepts
 \end_layout
 
-\begin_layout Chapter
-Box and Option
+\begin_layout Section
+Snippets
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Snippets"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Lift is built on the Scala programming language.
+ Scala is a hybrid of Functional and Object Oriented.
+ Two core principles of functional programming languages are immutability
+ and transformation.
+\end_layout
+
+\begin_layout Standard
+Immutability means that once a data structure is instantiated, it will not
+ change for its life.
+ More concretely, once you instantiate an object, you can freely pass the
+ object around and the object will always return the same values for all
+ its methods.
+ Java's 
+\family typewriter
+String
+\family default
+ class is immutable.
+ Python requires immutable classes as indexes to dictionaries.
+ Immutability is also very powerful for multithreaded applications because
+ you can pass references to immutable objects across thread boundaries without
+ having to worry about locking or synchronization because you are guaranteed
+ that the objects will not change state.
+\end_layout
+
+\begin_layout Standard
+Transformation 
+\end_layout
+
+\begin_layout Section
+Box/Option
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Box/Option"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -254,8 +393,53 @@ Scala has a ton of nice features.
 \end_layout
 
 \begin_layout Standard
-x = someOperation if !x.nil? y = someOtherOperation if !y.nil? doSomething(x,y)
- return "it worked" end end return "it failed" 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+x = someOperation 
+\end_layout
+
+\begin_layout Plain Layout
+
+if !x.nil? 
+\end_layout
+
+\begin_layout Plain Layout
+
+  y = someOtherOperation 
+\end_layout
+
+\begin_layout Plain Layout
+
+  if !y.nil? 
+\end_layout
+
+\begin_layout Plain Layout
+
+    doSomething(x,y) return "it worked" 
+\end_layout
+
+\begin_layout Plain Layout
+
+  end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+return "it failed" 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -553,11 +737,66 @@ I hope this is an understandable introduction to Scala's Option class and
  'for' comprehension and how Lift makes use of these tools.
 \end_layout
 
+\begin_layout Section
+S/SHtml
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:S/SHtml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+GUIDs
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:GUIDs"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+SessionVars and RequestVars
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:SessionVars-and-RequestVars"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Helpers
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Helpers"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Comet
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Comet"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Chapter
 Common Patterns
 \end_layout
 
-\begin_layout Chapter
+\begin_layout Section
 Dependency Injection
 \end_layout
 
@@ -675,6 +914,18 @@ s based on some rules when a session is created): if (browserIsSomethingElse)
  and provides more flexible features than most Java-based dependency injection
  frameworks without resorting to XML for configuration or byte-code rewriting
  magic.
+\end_layout
+
+\begin_layout Chapter
+SiteMap
+\end_layout
+
+\begin_layout Chapter
+REST
+\end_layout
+
+\begin_layout Chapter
+MVC (If you really want it)
 \end_layout
 
 \begin_layout Part

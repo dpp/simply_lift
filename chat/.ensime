@@ -1,0 +1,13 @@
+;; This config was generated using ensime-config-gen. Feel free to customize its contents manually. 
+
+(
+
+:project-name "Chat"
+
+:server-root "/home/dpp/bin/ensime"
+
+:project-package "code"
+
+:use-sbt t
+
+)
