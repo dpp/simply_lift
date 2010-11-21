@@ -240,6 +240,10 @@ Writing a multi-user chat application in Lift is super-simple and illustrates
  many of Lift's core concepts.
 \end_layout
 
+\begin_layout Section
+The View
+\end_layout
+
 \begin_layout Standard
 When writing a Lift app, it's often best to start off with the user interface...
  build what the user will see and then add behavior to the HTML page.
@@ -325,6 +329,515 @@ reference "sec:Snippets"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+Next, we define how we associate dynamic behavior with the list of chat
+ elements: 
+\family typewriter
+<div class="lift:comet?type=Chat">
+\family default
+.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+comet
+\begin_inset Quotes erd
+\end_inset
+
+ snippet looks for a class named 
+\family typewriter
+Chat
+\family default
+ that extends 
+\family typewriter
+CometActor
+\family default
+ and enables the mechanics of pushing content from the 
+\family typewriter
+CometActor
+\family default
+ to the browser when the state of the 
+\family typewriter
+CometActor
+\family default
+ changes.
+ 
+\end_layout
+
+\begin_layout Section
+The Chat Comet component
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset CommandInset href
+LatexCommand href
+name "Actor Model"
+target "http://en.wikipedia.org/wiki/Actor_model"
+
+\end_inset
+
+ provides state in functional languages include Erlang.
+ Lift has an Actor library and LiftActors (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:LiftActor"
+
+\end_inset
+
+) provides a powerful state and concurrency model.
+ 
+\family typewriter
+CometActors
+\family default
+ This may all seem abstract, so let's look at the 
+\family typewriter
+Chat
+\family default
+ class.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "chat/src/main/scala/code/comet/Chat.scala"
+lstparams "caption={Chat.scala},label={Chat}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+Chat
+\family default
+ component has private state, registers with the 
+\family typewriter
+ChatServer
+\family default
+, handles incoming messages and can render itself.
+ Let's look at each of those pieces.
+\end_layout
+
+\begin_layout Standard
+The private state, like any private state in prototypical object oriented
+ code, is the state that defines the object's behavior.
+\end_layout
+
+\begin_layout Standard
+registerWith is a method that defines what component to register the Chat
+ component with.
+ Registration is a part of the Listener (or 
+\begin_inset CommandInset href
+LatexCommand href
+name "Observer"
+target "http://en.wikipedia.org/wiki/Observer_pattern"
+
+\end_inset
+
+) pattern.
+ We'll look at the definition of the 
+\family typewriter
+ChatServer
+\family default
+ in a minute.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+lowPriority
+\family default
+ method define how to process incoming messages.
+ In this case, we're Pattern Matching (see 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Pattern-Matching"
+
+\end_inset
+
+) the incoming message and if it's a 
+\family typewriter
+Vector[String]
+\family default
+, then we perform the action of setting our local state to the 
+\family typewriter
+Vector
+\family default
+ and re-rendering the component.
+ The re-rendering will force the changes out to any browser that is displaying
+ the component.
+\end_layout
+
+\begin_layout Standard
+We define how to 
+\family typewriter
+render
+\family default
+ the component by defining the CSS to match and the replacement (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+).
+ We match all the 
+\family typewriter
+<li>
+\family default
+ tags the the template and for each message, create an 
+\family typewriter
+<li>
+\family default
+ tag with the child nodes set to the message.
+ Additionally, we clear all the elements that have the 
+\family typewriter
+clearable
+\family default
+ in the 
+\family typewriter
+class
+\family default
+ attribute.
+\end_layout
+
+\begin_layout Standard
+That's it for the Chat CometActor component.
+\end_layout
+
+\begin_layout Section
+The 
+\family typewriter
+ChatServer
+\end_layout
+
+\begin_layout Standard
+The ChatServer code is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "chat/src/main/scala/code/comet/ChatServer.scala"
+lstparams "caption={ChatServer.scala},label={ChatServer.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+ChatServer
+\family default
+ is defined as an 
+\family typewriter
+object
+\family default
+ rather than a 
+\family typewriter
+class
+\family default
+.
+ This makes it a singleton which can be references by the name 
+\family typewriter
+ChatServer
+\family default
+ anywhere in the application.
+ Scala's singletons differ from Java's 
+\family typewriter
+static
+\family default
+ in that the singleton is an instance of an object and that instance can
+ be passed around like any other instance.
+ This is why we can return the 
+\family typewriter
+ChatServer
+\family default
+ instance from the 
+\family typewriter
+registerWith
+\family default
+ method in that 
+\family typewriter
+Chat
+\family default
+ component.
+\end_layout
+
+\begin_layout Standard
+The ChatServer has private state, a 
+\family typewriter
+Vector[String]
+\family default
+ representing the list of chat messages.
+ Note that Scala's type inferencer infers the type of 
+\family typewriter
+msgs
+\family default
+ so you do not have the explicitly define it.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+createUpdate
+\family default
+ method generates an update to send to listeners.
+ This update is sent when a listener registers with the 
+\family typewriter
+ChatServer
+\family default
+ or when the 
+\family typewriter
+updateListeners()
+\family default
+ method is invoked.
+\end_layout
+
+\begin_layout Standard
+Finally, the 
+\family typewriter
+lowPriority
+\family default
+ method defines the messages that this component can handle.
+ If the 
+\family typewriter
+ChatServer
+\family default
+ receives a 
+\family typewriter
+String
+\family default
+ as a message, it appends the 
+\family typewriter
+String
+\family default
+ to the 
+\family typewriter
+Vector
+\family default
+ of messages and updates listeners.
+\end_layout
+
+\begin_layout Section
+User Input
+\end_layout
+
+\begin_layout Standard
+Let's go back to the view and see how the behavior is defined for adding
+ lines to the chat.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<form class="lift:form.ajax">
+\family default
+ defines an input form and the 
+\family typewriter
+form.ajax
+\family default
+ snippet turns a form into an Ajax (see 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Ajax"
+
+\end_inset
+
+) form that will be submitted back to the server without cause a full page
+ load.
+\end_layout
+
+\begin_layout Standard
+Next, we define the input form element: 
+\family typewriter
+<input class="lift:ChatIn" id="chat_in"/>
+\family default
+.
+ It's a plain old input form, but we've told Lift to modify the 
+\family typewriter
+<input>
+\family default
+'s behavior by calling the 
+\family typewriter
+ChatIn
+\family default
+ snippet.
+\end_layout
+
+\begin_layout Section
+Chat In
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+ChatIn
+\family default
+ snippet (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Snippets"
+
+\end_inset
+
+) is defined as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "chat/src/main/scala/code/snippet/ChatIn.scala"
+lstparams "caption={ChatIn.scala},label={ChatIn.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The code is very simple.
+ The snippet is defined as a method that associates a function with form
+ element submission, 
+\family typewriter
+onSubmit
+\family default
+.
+ When the element is submitted, be that normal form submission, Ajax, or
+ whatever, the function is applied to the value of the form.
+ In English, when the user submits the form, the function is called with
+ the user's input.
+\end_layout
+
+\begin_layout Standard
+The function sends the input as a message to the 
+\family typewriter
+ChatServer
+\family default
+ and returns JavaScript that sets the value of the input box to a blank
+ string.
+\end_layout
+
+\begin_layout Section
+Running it
+\end_layout
+
+\begin_layout Standard
+Running the application is easy.
+ Make sure you've got Java 1.6 or better installed on your machine.
+ Change directories into the 
+\family typewriter
+chat
+\family default
+ directory and type 
+\family typewriter
+sbt update jetty-run
+\family default
+.
+ The Simple Build Tool will download all necessary dependencies, compile
+ the program and run it.
+\end_layout
+
+\begin_layout Standard
+You can point a couple of browsers to 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://localhost:8080
+\end_layout
+
+\end_inset
+
+ and start chatting.
+\end_layout
+
+\begin_layout Standard
+Oh, and for fun, try entering 
+\family typewriter
+<script>alert('I ownz your browser');<script>
+\family default
+ and see what happens.
+ You'll note it's what you want to happen.
+\end_layout
+
+\begin_layout Section
+What you don't see
+\end_layout
+
+\begin_layout Standard
+Excluding imports and comments, there are about 20 lines of Scala code to
+ implement a multi-threaded, multi-user chat application.
+ That's not a lot.
+\end_layout
+
+\begin_layout Standard
+The first thing that's missing is synchronization or other explicit forms
+ of thread locking.
+ The application takes advantage of Actors and immutable data structures,
+ thus the developer can focus on the business logic rather than the threading
+ and locking primatives.
+\end_layout
+
+\begin_layout Standard
+The next thing that's missing is routing and controllers and other stuff
+ that you might have to do to wire up Ajax calls and polling for server-side
+ changes (long or otherwise).
+ In our application, we associated behavior with display and Lift took care
+ of the rest (see 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Page-rewriting"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+We didn't do anything to explicitly to avoid cross-site scripting in our
+ application.
+ Because Lift takes advantage of Scala's strong typing and type safety (see
+ 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Type-safety"
+
+\end_inset
+
+), Lift knows the difference between a String that must be HTML encoded
+ and an HTML element that's already properly encoded.
+ By default, Lift applications are resistant to many of the OWASP top 10
+ security vulnerabilities (see 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Security"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+This example shows many of Lift's strengths.
+ Let's expand the application and see how Lift's strengths continue to support
+ the development of the application.
+\end_layout
+
+\begin_layout Chapter
+Chat Plus
+\end_layout
+
+\begin_layout Chapter
+Chat with Rooms
 \end_layout
 
 \begin_layout Chapter
@@ -760,6 +1273,17 @@ name "sec:GUIDs"
 \end_layout
 
 \begin_layout Section
+LiftRules
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:LiftRules"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 SessionVars and RequestVars
 \begin_inset CommandInset label
 LatexCommand label
@@ -782,10 +1306,486 @@ name "sec:Helpers"
 \end_layout
 
 \begin_layout Section
+CSS Selector Transforms
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Lift 2.2-M1 introduced a new mechanism for transforming XHTML: CSS Selector
+ Transforms (
+\family typewriter
+CssBindFunc
+\family default
+).
+ The new mechanism provides a subset of CSS selectors that can be used to
+ transform 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+ Examples of this feature include:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"#name" #> userName
+\family default
+ // replace the element with the id name with the variable userName 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"#chat_lines *" #> listOfChats
+\family default
+ // replace the content of chat_lines with each element of listOfChats 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+".pretty *" #> <b>Unicorn</b>
+\family default
+ // each element with CSS class pretty, replace content with <b>Unicorn</b>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"dog=cat [href]" #> "http://dogscape.com"
+\family default
+ // set the href attribute of all elements with the dog attribute set to
+ cat 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"#name" #> userName & "#age" #> userAge
+\family default
+ // set name to userName and age to userAge
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"li *" #> userName & "li [class]" #> "foo"
+\family default
+ // set the contents of all <li> element with username and class to foo
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"li *" #> userName & "li [class+]" #> "foo"
+\family default
+ // set the contents of all <li> element with username and append foo to
+ the class
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"*" #> <span>{userName}</span>
+\family default
+ // set all the elements to <span>{userName}</span>
+\end_layout
+
+\begin_layout Standard
+CSS Selector Transforms extends 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+...
+ they are quite literally functions and can be passes as a parameter to
+ anything expecting 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ or returned as a result for any method that returns 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Let's look at each of the pieces to see how they work.
+\end_layout
+
+\begin_layout Standard
+First, you must 
+\family typewriter
+import net.liftweb.util._
+\family default
+ and 
+\family typewriter
+import Helpers._
+\family default
+ These packages include the classes and the implicit conversions that make
+ the CSS Selector Tranforms work.
+\end_layout
+
+\begin_layout Standard
+The transform is defined by: String representing selector #> transform value.
+\end_layout
+
+\begin_layout Standard
+The selector is a String constant which implements the following subset
+ of CSS Selectors:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+#id
+\family default
+ - selects the element with the specified id 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+.class
+\family default
+ - selects all elements have a class attribute where one of the space-separated
+ values equals class 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+attr_name=attr_value
+\family default
+ - selects all elements where the given attribute equals the given value
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+element_name
+\family default
+ - selects all the elements matching the name
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+*
+\family default
+ - selects all elements
+\end_layout
+
+\begin_layout Standard
+You can put replacement rules after the selector:
+\end_layout
+
+\begin_layout Itemize
+none (e.g., 
+\family typewriter
+"#id"
+\family default
+) replaces all matching elements with the values
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name" #> "David" // <span><span id="name"/></span> -> <span>David</span>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+*
+\family default
+ (e.g., "
+\family typewriter
+#id *
+\family default
+") replaces the content children of the matching elements with the values
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name *" #> "David" // <span><span id="name"/></span> -> <span><span id="name>D
+avid</span></span>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+[attr]
+\family default
+ (e.g., "#id 
+\family typewriter
+[href]
+\family default
+") replaces the matching attribute's value with the values.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#link [href]" #> "http://dogscape.com" 
+\begin_inset Newline newline
+\end_inset
+
+// <a href="#" id="link">Dogscape</a> -> <a href="http://dogscape.com" id="link">
+Dogscape</a>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+[attr+]
+\family default
+ (e.g., "#id 
+\family typewriter
+[class+]
+\family default
+") appends the value to the existing attribute.
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"span [class+]" #> "error" 
+\begin_inset Newline newline
+\end_inset
+
+// <span class"foo">Dogscape</span> -> <span class"foo error">Dogscape</span>
+\end_layout
+
+\begin_layout Standard
+The right hand side of the CSS Selector Transform can be one of the following:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+String
+\family default
+ -- a 
+\family typewriter
+String
+\family default
+ constant, for example: 
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> "David" // <span id="name"/> -> <span id="name">David</span>
+ 
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> getUserNameAsString
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+NodeSeq
+\family default
+ - a 
+\family typewriter
+NodeSeq
+\family default
+ constant, for example:
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> <i>David</i> // <span id="name"/> -> <span id="name"><i>David</i></
+span>
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> getUserNameAsHtml
+\end_layout
+
+\begin_layout Itemize
+NodeSeq => NodeSeq -- a function that transforms the node (yes, it can be
+ a CssBindFunc):
+\begin_inset Newline newline
+\end_inset
+
+"#name" #> (n: NodeSeq) => n % ("class" -> "dog") // <span id="name"/> ->
+ <span id="name" class="dog"/>
+\end_layout
+
+\begin_layout Itemize
+Bindable -- something that implements the Bindable trait (e.g., MappedField
+ and Record.Field)
+\end_layout
+
+\begin_layout Itemize
+StringPromotable -- A constant that can be promoted to a String (Int, Symbol,
+ Long or Boolean).
+ There is an automatic (implicit) conversion from Int, Symbol, Long or Boolean
+ to StringPromotable.
+\begin_inset Newline newline
+\end_inset
+
+"#id_like_cats" #> true "#number_of_cats" #> 2
+\end_layout
+
+\begin_layout Itemize
+IterableConst -- A Box, Seq, or Option of String, NodeSeq, or Bindable.
+ Implicit conversions automatically promote the likes of Box[String], List[Strin
+g], List[NodeSeq], etc.
+ to IterableConst.
+\begin_inset Newline newline
+\end_inset
+
+"#id" #> (Empty: Box[String]) // <span><span id="id">Hi</span></span> ->
+ <span/>
+\begin_inset Newline newline
+\end_inset
+
+"#id" #> List("a", "b", "c") // <span><span id="id"/></span> -> <span>abc</span>
+\begin_inset Newline newline
+\end_inset
+
+"#id [href]" #> (None: Option[String]) <a id="id" href="dog"/> -> <a id="id"/>
+\end_layout
+
+\begin_layout Itemize
+List[NodeSeq => NodeSeq], Box[NodeSeq => NodeSeq], Option[NodeSeq => NodeSeq]
+ - 
+\end_layout
+
+\begin_layout Standard
+Note that if you bind to the children of a selected element, multiple copies
+ of the element result from bind to an IterableConst (if the element has
+ an id attribute, the id attribute will be stripped after the first element):
+ "#line *" #> List("a", "b", "c") // <li id="line>sample</li> -> <li id="line">a
+</li><li>b</li><li>c</li> "#age *" #> (None: Option[NodeSeq]) // <span><span
+ id="age">Dunno</span></span> -> <span/>
+\end_layout
+
+\begin_layout Standard
+The above use cases may seem a little strange (they are not quite orthogonal),
+ but they address common use cases in Lift.
+ * IterableFunc -- A Box, Seq, or Option of functions that transform NodeSeq
+ => String, NodeSeq, Seq[String], Seq[NodeSeq], Box[String], Box[NodeSeq],
+ Option[String] or Option[NodeSeq].
+ The same rules for handling multiple values in IterableConst apply to IterableF
+unc.
+ Implicit conversions automatically promote the functions with the appropriate
+ signature to an IterableFunc.
+\end_layout
+
+\begin_layout Standard
+You can chain CSS Selector Transforms with the 
+\family typewriter
+&
+\family default
+ method:
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#id" #> "33" & "#name" #> "David" & "#chat_line" #> List("a", "b", "c")
+ & ClearClearable
+\end_layout
+
+\begin_layout Standard
+CSS Selector Transforms offer an alternative to Lift's traditional binding
+ (See Helpers.bind()).
+\end_layout
+
+\begin_layout Section
+Client-side behavior invoking server-side functions
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Client-side-behavior-invoking"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Ajax
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Ajax"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Comet
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Comet"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+LiftActor
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:LiftActor"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Pattern Matching
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Pattern-Matching"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Type safety
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Type-safety"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Page rewriting
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Page-rewriting"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Security
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Security"
 
 \end_inset
 
@@ -1269,6 +2269,56 @@ How Lift does function/GUID mapping
 
 \begin_layout Chapter
 How Lift does Comet
+\end_layout
+
+\begin_layout Standard
+I can speak to Lift's Comet Architecture which was selected by Novell to
+ power their Pulse product after they evaluated a number of different technologi
+es.
+\end_layout
+
+\begin_layout Standard
+Lift's Comet implementation uses a single HTTP connection to poll for changes
+ to an arbitrary number of components on the page.
+ Each component has a version number.
+ The long poll includes the version number and the component GUID.
+ On the server side, a listener is attached to all of the GUIDs listed in
+ the long poll requests.
+ If any of the components has a higher version number (or the version number
+ increases during the period of the long poll), the deltas (a set of JavaScript
+ describing the change from each version) is sent to the client.
+ The deltas are applied and the version number on the client is set to the
+ highest version number for the change set.
+\end_layout
+
+\begin_layout Standard
+Lift integrates long polling with session management so that if a second
+ request comes into the same URL during a long poll, the long poll is terminated
+ to avoid connection starvation (most browsers have a maximum of 2 HTTP
+ connections per named server).
+ Lift also supports DNS wild-carded servers for long poll requests such
+ that each tab in the browser can do long polling against a different DNS
+ wildcarded server.
+ This avoids the connection starvation issues.
+\end_layout
+
+\begin_layout Standard
+Lift dynamically detects the container the Servlet is running in and on
+ Jetty 6 & 7 and (soon) Glassfish, Lift will use the platform's "continuations"
+ implementation to avoid using a thread during the long poll.
+\end_layout
+
+\begin_layout Standard
+Lift's JavaScript can sit on top of jQuery and YUI (and could sit on top
+ of Prototype/Scriptaculous as well.) The actual polling code includes back-off
+ on connection failures and other "graceful" ways of dealing with transient
+ connection failures.
+\end_layout
+
+\begin_layout Standard
+I've looked at Atmosphere and CometD (both JVM-oriented Comet technologies).
+ Neither had (at the time I evaluated them) support for multiple components
+ per page or connection starvation avoidance.
 \end_layout
 
 \end_body
