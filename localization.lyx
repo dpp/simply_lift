@@ -1,0 +1,415 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip bigskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Localization
+\end_layout
+
+\begin_layout Standard
+Lift has broad support for localization at the page and element level.
+\end_layout
+
+\begin_layout Subsection
+Localizing Templates
+\end_layout
+
+\begin_layout Standard
+The locale for the current request is calculated based on the function in
+ 
+\family typewriter
+LiftRules.localeCalculator
+\family default
+.
+ By default, the function looks at the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Locale in the HTTP request"
+target "http://download.oracle.com/javaee/1.2.1/api/javax/servlet/ServletRequest.html#getLocale%28%29"
+
+\end_inset
+
+.
+ But you can change this function to look at the Locale for the current
+ user by changing 
+\family typewriter
+LiftRules.localeCalculator
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+When a template is requested, Lift's 
+\family typewriter
+TemplateFinder
+\family default
+ looks for a template with the suffix 
+\family typewriter
+_langCOUNTRY.html
+\family default
+, then 
+\family typewriter
+_lang.html
+\family default
+, then 
+\family typewriter
+.html
+\family default
+.
+ So, if you're loading 
+\family typewriter
+/frog
+\family default
+ and your Locale is 
+\family typewriter
+enUS
+\family default
+, then Lift will look for 
+\family typewriter
+/frog_enUS.html
+\family default
+, then 
+\family typewriter
+/frog_en.html
+\family default
+, then 
+\family typewriter
+/frog.html
+\family default
+.
+ But if your Locale is Czech, then Lift would look for 
+\family typewriter
+/frog_csCZ.html
+\family default
+, 
+\family typewriter
+/frog_cs.html
+\family default
+, and 
+\family typewriter
+/frog.html
+\family default
+.
+ The same lookup mechanism is used for templates accessed via the Surround
+ (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Tail"
+
+\end_inset
+
+) and Embed (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Embed"
+
+\end_inset
+
+) snippets.
+ So, at the template level, Lift offers very flexible templating.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+Note: Lift parses all templates in UTF-8.
+ Please make sure your text editor is set to UTF-8 encoding.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Resource Lookup
+\end_layout
+
+\begin_layout Standard
+Lift uses the following mechanism to look up resources.
+ Localized resources are stored in template files along-side your HTML pages.
+ The same parser is used to load resources and the pages themselves.
+ A global set of resources is searched for in the following files: 
+\family typewriter
+/_resources.html
+\family default
+, 
+\family typewriter
+/templates-hidden/_resources.html
+\family default
+, and 
+\family typewriter
+/resources-hidden/_resources.html
+\family default
+.
+ Keep in mind that Lift will look for the _resources file using the suffixes
+ based on the Locale.
+\end_layout
+
+\begin_layout Standard
+The resource file should be in the following format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<resources>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="hello">Ahoj</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="my_lang">Můj jazyk: </res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="set_locale">Nastavit <b>Národní</b></res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="change">Změnit</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+</resources>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition to global resource files, there are per-page resource files
+ (based on the current 
+\family typewriter
+Req
+\family default
+.) If you are currently requesting page 
+\family typewriter
+/foo/bar
+\family default
+, the following resource files will also be consulted: 
+\family typewriter
+/foo/_resources_bar.html
+\family default
+, 
+\family typewriter
+/templates-hidden/foo/_resources_bar.html
+\family default
+, and 
+\family typewriter
+/foo/resources-hidden/_resources_bar.html
+\family default
+ (and all Locale-specific suffixes.) You can choose to create a separate
+ resource file for each locale, or lump multiple locales into the 
+\family typewriter
+_resources_bar.html
+\family default
+ file itself using the following format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<resources>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="hello" lang="cs">Ahoj</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="hello" lang="en" default="true">Hello</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="hello" lang="en" country="US">Howdy, dude!</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="my_lang" lang="cs">Můj jazyk: </res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="my_lang" lang="en" default="true">My Language: </res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="set_locale" lang="cs">Nastavit Národní</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="set_locale" lang="en" default="true">Set Locale</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="change" lang="cs">Změnit</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="change" lang="en" default="true">Change</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+</resources>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Accessing Resources
+\end_layout
+
+\begin_layout Standard
+Lift makes it easy to access resources.
+\end_layout
+
+\begin_layout Standard
+From snippets: 
+\family typewriter
+<span class="lift:Loc.hello">This Hello will be replaced if possible</span>
+\family default
+ Note that the value after the .
+ in the snippet invocation is used to look up the resource name.
+\end_layout
+
+\begin_layout Standard
+From code:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+S.loc("hello")
+\family default
+ - return a 
+\family typewriter
+Box[NodeSeq]
+\family default
+ containing the localized value for the resource named 
+\begin_inset Quotes eld
+\end_inset
+
+hello
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+S.??("Hello World")
+\family default
+ - look for a resource named 
+\begin_inset Quotes eld
+\end_inset
+
+Hello World
+\begin_inset Quotes erd
+\end_inset
+
+ and return the String value for that resource.
+ If the resource is not found, return 
+\begin_inset Quotes eld
+\end_inset
+
+Hello World
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Conclusion
+\end_layout
+
+\begin_layout Standard
+Lift offers a broad range of mechanisms for localizing your application
+ on a page-by-page and resource-by-resource by-resource basis.
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,427 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Section
+HtmlProperties, XHTML and HTML5
+\end_layout
+
+\begin_layout Standard
+Lift unifies many aspects of parsing and displaying the HTML page in a single
+ trait, 
+\family typewriter
+HtmlProperties
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+HtmlProperties defines, on a session-by-session (and even a request-by-request)
+ basis, the way that templates are parsed and the way that Scala's 
+\family typewriter
+NodeSeq
+\family default
+ is converted into valid HTML output.
+ The properties on 
+\family typewriter
+HtmlProperties
+\family default
+ are:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+docType
+\family default
+ - the DocType for the HTML page, e.g., 
+\family typewriter
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/T
+R/xhtml1/DTD/xhtml1-transitional.dtd">
+\family default
+ or 
+\family typewriter
+<!DOCTYPE html>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+encoding
+\family default
+ - the page's encoding, e.g., 
+\family typewriter
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Itemize
+contentType - the setting of the Content-Type response header, e.g., 
+\family typewriter
+application/xhtml+xml; charset=utf-8
+\family default
+ or 
+\family typewriter
+text/html; charset=utf-8
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+htmlOutputHeader
+\family default
+ - calculates the way to combine the 
+\family typewriter
+docType
+\family default
+ and 
+\family typewriter
+encoding
+\family default
+ (this is important for IE6 support where encoding goes after docType).
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+htmlParser
+\family default
+ - a function that converts an 
+\family typewriter
+InputStream
+\family default
+ to a 
+\family typewriter
+Box[NodeSeq]
+\family default
+.
+ This is used by Lift to parse templates.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+htmlWriter
+\family default
+ - a function that writes a 
+\family typewriter
+NodeSeq
+\family default
+ to a 
+\family typewriter
+Writer
+\family default
+.
+ This is used by Lift to convert the internal XML representation of a page
+ to a stream of bytes representing an HTML page.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+html5FormsSupport
+\family default
+ - a flag indicating whether the current browser supports HTML5 forms.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+maxOpenRequests
+\family default
+ - the maximum number of concurrent HTTP requests the browser supports to
+ a named host.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+userAgent
+\family default
+ - the User-Agent string sent from the browser.
+\end_layout
+
+\begin_layout Subsection
+XHTML via 
+\family typewriter
+OldHtmlProperties
+\end_layout
+
+\begin_layout Standard
+The default properties that keep compability with the disparate LiftRules
+ used to calculate DocType and Encoding.
+ Uses the 
+\family typewriter
+PCDataXmlParser
+\family default
+ parser which requires well-formed XML files.
+ Output is generally XHTML via 
+\family typewriter
+AltXML.toXML
+\family default
+, but cerain tags (e.g., 
+\family typewriter
+<br>
+\family default
+) are written in IE6/IE7 friendly ways.
+\end_layout
+
+\begin_layout Subsection
+HTML5 via 
+\family typewriter
+Html5Properties
+\end_layout
+
+\begin_layout Standard
+Prior to Lift 2.2, Lift always emitted XHTML and by default set the Content-Type
+ header to 
+\family typewriter
+application/xhtml+xml; charset=utf-8
+\family default
+.
+ This continues to be Lift's default behavior.
+ It turns out that most browsers, even modern ones (Firefox, Chrome and
+ Safari) had issues with XHTML.
+ Further, XHTML limited the behavior of certain JavaScript libraries.
+\end_layout
+
+\begin_layout Standard
+By invoking 
+\family typewriter
+LiftRules.htmlProperties.default.set((r: Req) => new Html5Properties(r.userAgent))
+\family default
+ in Boot.scala, you can set Lift to full HTML5 support.
+ Lift uses the 
+\begin_inset CommandInset href
+LatexCommand href
+name "nu.validator"
+target "http://about.validator.nu/htmlparser/"
+
+\end_inset
+
+ HTML parser and emits the correct DocType and response headers such that
+ all tested browsers (IE6+, Firefox 2+, Safari 2+, Chrome 1+) render pages
+ correctly.
+\end_layout
+
+\begin_layout Standard
+Because the HTML5 parser is different from the standard XML parser, you
+ will need to adjust your existing templates in the following ways:
+\end_layout
+
+\begin_layout Itemize
+All tags are converted to lower case.
+ This means the 
+\family typewriter
+<lift:FooBar/>
+\family default
+ gets converted to 
+\family typewriter
+<lift:foobar/>
+\family default
+ I advise converting to designer friendly where possible (e.g., 
+\family typewriter
+<div class="lift:FooBar"></div>
+\family default
+).
+\end_layout
+
+\begin_layout Itemize
+Tags of the format 
+\family typewriter
+<div/>
+\family default
+ and 
+\family typewriter
+<my_thing:bind/>
+\family default
+ are not legal.
+ They must be converted to 
+\family typewriter
+<div></div>
+\family default
+ and 
+\family typewriter
+<my_thing:bind></my_thing:bind>
+\family default
+.
+ Unfortunately, the parser is very forgiving so rather than barking about
+ the lack of closing tag, the parser will nest things in unexpected ways.
+\end_layout
+
+\begin_layout Itemize
+There are some tags that the parser "ensures".
+ For example a 
+\family typewriter
+<tr>
+\family default
+, 
+\family typewriter
+<thead>
+\family default
+, or 
+\family typewriter
+<tbody>
+\family default
+ tag 
+\series bold
+must
+\series default
+ be the first tag inside 
+\family typewriter
+<table>
+\family default
+.
+ This breaks the 
+\family typewriter
+
+\begin_inset Newline newline
+\end_inset
+
+<table><mysnippet:line>
+\begin_inset Newline newline
+\end_inset
+
+<tr><td><mysnippet:bind_here></mysnippet:bind_here></td></tr>
+\begin_inset Newline newline
+\end_inset
+
+</mysnippet:line><table>
+\family default
+ 
+\begin_inset Newline newline
+\end_inset
+
+paradigm.
+ You can get the desired behavior with
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+<table><tr lift:bind="mysnippet:line"><td><mysnippet:bind_here></mysnippet:bind_
+here></td></tr><table>
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Changing behavior mid-session or mid-request
+\end_layout
+
+\begin_layout Standard
+You can change the behavior of HtmlProperties mid-session or mid-request.
+ 
+\family typewriter
+LiftSession.sessionHtmlProperties
+\family default
+ is a 
+\family typewriter
+SessionVar
+\family default
+ that contains the 
+\family typewriter
+HtmlProperties
+\family default
+ for the session.
+ 
+\family typewriter
+LiftSession.requestHtmlProperties
+\family default
+ is a 
+\family typewriter
+TranientRequestVar
+\family default
+ containing the 
+\family typewriter
+HtmlProperties
+\family default
+ for the request.
+ At the begining of the request, 
+\family typewriter
+requestHtmlProperties
+\family default
+ is set to the value of 
+\family typewriter
+sessionHtmlProperties
+\family default
+.
+ You can alter a property for the duration of the request using:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+for {
+\end_layout
+
+\begin_layout Plain Layout
+
+  session <- S.session
+\end_layout
+
+\begin_layout Plain Layout
+
+} session.requestHtmlProperties.set(session.
+\end_layout
+
+\begin_layout Plain Layout
+
+          requestHtmlProperties.is.setDocType(() => 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                   Full("<!DOCTYPE moose>")))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

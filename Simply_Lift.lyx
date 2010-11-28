@@ -56,7 +56,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-11/20/2010
+11/27/2010
 \end_layout
 
 \begin_layout Standard
@@ -1796,6 +1796,20 @@ name "sec:Security"
 Common Patterns
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "localization.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
 \begin_layout Section
 Dependency Injection
 \end_layout
@@ -1914,6 +1928,221 @@ s based on some rules when a session is created): if (browserIsSomethingElse)
  and provides more flexible features than most Java-based dependency injection
  frameworks without resorting to XML for configuration or byte-code rewriting
  magic.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "htmlproperties.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Built-in Snippets
+\end_layout
+
+\begin_layout Section
+CSS
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:CSS"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Msgs"
+
+\end_inset
+
+Msgs
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Msg"
+
+\end_inset
+
+Msg
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Menu"
+
+\end_inset
+
+Menu
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:A"
+
+\end_inset
+
+A
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Children"
+
+\end_inset
+
+Children
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:CometSnippet"
+
+\end_inset
+
+Comet
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Form"
+
+\end_inset
+
+Form
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Ignore"
+
+\end_inset
+
+Ignore
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Loc"
+
+\end_inset
+
+Loc
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Surround"
+
+\end_inset
+
+Surround
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:TestCond"
+
+\end_inset
+
+TestCond
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Embed"
+
+\end_inset
+
+Embed
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tail"
+
+\end_inset
+
+Tail
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:WithParam"
+
+\end_inset
+
+WithParam
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:VersionInfo"
+
+\end_inset
+
+VersionInfo
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:SkipDocType"
+
+\end_inset
+
+SkipDocType
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:XmlGroup"
+
+\end_inset
+
+XmlGroup
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:LazyLoad"
+
+\end_inset
+
+LazyLoad
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:WithResourceId"
+
+\end_inset
+
+WithResourceId
 \end_layout
 
 \begin_layout Chapter
