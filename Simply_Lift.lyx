@@ -37,7 +37,7 @@ figs-within-sections
 \defskip medskip
 \quotes_language english
 \papercolumns 1
-\papersides 1
+\papersides 2
 \paperpagestyle default
 \tracking_changes false
 \output_changes false
@@ -251,10 +251,21 @@ When writing a Lift app, it's often best to start off with the user interface...
 \end_layout
 
 \begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "chat/src/main/webapp/index.html"
 lstparams "caption={index.html}"
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -2159,6 +2170,136 @@ MVC (If you really want it)
 
 \begin_layout Part
 Recipes
+\end_layout
+
+\begin_layout Chapter
+Dynamically choosing content
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Standard
+I want to to keep design completely separated from logic and I am bit stuck.
+ I have a page that loads different pieces of html depending on some variables
+ and it also has some ajax code so it may load new pieces of html.
+ So far, that page uses only one snippet that has the logic to decide what
+ html should be loaded.
+ So here is the question, how should the snippet get an only-with-design
+ piece of html to bind data to it.
+\end_layout
+
+\begin_layout Section
+Solution
+\end_layout
+
+\begin_layout Standard
+Snippets are evaluated recursively...
+ this means that you can return markup from a snippet that contains other
+ snippets.
+\end_layout
+
+\begin_layout Standard
+The other thing to pay attention to is the 
+\family typewriter
+<lift:embed>
+\family default
+ snippet (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Embed"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Combining the two:
+\end_layout
+
+\begin_layout Standard
+Main page:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<html><body> Stuff here
+\end_layout
+
+\begin_layout Plain Layout
+
+<div class="lift:ChooseBehavior">Different behavior will go here</div>
+\end_layout
+
+\begin_layout Plain Layout
+
+</body></html>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The snippet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object ChooseBehavior {
+\end_layout
+
+\begin_layout Plain Layout
+
+  def render = someState match {
+\end_layout
+
+\begin_layout Plain Layout
+
+    case ShowData => <lift:embed what="_showData" />
+\end_layout
+
+\begin_layout Plain Layout
+
+    case EditData => <lift:embed what="_editData" />
+\end_layout
+
+\begin_layout Plain Layout
+
+    case AjaxThing => <lift:embed what="_ajaxThing" />
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then your designer need only edit the main page and each of the templates,
+ and then you wire them together.
 \end_layout
 
 \begin_layout Part
