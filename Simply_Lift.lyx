@@ -3,6 +3,51 @@
 \begin_document
 \begin_header
 \textclass book
+\begin_preamble
+\usepackage[notbib]{tocbibind}
+\usepackage{breakurl}
+\usepackage{textcomp}
+\usepackage[htt]{hyphenat}
+
+% redefine the \LyX macro for PDF bookmarks
+\def\LyX{\texorpdfstring{%
+  L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@}
+  {LyX }}
+
+
+% "define" Scala
+\lstdefinelanguage{scala}{morekeywords={abstract,case,catch,class,def,do,else,extends,false,final,finally,for,forSome,if,implicit,import,lazy,match,new,null,object,override,package,private,protected,return,sealed,super,this,throw,trait,try,true,type,val,var,while,with,yield},
+otherkeywords={=>,<-,<:,<\%,>:},
+sensitive=true,
+morecomment=[l]{//},
+morecomment=[s]{/*}{*/},
+morestring=[b]"}
+
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+
+% Default settings for code listings
+\lstset{frame=tb,
+language=scala,
+aboveskip=3mm,
+belowskip=3mm,
+showstringspaces=false,
+columns=flexible,
+basicstyle={\small\ttfamily},
+keywordstyle=\color{blue},
+commentstyle=\color{darkgreen},
+stringstyle=\color{red},
+upquote=true,
+showtabs=true,
+tab=BADTAB,
+numbers=left,
+numberstyle=\tiny}
+
+% Fix the List of Listings title
+\renewcommand{\lstlistlistingname}{List of Listings}
+
+% Be less rigorous with line breaking
+\sloppy
+\end_preamble
 \use_default_options true
 \begin_modules
 theorems-ams
@@ -10,10 +55,10 @@ eqs-within-sections
 figs-within-sections
 \end_modules
 \language english
-\inputencoding auto
-\font_roman default
+\inputencoding latin2
+\font_roman palatino
 \font_sans default
-\font_typewriter default
+\font_typewriter courier
 \font_default_family default
 \font_sc false
 \font_osf false
@@ -21,9 +66,21 @@ figs-within-sections
 \font_tt_scale 100
 
 \graphics default
-\paperfontsize default
+\paperfontsize 11
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_title "Simply Lift"
+\pdf_author "David Pollak"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle false
+\pdf_quoted_options "urlcolor=blue,linkcolor=blue"
 \papersize letterpaper
 \use_geometry true
 \use_amsmath 1
@@ -31,6 +88,10 @@ figs-within-sections
 \cite_engine basic
 \use_bibtopic false
 \paperorientation portrait
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
 \secnumdepth 2
 \tocdepth 2
 \paragraph_separation skip
@@ -38,7 +99,7 @@ figs-within-sections
 \quotes_language english
 \papercolumns 1
 \papersides 2
-\paperpagestyle default
+\paperpagestyle headings
 \tracking_changes false
 \output_changes false
 \author "" 
@@ -46,6 +107,22 @@ figs-within-sections
 \end_header
 
 \begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+frontmatter
+\end_layout
+
+\end_inset
+
+
+\end_layout
 
 \begin_layout Title
 Simply Lift
@@ -60,10 +137,24 @@ David Pollak
 \end_layout
 
 \begin_layout Standard
-\begin_inset Newpage pagebreak
+\noindent
+Copyright © 2010 by David Pollak
+\begin_inset Newline newline
 \end_inset
 
+This document is licensed Creative Commons Attribution, Non Commercial,
+ No Derivatives: 
+\begin_inset Flex URL
+status open
 
+\begin_layout Plain Layout
+
+http://creativecommons.org/licenses/by-nc-nd/3.0/
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
@@ -76,7 +167,40 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Standard
-\begin_inset Newpage clearpage
+\begin_inset FloatList figure
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+lstlistoflistings
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mainmatter
+\end_layout
+
 \end_inset
 
 
@@ -175,7 +299,17 @@ target "http://exploring.liftweb.net/"
 \begin_layout Standard
 Lift is different from most web frameworks and it's likely that Lift's differenc
 es will present a challenge and a friction if you are familiar with the
- MVC school of web frameworks
+ MVC
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+MVC
+\end_layout
+
+\end_inset
+
+ school of web frameworks
 \begin_inset Foot
 status open
 
@@ -251,21 +385,10 @@ When writing a Lift app, it's often best to start off with the user interface...
 \end_layout
 
 \begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "chat/src/main/webapp/index.html"
-lstparams "caption={index.html}"
-
-\end_inset
-
-
-\end_layout
+lstparams "caption={index.html},language=XML"
 
 \end_inset
 
@@ -2689,6 +2812,15 @@ Lift's JavaScript can sit on top of jQuery and YUI (and could sit on top
 I've looked at Atmosphere and CometD (both JVM-oriented Comet technologies).
  Neither had (at the time I evaluated them) support for multiple components
  per page or connection starvation avoidance.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset index_print
+LatexCommand printindex
+
+\end_inset
+
+
 \end_layout
 
 \end_body

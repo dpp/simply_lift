@@ -1,0 +1,83 @@
+# -*- perl -*-
+package main;
+
+sub do_env_lstlisting {
+    local($liststyle,$listcaption,$listlabel,$listlang);
+
+    $liststyle = "style=\"border: 2px solid #ddd;\"";
+
+    if (/label=(.*?),/) {
+        $listlabel = "<div $liststyle id=\"$1\">";
+    } else {
+        $listlabel = "<div $liststyle>";
+    }
+
+    if (/caption=(.*?),/) {
+        $listcaption = "<div style=\"text-align: center; font-weight: bold\">$1</div>";
+    } else {
+        $listcaption = "";
+    }
+
+    if (/language=XML/) {
+        $listlang = "class=\"brush: xml\"";
+    } elsif (/language=HTML/) {
+        $listlang = "class=\"brush: html\"";
+    } else {
+        $listlang = "class=\"brush: scala\"";
+    }
+
+    $result = join('',"$listlabel$listcaption<pre $listlang>","@_","</pre></div>");
+
+    $result =~ s/\[.*\]//;
+
+    $result;
+}
+
+sub do_cmd_lstinputlisting {
+    local($liststyle,$listcaption,$listlabel,$listlang,$listsrc,$rest);
+
+    if (/\].*>(\S+)<(.*)/) {
+        $listsrc = do {
+            local $/ = undef;
+            open my $fh, "<", "../$1"
+                or die "could not open \"$1\": $!";
+            <$fh>;
+        };
+
+        # Let's attempt to escape left angles. Frustratingly, 15 minutes
+        # on google led to no good suggestions on escaping XML
+        $listsrc =~ s/</&lt;/;
+
+        $rest = $2;
+    }
+
+    $liststyle = "style=\"border: 2px solid #ddd;\"";
+
+    if (/label=(.*?),/) {
+        $listlabel = "<div $liststyle id=\"$1\">";
+    } else {
+        $listlabel = "<div $liststyle>";
+    }
+
+    if (/caption=(.*?),/) {
+        $listcaption = "<div style=\"text-align: center; font-weight: bold\">$1</div>";
+    } else {
+        $listcaption = "";
+    }
+
+    if (/language=XML/) {
+        $listlang = "class=\"brush: xml\"";
+    } elsif (/language=HTML/) {
+        $listlang = "class=\"brush: html\"";
+    } else {
+        $listlang = "class=\"brush: scala\"";
+    }
+
+    $result = join('',"$listlabel$listcaption<pre $listlang>","$listsrc","</pre></div>$2");
+
+    $result =~ s/\[.*\]//;
+
+    $result;
+}
+
+1;			# Must be last line

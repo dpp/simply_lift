@@ -52,3 +52,17 @@ lift_proto*
 # Pax Runner (for easy OSGi launching)
 runner
 
+# LyX-generated artifacts
+*.aux
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lol
+*.out
+*.pdf
+*.tex
+*.toc
+Simply_Lift/
+Simply_Lift.html.tgz
