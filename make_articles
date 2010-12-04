@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm -rf Simply_Lift
+make clean
+make htmlpost

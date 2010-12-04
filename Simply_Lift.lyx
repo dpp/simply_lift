@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-11/27/2010
+12/3/2010
 \end_layout
 
 \begin_layout Standard
@@ -975,6 +975,10 @@ Chat with Rooms
 \end_layout
 
 \begin_layout Chapter
+Wiring
+\end_layout
+
+\begin_layout Chapter
 Core Concepts
 \end_layout
 
@@ -1102,26 +1106,106 @@ Further, null/nil are passed around as failures.
 \end_layout
 
 \begin_layout Standard
-In Java, null is a non-object.
+In Java, 
+\family typewriter
+null
+\family default
+ is a non-object.
  It has no methods.
- It is the exception to the statically typed rule (null has no class, but
- any reference of any class can be set to null.) Invoking a method on null
+ It is the exception to the statically typed rule (
+\family typewriter
+null
+\family default
+ has no class, but any reference of any class can be set to 
+\family typewriter
+null
+\family default
+.) Invoking a method on 
+\family typewriter
+null
+\family default
  has one and only one result: an exception is thrown.
- null is often returned from methods as a flag indicating that the method
- ran successfully, but yielded no meaningful value.
- For example, CardHolder.findByCreditCardNumber("2222222222") In fact, the
- guy who invented null called it a billion dollar mistake.
+ 
+\family typewriter
+null
+\family default
+ is often returned from methods as a flag indicating that the method ran
+ successfully, but yielded no meaningful value.
+ For example, 
+\family typewriter
+CardHolder.findByCreditCardNumber("2222222222")
+\family default
+ In fact, the guy who invented 
+\family typewriter
+null
+\family default
+ called it a 
+\begin_inset CommandInset href
+LatexCommand href
+name "billion dollar mistake"
+target "http://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-Ruby has nil which is marginally better than null.
- nil is a real, singleton object.
- There's only one instance of nil in the whole system.
+Ruby has 
+\family typewriter
+nil
+\family default
+ which is marginally better than 
+\family typewriter
+null
+\family default
+.
+ 
+\family typewriter
+nil
+\family default
+ is a real, singleton object.
+ There's only one instance of 
+\family typewriter
+nil
+\family default
+ in the whole system.
  It has methods.
- It is a subclass of Object.
- Object has a method called "nil?" which returns false, except the nil singleton
- overrides this method to return true.
- nil is returned much like null in Java.
+ It is a subclass of 
+\family typewriter
+Object
+\family default
+.
+ 
+\family typewriter
+Object
+\family default
+ has a method called "
+\family typewriter
+nil?
+\family default
+" which returns 
+\family typewriter
+false
+\family default
+, except the 
+\family typewriter
+nil
+\family default
+ singleton overrides this method to return 
+\family typewriter
+true
+\family default
+.
+ 
+\family typewriter
+nil
+\family default
+ is returned much like 
+\family typewriter
+null
+\family default
+ in Java.
  It's the "no valid answer" answer.
 \end_layout
 
@@ -1130,25 +1214,111 @@ Scala does something different.
 \end_layout
 
 \begin_layout Standard
-There's an abstract class, called Option.
+There's an abstract class, called 
+\family typewriter
+Option
+\family default
+.
  Options are strongly typed.
- They are declared Option[T].
- This means an Option can be of any type, but once its type is defined,
- it does not change.
- There are two subclasses of Option: Some and None.
- None is a singleton (like nil).
- Some is a container around the actual answer.
+ They are declared 
+\family typewriter
+Option[T]
+\family default
+.
+ This means an 
+\family typewriter
+Option
+\family default
+ can be of any type, but once its type is defined, it does not change.
+ There are two subclasses of 
+\family typewriter
+Option
+\family default
+: 
+\family typewriter
+Some
+\family default
+ and 
+\family typewriter
+None
+\family default
+.
+ 
+\family typewriter
+None
+\family default
+ is a singleton (like 
+\family typewriter
+nil
+\family default
+).
+ 
+\family typewriter
+Some
+\family default
+ is a container around the actual answer.
  So, you might have a method that looks like:
 \end_layout
 
 \begin_layout Standard
-def findUser(name: String): Option[User] = { val query = buildQuery(name)
- val resultSet = performQuery(query) val retVal = if (resultSet.next) Some(create
-User(resultSet)) else None resultSet.close retVal } 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def findUser(name: String): Option[User] = {
+\end_layout
+
+\begin_layout Plain Layout
+
+  val query = buildQuery(name)
+\end_layout
+
+\begin_layout Plain Layout
+
+  val resultSet = performQuery(query)
+\end_layout
+
+\begin_layout Plain Layout
+
+  val retVal = if (resultSet.next) Some(createUser(resultSet)) else None
+\end_layout
+
+\begin_layout Plain Layout
+
+  resultSet.close 
+\end_layout
+
+\begin_layout Plain Layout
+
+  retVal 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-Some, you've got a findUser method that returns either Some(User) or None.
+Some, you've got a 
+\family typewriter
+findUser
+\family default
+ method that returns either 
+\family typewriter
+Some(User)
+\family default
+ or 
+\family typewriter
+None
+\family default
+.
  So far, it doesn't look a lot different than our example above.
  So, to confuse everyone, I'm going to talk about collections for a minute.
 \end_layout
@@ -1163,7 +1333,23 @@ A really nice thing in Scala (yes, Ruby has this too) is rich list operations.
 \end_layout
 
 \begin_layout Standard
-scala> List(1,2,3).map(x => x * 2) line0: scala.List[scala.Int] = List(2,4,6)
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> List(1,2,3).map(x => x * 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+line0: scala.List[scala.Int] = List(2,4,6)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1173,16 +1359,44 @@ The above code multiplies each list item by two and "map" returns the resulting
 \end_layout
 
 \begin_layout Standard
-scala> List(1,2,3).map(_ * 2) line2: scala.List[scala.Int] = List(2,4,6)
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> List(1,2,3).map(_ * 2)
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+
+line2: scala.List[scala.Int] = List(2,4,6)
+\end_layout
+
+\end_inset
+
 You can nest map operations:
 \end_layout
 
 \begin_layout Standard
-scala> List(1,2,3).map(x => List(4,5,6).map(y => x * y)) line13: scala.List[scala.Li
-st[scala.Int]] = List(List(4,5,6),List(8,10,12),List(12,15,18))
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> List(1,2,3).map(x => List(4,5,6).map(y => x * y))
+\end_layout
+
+\begin_layout Plain Layout
+
+line13: scala.List[scala.List[scala.Int]] = List(List(4,5,6),List(8,10,12),List(12,
+15,18))
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1190,37 +1404,116 @@ And, you can "flatten" the inner list:
 \end_layout
 
 \begin_layout Standard
-scala> List(1,2,3).flatMap(x => List(4,5,6).map(y => x * y)) line14: scala.List[sca
-la.Int] = List(4,5,6,8,10,12,12,15,18)
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> List(1,2,3).flatMap(x => List(4,5,6).map(y => x * y))
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+
+line14: scala.List[scala.Int] = List(4,5,6,8,10,12,12,15,18)
+\end_layout
+
+\end_inset
+
 Finally, you can "filter" only the even numbers from the first list:
 \end_layout
 
 \begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 scala> List(1,2,3).filter(_ % 2 == 0).
- flatMap(x => List(4,5,6).map(y => x * y)) line16: scala.List[scala.Int] =
- List(8,10,12)
+ flatMap(x => List(4,5,6).map(y => x * y))
 \end_layout
 
-\begin_layout Standard
-But, as you can see, the map/flatMap/filter stuff gets pretty verbose.
+\begin_layout Plain Layout
+
+line16: scala.List[scala.Int] = List(8,10,12)
+\end_layout
+
+\end_inset
+
+But, as you can see, the 
+\family typewriter
+map
+\family default
+/
+\family typewriter
+flatMap
+\family default
+/
+\family typewriter
+filter
+\family default
+ stuff gets pretty verbose.
  Scala introduced a "for" comprehension to make the code more readable:
 \end_layout
 
 \begin_layout Standard
-scala> for {x <- List(1,2,3) if x % 2 == 0 y <- List(4,5,6)} yield x * y
- res0: List[Int] = List(8, 10, 12) 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> for {
+\end_layout
+
+\begin_layout Plain Layout
+
+  x <- List(1,2,3) if x % 2 == 0
+\end_layout
+
+\begin_layout Plain Layout
+
+  y <- List(4,5,6)} yield x * y
+\end_layout
+
+\begin_layout Plain Layout
+
+res0: List[Int] = List(8, 10, 12)
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-Okay, but what does this have to do with Option[T]?
+Okay, but what does this have to do with 
+\family typewriter
+Option[T]
+\family default
+?
 \end_layout
 
 \begin_layout Standard
-Turns out that Option implements map, flatMap, and filter (the methods necessary
- for the Scala compiler to use in the 'for' comprehension).
+Turns out that 
+\family typewriter
+Option
+\family default
+ implements 
+\family typewriter
+map
+\family default
+, 
+\family typewriter
+flatMap
+\family default
+, and 
+\family typewriter
+filter
+\family default
+ (the methods necessary for the Scala compiler to use in the 'for' comprehension
+).
  Just as a side note, when I first encountered the phrase "'for' comprehension",
  I got scared.
  I've been doing programming for years and never heard of a "comprenhension"
@@ -1235,8 +1528,27 @@ So, the cool thing is that you can use this construct very effectively.
 \end_layout
 
 \begin_layout Standard
-scala> for {x <- Some(3) y <- Some(4)} yield x * y res1: Option[Int] = Some(12)
- "That's nice, you just wrote a lot of code to multiply 3 by 4."
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> for {x <- Some(3); y <- Some(4)} yield x * y
+\end_layout
+
+\begin_layout Plain Layout
+
+res1: Option[Int] = Some(12)
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+"That's nice, you just wrote a lot of code to multiply 3 by 4."
 \end_layout
 
 \begin_layout Standard
@@ -1244,34 +1556,137 @@ Let's see what happens if we have a "None" in there:
 \end_layout
 
 \begin_layout Standard
-scala> val yOpt: Option[Int] = None yOpt: Option[Int] = None 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> val yOpt: Option[Int] = None
+\end_layout
+
+\begin_layout Plain Layout
+
+yOpt: Option[Int] = None 
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> for {x <- Some(3); y <- yOpt} yield x * y
+\end_layout
+
+\begin_layout Plain Layout
+
+res3: Option[Int] = None
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-scala> for {x <- Some(3) y <- yOpt} yield x * y res3: Option[Int] = None
- So, we get a "None" back.
+So, we get a "
+\family typewriter
+None
+\family default
+" back.
  How do we turn this into a default value?
 \end_layout
 
 \begin_layout Standard
-scala> (for {x <- Some(3); y <- yOpt} yield x * y) getOrElse -1 res4: Int
- = -1 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> (for {x <- Some(3); y <- yOpt} yield x * y) getOrElse -1
+\end_layout
+
+\begin_layout Plain Layout
+
+res4: Int = -1
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-scala> (for {x <- Some(3); y <- Some(4)} yield x * y) getOrElse -1 res5:
- Int = 12 Note that the "getOrElse" code is "passed by name".
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> (for {x <- Some(3); y <- Some(4)} yield x * y) getOrElse -1
+\end_layout
+
+\begin_layout Plain Layout
+
+res5: Int = 12
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the "
+\family typewriter
+getOrElse
+\family default
+" code is "passed by name".
  Put another way, that code is only executed if the "else" clause is valid.
 \end_layout
 
 \begin_layout Standard
-Lift has an analogous construct called Box.
+Lift has an analogous construct called 
+\family typewriter
+Box
+\family default
+.
 \end_layout
 
 \begin_layout Standard
-A Box Full or not.
- A non-Full Box can be the Empty singleton or a Failure.
- A Failure carries around information about why the Box contains no value.
+A 
+\family typewriter
+Box
+\family default
+ 
+\family typewriter
+Full
+\family default
+ or not.
+ A non-
+\family typewriter
+Full
+\family default
+ 
+\family typewriter
+Box
+\family default
+ can be the 
+\family typewriter
+Empty
+\family default
+ singleton or a 
+\family typewriter
+Failure
+\family default
+.
+ A 
+\family typewriter
+Failure
+\family default
+ carries around information about why the 
+\family typewriter
+Box
+\family default
+ contains no value.
 \end_layout
 
 \begin_layout Standard
@@ -2423,6 +2838,10 @@ object ChooseBehavior {
 \begin_layout Standard
 Then your designer need only edit the main page and each of the templates,
  and then you wire them together.
+\end_layout
+
+\begin_layout Chapter
+Ajax Forms
 \end_layout
 
 \begin_layout Part

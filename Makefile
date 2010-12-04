@@ -8,6 +8,12 @@ html	: Simply_Lift.tex Simply_Lift.aux
 	./highlightHtml.sh
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
 
+htmlpost	: Simply_Lift.tex Simply_Lift.aux 
+	@echo [Building HTML]
+	latex2html -split 4 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
+	./highlightHtml.sh
+	tar cvzf Simply_Lift.html.tgz Simply_Lift/
+
 pdf	: Simply_Lift.pdf
 
 Simply_Lift.pdf	: Simply_Lift.aux

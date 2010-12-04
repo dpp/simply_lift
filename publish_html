@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rm -rf Simply_Lift
+make clean
+make html
+tar -cjf - Simply_Lift | ssh simply.liftweb.net "rm -rf Simply_Lift ; tar -xjvf -"   
