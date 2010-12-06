@@ -4,12 +4,18 @@ all	: Simply_Lift.pdf
 
 html	: Simply_Lift.tex Simply_Lift.aux 
 	@echo [Building HTML]
+	cat Simply_Lift.tex | ./fix_double_quotes.sh > Simply_Lift_fixed.tex
+	rm Simply_Lift.tex
+	mv Simply_Lift_fixed.tex Simply_Lift.tex
 	latex2html -split 3 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
 	./highlightHtml.sh
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
 
 htmlblob	: Simply_Lift.tex Simply_Lift.aux 
 	@echo [Building HTML]
+	cat Simply_Lift.tex | ./fix_double_quotes.sh > Simply_Lift_fixed.tex
+	rm Simply_Lift.tex
+	mv Simply_Lift_fixed.tex Simply_Lift.tex
 	latex2html -split 1 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
 	./highlightHtmlBlob.sh
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
@@ -17,6 +23,9 @@ htmlblob	: Simply_Lift.tex Simply_Lift.aux
 
 htmlpost	: Simply_Lift.tex Simply_Lift.aux 
 	@echo [Building HTML]
+	cat Simply_Lift.tex | ./fix_double_quotes.sh > Simply_Lift_fixed.tex
+	rm Simply_Lift.tex
+	mv Simply_Lift_fixed.tex Simply_Lift.tex
 	latex2html -split 4 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
 	./highlightHtml.sh
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/

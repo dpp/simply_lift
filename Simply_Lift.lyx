@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-12/3/2010
+12/5/2010
 \end_layout
 
 \begin_layout Standard
@@ -785,8 +785,8 @@ reference "sec:Ajax"
 
 \end_inset
 
-) form that will be submitted back to the server without cause a full page
- load.
+) form that will be submitted back to the server without causing a full
+ page load.
 \end_layout
 
 \begin_layout Standard
@@ -1262,12 +1262,13 @@ Some
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Scala"
 inline false
 status open
 
 \begin_layout Plain Layout
 
-def findUser(name: String): Option[User] = {
+def findUser(name: String): Option[User] = { 
 \end_layout
 
 \begin_layout Plain Layout
@@ -1297,7 +1298,7 @@ def findUser(name: String): Option[User] = {
 
 \begin_layout Plain Layout
 
-}
+} 
 \end_layout
 
 \end_inset
@@ -1690,8 +1691,12 @@ Box
 \end_layout
 
 \begin_layout Standard
-Failure is very helpful because you can carry around information to display
- an error...
+
+\family typewriter
+Failure
+\family default
+ is very helpful because you can carry around information to display an
+ error...
  an HTTP response code, a message, what have you.
 \end_layout
 
@@ -1699,22 +1704,72 @@ Failure is very helpful because you can carry around information to display
 In Lift, I put this all together in the following way:
 \end_layout
 
-\begin_layout Standard
-methods that return request parameters return Box[String] finder methods
- on models (not find all, just the ones that return a single instance) return
- Box[Model] any method that would have returned a null if I was writing
- in Java returns a Box[T] in Lift That means you get code that looks like:
+\begin_layout Itemize
+methods that return request parameters return 
+\family typewriter
+Box[String]
+\family default
+ 
+\end_layout
+
+\begin_layout Itemize
+finder methods on models (not find all, just the ones that return a single
+ instance) return 
+\family typewriter
+Box[Model]
+\end_layout
+
+\begin_layout Itemize
+any method that would have returned a null if I was writing in Java returns
+ a 
+\family typewriter
+Box[T]
+\family default
+ in Lift 
 \end_layout
 
 \begin_layout Standard
-scala> for {id <- S.param("id") ?~ "id param missing" u <- getUser(id) ?~
- "User not found" } yield u.toXml res6: net.liftweb.common.Box[scala.xml.Elem]
- = Failure(id param missing,Empty,Empty) 
+That means you get code that looks like:
 \end_layout
 
 \begin_layout Standard
-There's no explicit guard/test to see if the "id" parameter was passed in
- and there's no explicit test to see if the user was found.
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> for {id <- S.param("id") ?~ "id param missing"
+\end_layout
+
+\begin_layout Plain Layout
+
+u <- getUser(id) ?~ "User not found" 
+\end_layout
+
+\begin_layout Plain Layout
+
+} yield u.toXml 
+\end_layout
+
+\begin_layout Plain Layout
+
+res6: net.liftweb.common.Box[scala.xml.Elem] = Failure(id param missing,Empty,Empty)
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There's no explicit guard/test to see if the "
+\family typewriter
+id
+\family default
+" parameter was passed in and there's no explicit test to see if the user
+ was found.
 \end_layout
 
 \begin_layout Standard
@@ -1728,14 +1783,56 @@ So, let's look at the code inside a REST handler:
 \end_layout
 
 \begin_layout Standard
-serve { case "user" :: "info" :: _ XmlGet _ => for { id <- S.param("id")
- ?~ "id param missing" ~> 401 u <- User.find(id) ?~ "User not found" } yield
- u.toXml }
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "user" :: "info" :: _ XmlGet _ => 
+\end_layout
+
+\begin_layout Plain Layout
+
+    for {
+\end_layout
+
+\begin_layout Plain Layout
+
+      id <- S.param("id") ?~ "id param missing" ~> 401 
+\end_layout
+
+\begin_layout Plain Layout
+
+      u <- User.find(id) ?~ "User not found" 
+\end_layout
+
+\begin_layout Plain Layout
+
+    } yield u.toXml 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-If the id parameter is missing, present a nice error message and return
- a 401 (okay...
+If the 
+\family typewriter
+id
+\family default
+ parameter is missing, present a nice error message and return a 401 (okay...
  this is random, but you get the point).
  And by default, if the user isn't found, return a 404 with the error that
  the user isn't found.
@@ -1746,46 +1843,165 @@ Here's what it looks like using wget:
 \end_layout
 
 \begin_layout Standard
+\begin_inset listings
+lstparams "language=none"
+inline false
+status open
+
+\begin_layout Plain Layout
+
 dpp@bison:~/lift_sbt_prototype$ wget http://localhost:8080/user/info.xml
- --2010-06-01 15:07:27-- http://localhost:8080/user/info.xml Resolving localhost...
- ::1, 127.0.0.1 Connecting to localhost|::1|:8080...
- connected.
- HTTP request sent, awaiting response...
- 401 Unauthorized Authorization failed.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+
+--2010-06-01 15:07:27-- http://localhost:8080/user/info.xml
+\end_layout
+
+\begin_layout Plain Layout
+
+Resolving localhost...
+ ::1, 127.0.0.1 
+\end_layout
+
+\begin_layout Plain Layout
+
+Connecting to localhost|::1|:8080...
+ connected.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+HTTP request sent, awaiting response...
+ 401 Unauthorized 
+\end_layout
+
+\begin_layout Plain Layout
+
+Authorization failed.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
 dpp@bison:~/lift_sbt_prototype$ wget http://localhost:8080/user/info.xml?id=2
- --2010-06-01 15:07:44-- http://localhost:8080/user/info.xml?id=2 Resolving
- localhost...
- ::1, 127.0.0.1 Connecting to localhost|::1|:8080...
- connected.
- HTTP request sent, awaiting response...
- 404 Not Found 2010-06-01 15:07:44 ERROR 404: Not Found.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+
+--2010-06-01 15:07:44-- http://localhost:8080/user/info.xml?id=2
+\end_layout
+
+\begin_layout Plain Layout
+
+Resolving localhost...
+ ::1, 127.0.0.1
+\end_layout
+
+\begin_layout Plain Layout
+
+Connecting to localhost|::1|:8080...
+ connected.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+HTTP request sent, awaiting response...
+ 404 Not Found 
+\end_layout
+
+\begin_layout Plain Layout
+
+2010-06-01 15:07:44 ERROR 404: Not Found.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
 dpp@bison:~/lift_sbt_prototype$ wget http://localhost:8080/user/info.xml?id=1
- --2010-06-01 15:24:12-- http://localhost:8080/user/info.xml?id=1 Resolving
- localhost...
- ::1, 127.0.0.1 Connecting to localhost|::1|:8080...
- connected.
- HTTP request sent, awaiting response...
- 200 OK Length: 274 [text/xml] Saving to: `info.xml?id=1'
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+
+--2010-06-01 15:24:12-- http://localhost:8080/user/info.xml?id=1
+\end_layout
+
+\begin_layout Plain Layout
+
+Resolving localhost...
+ ::1, 127.0.0.1
+\end_layout
+
+\begin_layout Plain Layout
+
+Connecting to localhost|::1|:8080...
+ connected.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+HTTP request sent, awaiting response...
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+200 OK Length: 274 [text/xml] Saving to: `info.xml?id=1'
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
 dpp@bison:~/lift_sbt_prototype$ cat info.xml
 \backslash
 ?id
 \backslash
-=1 <?xml version="1.0" encoding="UTF-8"?> <User id="1" firstName="Elwood"
- ...
- validated="true" superUser="false"></User> 
+=1
+\end_layout
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <User id="1" firstName="Elwood" ...
+ validated="true" superUser="false">
+\end_layout
+
+\begin_layout Plain Layout
+
+</User> 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-One more thing about Box and Option...
+One more thing about 
+\family typewriter
+Box
+\family default
+ and 
+\family typewriter
+Option
+\family default
+...
  they lead to less complex, more maintainable code.
  Even if you didn't know anything about Scala or Lift, you can read the
  XML serving code and the console exchange and figure out what happened
@@ -1795,8 +2011,11 @@ One more thing about Box and Option...
 \end_layout
 
 \begin_layout Standard
-I hope this is an understandable introduction to Scala's Option class and
- 'for' comprehension and how Lift makes use of these tools.
+I hope this is an understandable introduction to Scala's 
+\family typewriter
+Option
+\family default
+ class and 'for' comprehension and how Lift makes use of these tools.
 \end_layout
 
 \begin_layout Section
@@ -1804,6 +2023,28 @@ S/SHtml
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:S/SHtml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Boot
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Boot"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+SiteMap
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:SiteMap"
 
 \end_inset
 
@@ -2167,8 +2408,11 @@ NodeSeq => NodeSeq -- a function that transforms the node (yes, it can be
 \begin_inset Newline newline
 \end_inset
 
-"#name" #> (n: NodeSeq) => n % ("class" -> "dog") // <span id="name"/> ->
- <span id="name" class="dog"/>
+
+\family typewriter
+"#name" #> ((n: NodeSeq) => n % ("class" -> "dog"))
+\family default
+ // <span id="name"/> -> <span id="name" class="dog"/>
 \end_layout
 
 \begin_layout Itemize
@@ -2184,7 +2428,9 @@ StringPromotable -- A constant that can be promoted to a String (Int, Symbol,
 \begin_inset Newline newline
 \end_inset
 
-"#id_like_cats" #> true "#number_of_cats" #> 2
+
+\family typewriter
+"#id_like_cats" #> true & "#number_of_cats" #> 2
 \end_layout
 
 \begin_layout Itemize
@@ -2479,6 +2725,361 @@ s based on some rules when a session is created): if (browserIsSomethingElse)
  magic.
 \end_layout
 
+\begin_layout Section
+Modules
+\end_layout
+
+\begin_layout Standard
+Lift has supported modules from the first version of the project in 2007.
+ Lift's entire handling of the HTTP request/response cycle is open to hooks.
+ Further, Lift's templating mechanism where resulting HTML pages are composed
+ by transforming page content via snippets (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Snippets"
+
+\end_inset
+
+) which are simply functions that take HTML and return HTML: 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+ Because Lift's snippet resolution mechanism is open and any code referenced
+ in Boot (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Boot"
+
+\end_inset
+
+), any code can be a Lift 
+\begin_inset Quotes eld
+\end_inset
+
+module
+\begin_inset Quotes erd
+\end_inset
+
+ by virtue of registering its snippets and other resources in 
+\family typewriter
+LiftRules
+\family default
+.
+ Many Lift modules already exist including PayPal, OAuth, OpenID, LDAP,
+ and even a module containing many jQuery widgets.
+\end_layout
+
+\begin_layout Standard
+The most difficult issue relating to integration of external modules into
+ Lift is how to properly insert the module's menu items into a SiteMap (See
+ 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:SiteMap"
+
+\end_inset
+
+) menu hierarchy.
+ Lift 2.2 introduces a more flexible mechanism for mutating the 
+\family typewriter
+SiteMap
+\family default
+: 
+\family typewriter
+SiteMap
+\family default
+ mutators.
+ 
+\family typewriter
+SiteMap
+\family default
+ mutators are functions that rewrite the SiteMap based on rules for where
+ to insert the module's menus in the menu hierarchy.
+ Each module may publish markers.
+ For example, here are the markers for ProtoUser:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+/**
+\end_layout
+
+\begin_layout Plain Layout
+
+* Insert this LocParam into your menu if you want the
+\end_layout
+
+\begin_layout Plain Layout
+
+* User's menu items to be inserted at the same level
+\end_layout
+
+\begin_layout Plain Layout
+
+* and after the item
+\end_layout
+
+\begin_layout Plain Layout
+
+*/
+\end_layout
+
+\begin_layout Plain Layout
+
+final case object AddUserMenusAfter extends Loc.LocParam[Any]
+\end_layout
+
+\begin_layout Plain Layout
+
+/**
+\end_layout
+
+\begin_layout Plain Layout
+
+* replace the menu that has this LocParam with the User's menu
+\end_layout
+
+\begin_layout Plain Layout
+
+* items
+\end_layout
+
+\begin_layout Plain Layout
+
+*/
+\end_layout
+
+\begin_layout Plain Layout
+
+final case object AddUserMenusHere extends Loc.LocParam[Any]
+\end_layout
+
+\begin_layout Plain Layout
+
+/**
+\end_layout
+
+\begin_layout Plain Layout
+
+* Insert this LocParam into your menu if you want the
+\end_layout
+
+\begin_layout Plain Layout
+
+* User's menu items to be children of that menu
+\end_layout
+
+\begin_layout Plain Layout
+
+*/
+\end_layout
+
+\begin_layout Plain Layout
+
+final case object AddUserMenusUnder extends Loc.LocParam[Any]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The module also makes a 
+\family typewriter
+SiteMap
+\family default
+ mutator available, this can either be returned from the module's 
+\family typewriter
+init
+\family default
+ method or via some other method on the module.
+ ProtoUser makes the 
+\family typewriter
+sitemapMutator
+\family default
+ method available which returns a 
+\family typewriter
+SiteMap => SiteMap
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The application can add the marker to the appropriate menu item:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+Menu("Home") / "index" >> User.AddUserMenusAfter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And when the application registers the 
+\family typewriter
+SiteMap
+\family default
+ with 
+\family typewriter
+LiftRules
+\family default
+, it applies the mutator:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Because the mutators are composable:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+val allMutators = User.sitemapMutator andThen FruitBat.sitemapMutator
+\end_layout
+
+\begin_layout Plain Layout
+
+LiftRules.setSiteMapFunc(() => allMutators(sitemap()))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For each module, the implementation of the mutators is pretty simple:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  private lazy val AfterUnapply = SiteMap.buildMenuMatcher(_ == AddUserMenusAfter
+)
+\end_layout
+
+\begin_layout Plain Layout
+
+  private lazy val HereUnapply = SiteMap.buildMenuMatcher(_ == AddUserMenusHere)
+\end_layout
+
+\begin_layout Plain Layout
+
+  private lazy val UnderUnapply = SiteMap.buildMenuMatcher(_ == AddUserMenusUnder
+)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * The SiteMap mutator function
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def sitemapMutator: SiteMap => SiteMap = SiteMap.sitemapMutator {
+\end_layout
+
+\begin_layout Plain Layout
+
+    case AfterUnapply(menu) => menu :: sitemap
+\end_layout
+
+\begin_layout Plain Layout
+
+    case HereUnapply(_) => sitemap
+\end_layout
+
+\begin_layout Plain Layout
+
+    case UnderUnapply(menu) => List(menu.rebuild(_ ::: sitemap))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }(SiteMap.addMenusAtEndMutator(sitemap))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We've defined some extractors that help with pattern matching.
+ 
+\family typewriter
+SiteMap.buildMenuMatcher
+\family default
+ is a helper method to make building the extractors super-simple.
+ Then we supply a 
+\family typewriter
+PartialFunction[Menu, List[Menu]]
+\family default
+ which looks for the marker 
+\family typewriter
+LocParam
+\family default
+ and re-writes the menu based on the marker.
+ If there are no matches, the additional rule is fired, in this case, we
+ append the menus at the end of the 
+\family typewriter
+SiteMap
+\family default
+.
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
@@ -2700,6 +3301,195 @@ SiteMap
 
 \begin_layout Chapter
 REST
+\end_layout
+
+\begin_layout Standard
+Lift makes providing REST-style web services very simple.
+\end_layout
+
+\begin_layout Standard
+First, create an object that extends 
+\family typewriter
+RestHelper
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import net.liftweb.http._
+\end_layout
+
+\begin_layout Plain Layout
+
+import net.liftweb.http.rest._
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+object MyRest extends RestHelper {
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And hook your changes up to Lift in 
+\family typewriter
+Boot.scala
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+LiftRules.dispatch.append(MyRest) // stateful -- associated with a servlet
+ container session
+\end_layout
+
+\begin_layout Plain Layout
+
+LiftRules.statelessDispatchTable.append(MyRest) // stateless -- no session
+ created
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Within your MyRest object, you can define which URLs to serve:
+\end_layout
+
+\begin_layout Standard
+serve { case Req("api" :: "static" :: _, "xml", GetRequest) => <b>Static</b>
+ case Req("api" :: "static" :: _, "json", GetRequest) => JString("Static")
+ } 
+\end_layout
+
+\begin_layout Standard
+The above code uses the suffix of the request to determine the response
+ type.
+ Lift supports testing the Accept header for a response type:
+\end_layout
+
+\begin_layout Standard
+serve { case XmlGet("api" :: "static" :: _, _) => <b>Static</b> case JsonGet("ap
+i" :: "static" :: _, _) => JString("Static") } The above can also be written:
+\end_layout
+
+\begin_layout Standard
+serve { case "api" :: "static" :: _ XmlGet _=> <b>Static</b> case "api"
+ :: "static" :: _ JsonGet _ => JString("Static") } Note: If you want to
+ navigate your Web Service, you must remember to add a *.xml or *.json (depending
+ in what you have implemented) at the end of the URL: http://localhost:8080/XXX/
+api/static/call.json http://localhost:8080/XXX/api/static/call.xml Because
+ the REST dispatch code is based on Scala’s pattern matching, we can extract
+ elements from the request (in this case the third element will be extracted
+ into the id variable which is a String:
+\end_layout
+
+\begin_layout Standard
+serve { case "api" :: "user" :: id :: _ XmlGet _ => <b>ID: {id}</b> case
+ "api" :: "user" :: id :: _ JsonGet _ => JString(id) } And with extractors,
+ we convert an element to a particular type and only succeed with the pattern
+ match (and the dispatch) if the parameter can be converted.
+ For example:
+\end_layout
+
+\begin_layout Standard
+serve { case "api" :: "user" :: AsLong(id) :: _ XmlGet _ => <b>ID: {id}</b>
+ case "api" :: "user" :: AsLong(id) :: _ JsonGet _ => JInt(id) } In the
+ above example, id is extracted if it can be converted to a Long.
+\end_layout
+
+\begin_layout Standard
+Lift’s REST helper can also extract XML or JSON from a POST or PUT request
+ and only dispatch the request if the XML or JSON is valid:
+\end_layout
+
+\begin_layout Standard
+serve { case "api" :: "user" :: _ XmlPut xml -> _ => // xml is a scala.xml.Node
+ User.createFromXml(xml).map { u => u.save; u.toXml}
+\end_layout
+
+\begin_layout Standard
+case "api" :: "user" :: _ JsonPut json -> _ => // json is a net.liftweb.json.JsonAS
+T.JValue User.createFromJson(json).map { u => u.save; u.toJson} } There may be
+ cases when you want to have a single piece of business logic to calculate
+ a value, but then convert the value to a result based on the request type.
+ That’s where serveJx comes in … it’ll serve a response for JSON and XML
+ requests.
+ If you define a trait called Convertable:
+\end_layout
+
+\begin_layout Standard
+trait Convertable { def toXml: Elem def toJson: JValue } Then define a pattern
+ that will convert from a Convertable to a JSON or XML:
+\end_layout
+
+\begin_layout Standard
+implicit def cvt: JxCvtPF[Convertable] = { case (JsonSelect, c, _) => c.toJson
+ case (XmlSelect, c, _) => c.toXml } And anywhere you use serveJx and your
+ pattern results in a Box[Convertable], the cvt pattern is used to generate
+ the appropriate response:
+\end_layout
+
+\begin_layout Standard
+serveJx { case Get("api" :: "info" :: Info(info) :: _, _) => Full(info)
+ } Or:
+\end_layout
+
+\begin_layout Standard
+// extract the parameters, create a user // return the appropriate response
+ def addUser(): Box[UserInfo] = for { firstname <- S.param("firstname") ?~
+ "firstname parameter missing" ~> 400 lastname <- S.param("lastname") ?~
+ "lastname parameter missing" email <- S.param("email") ?~ "email parameter
+ missing" } yield { val u = User.create.firstName(firstname).
+ lastName(lastname).email(email)
+\end_layout
+
+\begin_layout Standard
+S.param("password") foreach u.password.set
+\end_layout
+
+\begin_layout Standard
+u.saveMe }
+\end_layout
+
+\begin_layout Standard
+serveJx { case Post("api" :: "add_user" :: _, _) => addUser() } In the above
+ example, if the firstname parameter is missing, the response will be a
+ 400 with the response body “firstname parameter missing”.
+ If the lastname parameter is missing, the response will be a 404 with the
+ response body “lastname parameter missing”.
 \end_layout
 
 \begin_layout Chapter
