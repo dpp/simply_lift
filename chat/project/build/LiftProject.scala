@@ -4,9 +4,9 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
   val liftVersion = "2.2-SNAPSHOT"
 
   // uncomment the following if you want to use the snapshot repo
-  // val scalatoolsSnapshot = ScalaToolsSnapshots
+  val scalatoolsSnapshot = ScalaToolsSnapshots
 
-  val dppsLocalMavenRepo = "m2" at "file:///home/dpp/.m2/repository"
+  // val dppsLocalMavenRepo = "m2" at "file:///home/dpp/.m2/repository"
 
   // If you're using JRebel for Lift development, uncomment
   // this line
