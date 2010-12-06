@@ -1844,7 +1844,7 @@ Here's what it looks like using wget:
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=none"
+lstparams "language=bash"
 inline false
 status open
 
