@@ -388,7 +388,7 @@ When writing a Lift app, it's often best to start off with the user interface...
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "chat/src/main/webapp/index.html"
-lstparams "caption={index.html},language=XML"
+lstparams "caption={index.html},language=xml"
 
 \end_inset
 
@@ -1262,7 +1262,7 @@ Some
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Scala"
+lstparams "language=scala"
 inline false
 status open
 
