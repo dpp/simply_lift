@@ -1,0 +1,185 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Snippets
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Snippets"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Lift is built on the Scala programming language.
+ Scala is a hybrid of Functional and Object Oriented.
+ Two core principles of functional programming languages are immutability
+ and transformation.
+\end_layout
+
+\begin_layout Standard
+Immutability means that once a data structure is instantiated, it will not
+ change for its life.
+ More concretely, once you instantiate an object, you can freely pass the
+ object around and the object will always return the same values for all
+ its methods.
+ Java's 
+\family typewriter
+String
+\family default
+ class is immutable.
+ Python requires immutable classes as indexes to dictionaries.
+ Immutability is also very powerful for multithreaded applications because
+ you can pass references to immutable objects across thread boundaries without
+ having to worry about locking or synchronization because you are guaranteed
+ that the objects will not change state.
+\end_layout
+
+\begin_layout Standard
+Transformation provides an alternative to 
+\begin_inset Quotes eld
+\end_inset
+
+writing to a stream
+\begin_inset Quotes erd
+\end_inset
+
+ for composing web pages.
+ Rather than having tags that cause characters to be streamed as part of
+ the response, Lift loads the view and for each 
+\begin_inset Quotes eld
+\end_inset
+
+snippet
+\begin_inset Quotes erd
+\end_inset
+
+ encountered in the view, Lift transforms just the markup associated with
+ the snippet invocation into a new set of HTML.
+\end_layout
+
+\begin_layout Standard
+Let's make it more concrete, here's some markup:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<span class="foo lift:WhatTime">The time is <span>currentTime</span></span>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the associated snippet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object WhatTime {
+\end_layout
+
+\begin_layout Plain Layout
+
+  def render = "span" #> (new Date).toString
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The resulting markup will look like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<span class="foo">The time is Mon Dec 06 21:01:36 PST 2010</span>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "cha:Snippet-Resolution"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

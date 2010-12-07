@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-12/5/2010
+12/6/2010
 \end_layout
 
 \begin_layout Standard
@@ -340,6 +340,38 @@ Lift creates abstractions that allow easier expression of business logic
  business logic patterns and the underlying protocol.
  The difference means that you spend more time thinking about your application
  and less time thinking about the plumbing.
+\end_layout
+
+\begin_layout Standard
+I am a 
+\begin_inset Quotes eld
+\end_inset
+
+concept learner.
+\begin_inset Quotes erd
+\end_inset
+
+ I learn concepts and then apply them over and over again as situations
+ come up.
+ This book focuses a lot on the concepts.
+ If you're a concept learner and like my stream on conciousness style, this
+ book will likely suit you well.
+ On the other hand, it may not.
+\end_layout
+
+\begin_layout Standard
+Up to date versions of this book are available in PDF form at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://simply.liftweb.net/Simply_Lift.pdf
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -988,44 +1020,14 @@ filename "chapters/wiring.lyx"
 Core Concepts
 \end_layout
 
-\begin_layout Section
-Snippets
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Snippets"
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/snippets.lyx"
 
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Lift is built on the Scala programming language.
- Scala is a hybrid of Functional and Object Oriented.
- Two core principles of functional programming languages are immutability
- and transformation.
-\end_layout
-
-\begin_layout Standard
-Immutability means that once a data structure is instantiated, it will not
- change for its life.
- More concretely, once you instantiate an object, you can freely pass the
- object around and the object will always return the same values for all
- its methods.
- Java's 
-\family typewriter
-String
-\family default
- class is immutable.
- Python requires immutable classes as indexes to dictionaries.
- Immutability is also very powerful for multithreaded applications because
- you can pass references to immutable objects across thread boundaries without
- having to worry about locking or synchronization because you are guaranteed
- that the objects will not change state.
-\end_layout
-
-\begin_layout Standard
-Transformation 
 \end_layout
 
 \begin_layout Section
@@ -2616,44 +2618,230 @@ Dependency Injection
 \end_layout
 
 \begin_layout Standard
-Lift and Dependency Injection Dependency injection is an important topic
- in the Java world.
+Dependency injection is an important topic in the Java world.
  It's important because Java lacks certain basic features (e.g., functions)
  that tend to bind abstract interfaces to concrete implementations.
- Basically, it's so much easier to do MyInterface thing = new MyInterfaceImpl(),
- so most developers do just that.
- Scala's cake pattern goes a long way to help developers compose complex
- behaviors by combining Scala traits.
- Jonas Bonér wrote an excellent piece on Dependency Injection.
- The cake pattern only goes half way to giving a Java developer complete
+ Basically, it's so much easier to do 
+\family typewriter
+MyInterface thing = new MyInterfaceImpl()
+\family default
+, so most developers do just that.
+ 
+\end_layout
+
+\begin_layout Standard
+Scala's 
+\begin_inset CommandInset href
+LatexCommand href
+name "cake pattern"
+target "http://scala.sygneca.com/patterns/component-mixins"
+
+\end_inset
+
+ goes a long way to help developers compose complex behaviors by combining
+ Scala traits.
+ Jonas Bonér wrote an excellent piece on 
+\begin_inset CommandInset href
+LatexCommand href
+name "Dependency Injection"
+target "http://jonasboner.com/2008/10/06/real-world-scala-dependency-injection-di.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The cake pattern only goes half way to giving a Java developer complete
  dependency injection functionality.
  The cake pattern allows you to compose the complex classes out of Scala
  traits, but the cake pattern is less helpful in terms of allowing you to
  make dynamic choices about which combination of cake to vend in a given
  situation.
  Lift provides a extra features that complete the dependency injection puzzle.
- Lift Libraries and Injector Lift is both a web framework and a set of Scala
- libraries.
- Lift's common, actor, json, and util packages provide common libraries
- for Scala developers to build their application.
- Lift's libraries are well tested, widely used, well supported, and released
- on a well defined schedule (montly milestones, quarterly releases).
- Lift's Injector trait forms the basis of dependency injection: /** * A
- trait that does basic dependency injection.
- */trait Injector { implicit def inject[T](implicit man: Manifest[T]): Box[T]}
- You can use this trait as follows: object MyInjector extends Injector {...}val
- myThing: Box[Thing] = MyInjector.inject The reason that the instance of
- MyThing is in a Box is because we're not guaranteed that MyInjector knows
- how to create an instance of Thing.
- Lift provides an implementation of Injector called SimpleInjector that
- allows you to register (and re-register) functions for injection:
+ 
+\end_layout
+
+\begin_layout Subsection
+Lift Libraries and Injector
 \end_layout
 
 \begin_layout Standard
-object MyInjector extends SimpleInjectordef buildOne(): Thing = if (testMode)
- new Thing with TestThingy {} else new Thing with RuntimeThingy {}MyInjector.regi
-sterInjection(buildOne _) // register the function that builds Thing val
- myThing: Box[Thing] = MyInjector.inject This isn't bad...
+Lift is both a web framework and a set of Scala libraries.
+ Lift's 
+\family typewriter
+common
+\family default
+, 
+\family typewriter
+actor
+\family default
+, 
+\family typewriter
+json
+\family default
+, and 
+\family typewriter
+util
+\family default
+ packages provide common libraries for Scala developers to build their applicati
+on.
+ Lift's libraries are well tested, widely used, well supported, and released
+ on a well defined schedule (montly milestones, quarterly releases).
+ 
+\end_layout
+
+\begin_layout Standard
+Lift's 
+\family typewriter
+Injector
+\family default
+ trait forms the basis of dependency injection: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+/** 
+\end_layout
+
+\begin_layout Plain Layout
+
+ * A trait that does basic dependency injection.
+\end_layout
+
+\begin_layout Plain Layout
+
+ */
+\end_layout
+
+\begin_layout Plain Layout
+
+trait Injector {
+\end_layout
+
+\begin_layout Plain Layout
+
+  implicit def inject[T](implicit man: Manifest[T]): Box[T]
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You can use this trait as follows: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object MyInjector extends Injector {...}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+val myThing: Box[Thing] = MyInjector.inject
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The reason that the instance of 
+\family typewriter
+MyThing
+\family default
+ is in a 
+\family typewriter
+Box
+\family default
+ is because we're not guaranteed that 
+\family typewriter
+MyInjector
+\family default
+ knows how to create an instance of 
+\family typewriter
+Thing
+\family default
+.
+ Lift provides an implementation of 
+\family typewriter
+Injector
+\family default
+ called 
+\family typewriter
+SimpleInjector
+\family default
+ that allows you to register (and re-register) functions for injection:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object MyInjector extends SimpleInjector
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def buildOne(): Thing = if (testMode) new Thing with TestThingy {} else
+ new Thing with RuntimeThingy {}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+MyInjector.registerInjection(buildOne _) // register the function that builds
+ Thing 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+val myThing: Box[Thing] = MyInjector.inject
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This isn't bad...
  it allows us to define a function that makes the injection-time decision,
  and we can change the function out during runtime (or test-time.) However,
  there are two problems: getting Boxes for each injection is less than optimal.
@@ -2661,27 +2849,136 @@ sterInjection(buildOne _) // register the function that builds Thing val
  logic (test vs.
  production vs.
  xxx) into the function.
- SimpleInjector has lots of ways to help out.
+ 
+\family typewriter
+SimpleInjector
+\family default
+ has lots of ways to help out.
 \end_layout
 
 \begin_layout Standard
-object MyInjector extends SimpleInjector { val thing = new Inject(buildOne
- _) {} // define a thing, has to be a val so it's eagerly evaluated and
- registered}def buildOne(): Thing = if (testMode) new Thing with TestThingy
- {} else new Thing with RuntimeThingy {} val myThingBox: Box[Thing] = MyInjector.
-injectval myThing = MyInjector.thing.vend // vend an instance of Thing Inject
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object MyInjector extends SimpleInjector {
+\end_layout
+
+\begin_layout Plain Layout
+
+  val thing = new Inject(buildOne _) {} // define a thing, has to be a val
+ so it's eagerly evaluated and registered
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def buildOne(): Thing = if (testMode) new Thing with TestThingy {} else
+ new Thing with RuntimeThingy {} 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+val myThingBox: Box[Thing] = MyInjector.injectval 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+myThing = MyInjector.thing.vend // vend an instance of Thing 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+Inject
+\family default
  has a futher trick up its sleave...
- with Inject, you can scope the function...
+ with 
+\family typewriter
+Inject
+\family default
+, you can scope the function...
  this is helpful for testing and if you need to change behavior for a particular
  call scope:
 \end_layout
 
 \begin_layout Standard
-MyInjector.thing.doWith(new Thing with SpecialThing {}) { val t = MyInjector.thing.v
-end // an instance of SpecialThing val bt: Box[Thing] = MyInjector.inject
- // Full(SpecialThing) }MyInjector.thing.default.set(() => new Thing with YetAnothe
-rThing {}) // set the global scope Within the scope of the doWith call,
- MyInjector.thing will vend instances of SpecialThing.
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+MyInjector.thing.doWith(new Thing with SpecialThing {}) { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  val t = MyInjector.thing.vend // an instance of SpecialThing 
+\end_layout
+
+\begin_layout Plain Layout
+
+  val bt: Box[Thing] = MyInjector.inject // Full(SpecialThing) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+MyInjector.thing.default.set(() => new Thing with YetAnotherThing {}) // set
+ the global scope 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Within the scope of the 
+\family typewriter
+doWith
+\family default
+ call, 
+\family typewriter
+MyInjector.thing
+\family default
+ will vend instances of 
+\family typewriter
+SpecialThing
+\family default
+.
  This is useful for testing as well as changing behavior within the scope
  of the call or globally.
  This gives us much of the functionality we get with dependency injection
@@ -2689,41 +2986,188 @@ rThing {}) // set the global scope Within the scope of the doWith call,
  But within Lift WebKit, it gets better.
 \end_layout
 
-\begin_layout Standard
-Lift WebKit and enhanced injection scoping Lift's WebKit offers broad ranging
- tools for handling HTTP requests as well as HTML manipulation.
+\begin_layout Subsection
+Lift WebKit and enhanced injection scoping 
 \end_layout
 
 \begin_layout Standard
-Lift WebKit's Factory extends SimpleInjector, but adds the ability to scope
- the function based on current HTTP request or the current container session:
+Lift's WebKit offers broad ranging tools for handling HTTP requests as well
+ as HTML manipulation.
 \end_layout
 
 \begin_layout Standard
-object MyInjector extends Factory { val thing = new FactoryMaker(buildOne
- _) {} // define a thing, has to be a val so it's eagerly evaluated and
- registered} MyInjector.thing.session.set(new Thing with ThingForSession {})
- // set the instance that will be vended for the duration of the session
- MyInjector.thing.request.set(new Thing with ThingForRequest {}) // set the
- instance that will be vended for the duration of the request WebKit's LiftRules
- is a Factory and many of the properties that LiftRules contains are FactoryMake
-rs.
+Lift WebKit's 
+\family typewriter
+Factory
+\family default
+ extends 
+\family typewriter
+SimpleInjector
+\family default
+, but adds the ability to scope the function based on current HTTP request
+ or the current container session:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object MyInjector extends Factory { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  val thing = new FactoryMaker(buildOne _) {} // define a thing, has to
+ be a val so it's eagerly 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                              // evaluated and registered
+\end_layout
+
+\begin_layout Plain Layout
+
+} 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+MyInjector.thing.session.set(new Thing with ThingForSession {}) // set the
+ instance that will be vended 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                                // for the
+ duration of the session 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+MyInjector.thing.request.set(new Thing with ThingForRequest {}) // set the
+ instance that will be vended 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                                // for the
+ duration of the request
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+WebKit's 
+\family typewriter
+LiftRules
+\family default
+ is a 
+\family typewriter
+Factory
+\family default
+ and many of the properties that 
+\family typewriter
+LiftRules
+\family default
+ contains are 
+\family typewriter
+FactoryMakers
+\family default
+.
  This means that you can change behavior during call scope (useful for testing):
 \end_layout
 
 \begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 LiftRules.convertToEntity.doWith(true) { ...
- test that we convert certain characters to entities} Or based on the current
- request (for example you can change the rules for calculating the docType
- during the current request):
+ test that we convert certain characters to entities} 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+Or based on the current request (for example you can change the rules for
+ calculating the docType during the current request):
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
 if (isMobileReqest) LiftRules.docType.request.set((r: Req) => Full(DocType.xhtmlMobi
-le)) Or based on the current session (for example, changing maxConcurrentRequest
-s based on some rules when a session is created): if (browserIsSomethingElse)
- LiftRules.maxConcurrentRequests.session.set((r: Req) => 32) // for this session,
- we allow 32 concurrent requests Conclusion Lift's SimpleInjector/Factory
+le))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Or based on the current session (for example, changing maxConcurrentRequests
+ based on some rules when a session is created):
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+if (browserIsSomethingElse) LiftRules.maxConcurrentRequests.session.set((r:
+ Req) => 32) 
+\end_layout
+
+\begin_layout Plain Layout
+
+              // for this session, we allow 32 concurrent requests 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Conclusion 
+\end_layout
+
+\begin_layout Standard
+Lift's 
+\family typewriter
+SimpleInjector
+\family default
+/
+\family typewriter
+Factory
+\family default
  facilities provide a powerful and flexible mechanism for vending instances
  based on a global function, call stack scoping, request and session scoping
  and provides more flexible features than most Java-based dependency injection
@@ -4027,6 +4471,16 @@ Lift's JavaScript can sit on top of jQuery and YUI (and could sit on top
 I've looked at Atmosphere and CometD (both JVM-oriented Comet technologies).
  Neither had (at the time I evaluated them) support for multiple components
  per page or connection starvation avoidance.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:Snippet-Resolution"
+
+\end_inset
+
+Snippet Resolution
 \end_layout
 
 \begin_layout Standard

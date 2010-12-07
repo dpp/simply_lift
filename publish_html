@@ -2,5 +2,7 @@
 
 rm -rf Simply_Lift
 make clean
+make
 make html
+cp Simply_Lift.pdf Simply_Lift/
 tar -cjf - Simply_Lift | ssh simply.liftweb.net "rm -rf Simply_Lift ; tar -xjvf -"   
