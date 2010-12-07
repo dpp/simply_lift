@@ -974,8 +974,14 @@ Chat Plus
 Chat with Rooms
 \end_layout
 
-\begin_layout Chapter
-Wiring
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/wiring.lyx"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
