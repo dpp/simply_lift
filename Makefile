@@ -2,32 +2,20 @@ RSYNCFLAGS = "-rv --delete"
 
 all	: Simply_Lift.pdf
 
-html	: Simply_Lift.tex Simply_Lift.aux 
+html	: 
 	@echo [Building HTML]
-	cat Simply_Lift.tex | ./fix_double_quotes.sh > Simply_Lift_fixed.tex
-	rm Simply_Lift.tex
-	mv Simply_Lift_fixed.tex Simply_Lift.tex
-	latex2html -split 3 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
-	./highlightHtml.sh
+	rm -rf Simply_Lift
+	mkdir Simply_Lift
+	cp -r templates/* Simply_Lift
+	python elyxer.py --splitpart 2 Simply_Lift.lyx Simply_Lift/index.html
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
 
-htmlblob	: Simply_Lift.tex Simply_Lift.aux 
+htmlblob	: 
 	@echo [Building HTML]
-	cat Simply_Lift.tex | ./fix_double_quotes.sh > Simply_Lift_fixed.tex
-	rm Simply_Lift.tex
-	mv Simply_Lift_fixed.tex Simply_Lift.tex
-	latex2html -split 1 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
-	./highlightHtmlBlob.sh
-	tar cvzf Simply_Lift.html.tgz Simply_Lift/
-
-
-htmlpost	: Simply_Lift.tex Simply_Lift.aux 
-	@echo [Building HTML]
-	cat Simply_Lift.tex | ./fix_double_quotes.sh > Simply_Lift_fixed.tex
-	rm Simply_Lift.tex
-	mv Simply_Lift_fixed.tex Simply_Lift.tex
-	latex2html -split 4 -local_icons -no_antialias_text -no_antialias -white Simply_Lift.tex
-	./highlightHtml.sh
+	rm -rf Simply_Lift
+	mkdir Simply_Lift
+	cp -r templates/* Simply_Lift
+	python elyxer.py Simply_Lift.lyx Simply_Lift/index.html
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
 
 pdf	: Simply_Lift.pdf
@@ -46,7 +34,7 @@ Simply_Lift.aux	: Simply_Lift.tex
 	@echo [Built PDF]
 
 clean:
-	rm -f *.tex images/*.eps *.toc *.aux *.dvi *.idx *.lof *.log *.out *.toc *.lol Simply_Lift.pdf
+	rm -f *.tex images/*.eps *.toc *.aux *.dvi *.idx *.lof *.log *.out *.toc *.lol Simply_Lift.pdf *.ilg *.ind *.tgz
 	rm -rf Simply_Lift/
 
 #install: pdf html
