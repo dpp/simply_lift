@@ -1,0 +1,450 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Section
+CSS Selector Transforms
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Lift 2.2-M1 introduced a new mechanism for transforming XHTML: CSS Selector
+ Transforms (
+\family typewriter
+CssBindFunc
+\family default
+).
+ The new mechanism provides a subset of CSS selectors that can be used to
+ transform 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+ Examples of this feature include:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"#name" #> userName
+\family default
+ // replace the element with the id name with the variable userName 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"#chat_lines *" #> listOfChats
+\family default
+ // replace the content of chat_lines with each element of listOfChats 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+".pretty *" #> <b>Unicorn</b>
+\family default
+ // each element with CSS class pretty, replace content with <b>Unicorn</b>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"dog=cat [href]" #> "http://dogscape.com"
+\family default
+ // set the href attribute of all elements with the dog attribute set to
+ cat 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"#name" #> userName & "#age" #> userAge
+\family default
+ // set name to userName and age to userAge
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"li *" #> userName & "li [class]" #> "foo"
+\family default
+ // set the contents of all <li> element with username and class to foo
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"li *" #> userName & "li [class+]" #> "foo"
+\family default
+ // set the contents of all <li> element with username and append foo to
+ the class
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+"*" #> <span>{userName}</span>
+\family default
+ // set all the elements to <span>{userName}</span>
+\end_layout
+
+\begin_layout Standard
+CSS Selector Transforms extends 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+...
+ they are quite literally functions and can be passes as a parameter to
+ anything expecting 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ or returned as a result for any method that returns 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Let's look at each of the pieces to see how they work.
+\end_layout
+
+\begin_layout Standard
+First, you must 
+\family typewriter
+import net.liftweb.util._
+\family default
+ and 
+\family typewriter
+import Helpers._
+\family default
+ These packages include the classes and the implicit conversions that make
+ the CSS Selector Tranforms work.
+\end_layout
+
+\begin_layout Standard
+The transform is defined by: String representing selector #> transform value.
+\end_layout
+
+\begin_layout Standard
+The selector is a String constant which implements the following subset
+ of CSS Selectors:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+#id
+\family default
+ - selects the element with the specified id 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+.class
+\family default
+ - selects all elements have a class attribute where one of the space-separated
+ values equals class 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+attr_name=attr_value
+\family default
+ - selects all elements where the given attribute equals the given value
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+element_name
+\family default
+ - selects all the elements matching the name
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+*
+\family default
+ - selects all elements
+\end_layout
+
+\begin_layout Standard
+You can put replacement rules after the selector:
+\end_layout
+
+\begin_layout Itemize
+none (e.g., 
+\family typewriter
+"#id"
+\family default
+) replaces all matching elements with the values
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name" #> "David" // <span><span id="name"/></span> -> <span>David</span>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+*
+\family default
+ (e.g., "
+\family typewriter
+#id *
+\family default
+") replaces the content children of the matching elements with the values
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name *" #> "David" // <span><span id="name"/></span> -> <span><span id="name>D
+avid</span></span>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+[attr]
+\family default
+ (e.g., "#id 
+\family typewriter
+[href]
+\family default
+") replaces the matching attribute's value with the values.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#link [href]" #> "http://dogscape.com" 
+\begin_inset Newline newline
+\end_inset
+
+// <a href="#" id="link">Dogscape</a> -> <a href="http://dogscape.com" id="link">
+Dogscape</a>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+[attr+]
+\family default
+ (e.g., "#id 
+\family typewriter
+[class+]
+\family default
+") appends the value to the existing attribute.
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"span [class+]" #> "error" 
+\begin_inset Newline newline
+\end_inset
+
+// <span class"foo">Dogscape</span> -> <span class"foo error">Dogscape</span>
+\end_layout
+
+\begin_layout Standard
+The right hand side of the CSS Selector Transform can be one of the following:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+String
+\family default
+ -- a 
+\family typewriter
+String
+\family default
+ constant, for example: 
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> "David" // <span id="name"/> -> <span id="name">David</span>
+ 
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> getUserNameAsString
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+NodeSeq
+\family default
+ - a 
+\family typewriter
+NodeSeq
+\family default
+ constant, for example:
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> <i>David</i> // <span id="name"/> -> <span id="name"><i>David</i></
+span>
+\begin_inset Newline newline
+\end_inset
+
+"#name *" #> getUserNameAsHtml
+\end_layout
+
+\begin_layout Itemize
+NodeSeq => NodeSeq -- a function that transforms the node (yes, it can be
+ a CssBindFunc):
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name" #> ((n: NodeSeq) => n % ("class" -> "dog"))
+\family default
+ // <span id="name"/> -> <span id="name" class="dog"/>
+\end_layout
+
+\begin_layout Itemize
+Bindable -- something that implements the Bindable trait (e.g., MappedField
+ and Record.Field)
+\end_layout
+
+\begin_layout Itemize
+StringPromotable -- A constant that can be promoted to a String (Int, Symbol,
+ Long or Boolean).
+ There is an automatic (implicit) conversion from Int, Symbol, Long or Boolean
+ to StringPromotable.
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#id_like_cats" #> true & "#number_of_cats" #> 2
+\end_layout
+
+\begin_layout Itemize
+IterableConst -- A Box, Seq, or Option of String, NodeSeq, or Bindable.
+ Implicit conversions automatically promote the likes of Box[String], List[Strin
+g], List[NodeSeq], etc.
+ to IterableConst.
+\begin_inset Newline newline
+\end_inset
+
+"#id" #> (Empty: Box[String]) // <span><span id="id">Hi</span></span> ->
+ <span/>
+\begin_inset Newline newline
+\end_inset
+
+"#id" #> List("a", "b", "c") // <span><span id="id"/></span> -> <span>abc</span>
+\begin_inset Newline newline
+\end_inset
+
+"#id [href]" #> (None: Option[String]) <a id="id" href="dog"/> -> <a id="id"/>
+\end_layout
+
+\begin_layout Itemize
+List[NodeSeq => NodeSeq], Box[NodeSeq => NodeSeq], Option[NodeSeq => NodeSeq]
+ - 
+\end_layout
+
+\begin_layout Standard
+Note that if you bind to the children of a selected element, multiple copies
+ of the element result from bind to an IterableConst (if the element has
+ an id attribute, the id attribute will be stripped after the first element):
+ "#line *" #> List("a", "b", "c") // <li id="line>sample</li> -> <li id="line">a
+</li><li>b</li><li>c</li> "#age *" #> (None: Option[NodeSeq]) // <span><span
+ id="age">Dunno</span></span> -> <span/>
+\end_layout
+
+\begin_layout Standard
+The above use cases may seem a little strange (they are not quite orthogonal),
+ but they address common use cases in Lift.
+ * IterableFunc -- A Box, Seq, or Option of functions that transform NodeSeq
+ => String, NodeSeq, Seq[String], Seq[NodeSeq], Box[String], Box[NodeSeq],
+ Option[String] or Option[NodeSeq].
+ The same rules for handling multiple values in IterableConst apply to IterableF
+unc.
+ Implicit conversions automatically promote the functions with the appropriate
+ signature to an IterableFunc.
+\end_layout
+
+\begin_layout Standard
+You can chain CSS Selector Transforms with the 
+\family typewriter
+&
+\family default
+ method:
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#id" #> "33" & "#name" #> "David" & "#chat_line" #> List("a", "b", "c")
+ & ClearClearable
+\end_layout
+
+\begin_layout Standard
+CSS Selector Transforms offer an alternative to Lift's traditional binding
+ (See Helpers.bind()).
+\end_layout
+
+\end_body
+\end_document

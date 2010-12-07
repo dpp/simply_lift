@@ -2070,6 +2070,24 @@ name "sec:GUIDs"
 
 \end_layout
 
+\begin_layout Standard
+A core concept in Lift is GUIDs.
+ GUIDs are globally unique identifiers used to associate something in the
+ browser with a function on the server.
+ GUIDs make Lift more secure because they make replay attacks very difficult
+ and GUIDs make it easier to develop complex, stateful, interactive applications
+ because the developer spends more time on business logic and less time
+ on the plumbing of 
+\end_layout
+
+\begin_layout Subsection
+How GUIDs are generated
+\end_layout
+
+\begin_layout Subsection
+Where they are used 
+\end_layout
+
 \begin_layout Section
 LiftRules
 \begin_inset CommandInset label
@@ -2103,408 +2121,14 @@ name "sec:Helpers"
 
 \end_layout
 
-\begin_layout Section
-CSS Selector Transforms
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:CSS-Selector-Transforms"
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
-Lift 2.2-M1 introduced a new mechanism for transforming XHTML: CSS Selector
- Transforms (
-\family typewriter
-CssBindFunc
-\family default
-).
- The new mechanism provides a subset of CSS selectors that can be used to
- transform 
-\family typewriter
-NodeSeq => NodeSeq
-\family default
-.
- Examples of this feature include:
-\end_layout
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/css_selector_transforms.lyx"
 
-\begin_layout Itemize
-
-\family typewriter
-"#name" #> userName
-\family default
- // replace the element with the id name with the variable userName 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-"#chat_lines *" #> listOfChats
-\family default
- // replace the content of chat_lines with each element of listOfChats 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-".pretty *" #> <b>Unicorn</b>
-\family default
- // each element with CSS class pretty, replace content with <b>Unicorn</b>
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-"dog=cat [href]" #> "http://dogscape.com"
-\family default
- // set the href attribute of all elements with the dog attribute set to
- cat 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-"#name" #> userName & "#age" #> userAge
-\family default
- // set name to userName and age to userAge
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-"li *" #> userName & "li [class]" #> "foo"
-\family default
- // set the contents of all <li> element with username and class to foo
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-"li *" #> userName & "li [class+]" #> "foo"
-\family default
- // set the contents of all <li> element with username and append foo to
- the class
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-"*" #> <span>{userName}</span>
-\family default
- // set all the elements to <span>{userName}</span>
-\end_layout
-
-\begin_layout Standard
-CSS Selector Transforms extends 
-\family typewriter
-NodeSeq => NodeSeq
-\family default
-...
- they are quite literally functions and can be passes as a parameter to
- anything expecting 
-\family typewriter
-NodeSeq => NodeSeq
-\family default
- or returned as a result for any method that returns 
-\family typewriter
-NodeSeq => NodeSeq
-\family default
-.
-\end_layout
-
-\begin_layout Standard
-Let's look at each of the pieces to see how they work.
-\end_layout
-
-\begin_layout Standard
-First, you must 
-\family typewriter
-import net.liftweb.util._
-\family default
- and 
-\family typewriter
-import Helpers._
-\family default
- These packages include the classes and the implicit conversions that make
- the CSS Selector Tranforms work.
-\end_layout
-
-\begin_layout Standard
-The transform is defined by: String representing selector #> transform value.
-\end_layout
-
-\begin_layout Standard
-The selector is a String constant which implements the following subset
- of CSS Selectors:
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-#id
-\family default
- - selects the element with the specified id 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-.class
-\family default
- - selects all elements have a class attribute where one of the space-separated
- values equals class 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-attr_name=attr_value
-\family default
- - selects all elements where the given attribute equals the given value
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-element_name
-\family default
- - selects all the elements matching the name
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-*
-\family default
- - selects all elements
-\end_layout
-
-\begin_layout Standard
-You can put replacement rules after the selector:
-\end_layout
-
-\begin_layout Itemize
-none (e.g., 
-\family typewriter
-"#id"
-\family default
-) replaces all matching elements with the values
-\begin_inset Newline newline
 \end_inset
 
 
-\family typewriter
-"#name" #> "David" // <span><span id="name"/></span> -> <span>David</span>
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-*
-\family default
- (e.g., "
-\family typewriter
-#id *
-\family default
-") replaces the content children of the matching elements with the values
-\begin_inset Newline newline
-\end_inset
-
-
-\family typewriter
-"#name *" #> "David" // <span><span id="name"/></span> -> <span><span id="name>D
-avid</span></span>
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-[attr]
-\family default
- (e.g., "#id 
-\family typewriter
-[href]
-\family default
-") replaces the matching attribute's value with the values.
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\family typewriter
-"#link [href]" #> "http://dogscape.com" 
-\begin_inset Newline newline
-\end_inset
-
-// <a href="#" id="link">Dogscape</a> -> <a href="http://dogscape.com" id="link">
-Dogscape</a>
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-[attr+]
-\family default
- (e.g., "#id 
-\family typewriter
-[class+]
-\family default
-") appends the value to the existing attribute.
-\begin_inset Newline newline
-\end_inset
-
-
-\family typewriter
-"span [class+]" #> "error" 
-\begin_inset Newline newline
-\end_inset
-
-// <span class"foo">Dogscape</span> -> <span class"foo error">Dogscape</span>
-\end_layout
-
-\begin_layout Standard
-The right hand side of the CSS Selector Transform can be one of the following:
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-String
-\family default
- -- a 
-\family typewriter
-String
-\family default
- constant, for example: 
-\begin_inset Newline newline
-\end_inset
-
-"#name *" #> "David" // <span id="name"/> -> <span id="name">David</span>
- 
-\begin_inset Newline newline
-\end_inset
-
-"#name *" #> getUserNameAsString
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-NodeSeq
-\family default
- - a 
-\family typewriter
-NodeSeq
-\family default
- constant, for example:
-\begin_inset Newline newline
-\end_inset
-
-"#name *" #> <i>David</i> // <span id="name"/> -> <span id="name"><i>David</i></
-span>
-\begin_inset Newline newline
-\end_inset
-
-"#name *" #> getUserNameAsHtml
-\end_layout
-
-\begin_layout Itemize
-NodeSeq => NodeSeq -- a function that transforms the node (yes, it can be
- a CssBindFunc):
-\begin_inset Newline newline
-\end_inset
-
-
-\family typewriter
-"#name" #> ((n: NodeSeq) => n % ("class" -> "dog"))
-\family default
- // <span id="name"/> -> <span id="name" class="dog"/>
-\end_layout
-
-\begin_layout Itemize
-Bindable -- something that implements the Bindable trait (e.g., MappedField
- and Record.Field)
-\end_layout
-
-\begin_layout Itemize
-StringPromotable -- A constant that can be promoted to a String (Int, Symbol,
- Long or Boolean).
- There is an automatic (implicit) conversion from Int, Symbol, Long or Boolean
- to StringPromotable.
-\begin_inset Newline newline
-\end_inset
-
-
-\family typewriter
-"#id_like_cats" #> true & "#number_of_cats" #> 2
-\end_layout
-
-\begin_layout Itemize
-IterableConst -- A Box, Seq, or Option of String, NodeSeq, or Bindable.
- Implicit conversions automatically promote the likes of Box[String], List[Strin
-g], List[NodeSeq], etc.
- to IterableConst.
-\begin_inset Newline newline
-\end_inset
-
-"#id" #> (Empty: Box[String]) // <span><span id="id">Hi</span></span> ->
- <span/>
-\begin_inset Newline newline
-\end_inset
-
-"#id" #> List("a", "b", "c") // <span><span id="id"/></span> -> <span>abc</span>
-\begin_inset Newline newline
-\end_inset
-
-"#id [href]" #> (None: Option[String]) <a id="id" href="dog"/> -> <a id="id"/>
-\end_layout
-
-\begin_layout Itemize
-List[NodeSeq => NodeSeq], Box[NodeSeq => NodeSeq], Option[NodeSeq => NodeSeq]
- - 
-\end_layout
-
-\begin_layout Standard
-Note that if you bind to the children of a selected element, multiple copies
- of the element result from bind to an IterableConst (if the element has
- an id attribute, the id attribute will be stripped after the first element):
- "#line *" #> List("a", "b", "c") // <li id="line>sample</li> -> <li id="line">a
-</li><li>b</li><li>c</li> "#age *" #> (None: Option[NodeSeq]) // <span><span
- id="age">Dunno</span></span> -> <span/>
-\end_layout
-
-\begin_layout Standard
-The above use cases may seem a little strange (they are not quite orthogonal),
- but they address common use cases in Lift.
- * IterableFunc -- A Box, Seq, or Option of functions that transform NodeSeq
- => String, NodeSeq, Seq[String], Seq[NodeSeq], Box[String], Box[NodeSeq],
- Option[String] or Option[NodeSeq].
- The same rules for handling multiple values in IterableConst apply to IterableF
-unc.
- Implicit conversions automatically promote the functions with the appropriate
- signature to an IterableFunc.
-\end_layout
-
-\begin_layout Standard
-You can chain CSS Selector Transforms with the 
-\family typewriter
-&
-\family default
- method:
-\begin_inset Newline newline
-\end_inset
-
-
-\family typewriter
-"#id" #> "33" & "#name" #> "David" & "#chat_line" #> List("a", "b", "c")
- & ClearClearable
-\end_layout
-
-\begin_layout Standard
-CSS Selector Transforms offer an alternative to Lift's traditional binding
- (See Helpers.bind()).
 \end_layout
 
 \begin_layout Section
@@ -3839,107 +3463,507 @@ Within your MyRest object, you can define which URLs to serve:
 \end_layout
 
 \begin_layout Standard
-serve { case Req("api" :: "static" :: _, "xml", GetRequest) => <b>Static</b>
- case Req("api" :: "static" :: _, "json", GetRequest) => JString("Static")
- } 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case Req("api" :: "static" :: _, "xml", GetRequest) => <b>Static</b> 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case Req("api" :: "static" :: _, "json", GetRequest) => JString("Static")
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
 The above code uses the suffix of the request to determine the response
  type.
- Lift supports testing the Accept header for a response type:
+ Lift supports testing the 
+\family typewriter
+Accept
+\family default
+ header for a response type:
 \end_layout
 
 \begin_layout Standard
-serve { case XmlGet("api" :: "static" :: _, _) => <b>Static</b> case JsonGet("ap
-i" :: "static" :: _, _) => JString("Static") } The above can also be written:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case XmlGet("api" :: "static" :: _, _) => <b>Static</b> 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case JsonGet("api" :: "static" :: _, _) => JString("Static") 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-serve { case "api" :: "static" :: _ XmlGet _=> <b>Static</b> case "api"
- :: "static" :: _ JsonGet _ => JString("Static") } Note: If you want to
- navigate your Web Service, you must remember to add a *.xml or *.json (depending
- in what you have implemented) at the end of the URL: http://localhost:8080/XXX/
-api/static/call.json http://localhost:8080/XXX/api/static/call.xml Because
- the REST dispatch code is based on Scala’s pattern matching, we can extract
- elements from the request (in this case the third element will be extracted
- into the id variable which is a String:
+The above can also be written:
 \end_layout
 
 \begin_layout Standard
-serve { case "api" :: "user" :: id :: _ XmlGet _ => <b>ID: {id}</b> case
- "api" :: "user" :: id :: _ JsonGet _ => JString(id) } And with extractors,
- we convert an element to a particular type and only succeed with the pattern
- match (and the dispatch) if the parameter can be converted.
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "static" :: _ XmlGet _=> <b>Static</b> 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "static" :: _ JsonGet _ => JString("Static") 
+\end_layout
+
+\begin_layout Plain Layout
+
+} 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note: If you want to navigate your Web Service, you must remember to add
+ a 
+\family typewriter
+*.xml
+\family default
+ or 
+\family typewriter
+*.json
+\family default
+ (depending in what you have implemented) at the end of the URL: 
+\family typewriter
+http://localhost:8080/XXX/api/static/call.json
+\family default
+ 
+\family typewriter
+http://localhost:8080/XXX/api/static/call.xml
+\family default
+ 
+\end_layout
+
+\begin_layout Standard
+Because the REST dispatch code is based on Scala’s pattern matching, we
+ can extract elements from the request (in this case the third element will
+ be extracted into the id variable which is a String:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "user" :: id :: _ XmlGet _ => <b>ID: {id}</b>
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "user" :: id :: _ JsonGet _ => JString(id) 
+\end_layout
+
+\begin_layout Plain Layout
+
+} 
+\end_layout
+
+\end_inset
+
+And with extractors, we convert an element to a particular type and only
+ succeed with the pattern match (and the dispatch) if the parameter can
+ be converted.
  For example:
 \end_layout
 
 \begin_layout Standard
-serve { case "api" :: "user" :: AsLong(id) :: _ XmlGet _ => <b>ID: {id}</b>
- case "api" :: "user" :: AsLong(id) :: _ JsonGet _ => JInt(id) } In the
- above example, id is extracted if it can be converted to a Long.
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "user" :: AsLong(id) :: _ XmlGet _ => <b>ID: {id}</b>
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "user" :: AsLong(id) :: _ JsonGet _ => JInt(id) 
+\end_layout
+
+\begin_layout Plain Layout
+
+} 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Lift’s REST helper can also extract XML or JSON from a POST or PUT request
- and only dispatch the request if the XML or JSON is valid:
+In the above example, id is extracted if it can be converted to a Long.
 \end_layout
 
 \begin_layout Standard
-serve { case "api" :: "user" :: _ XmlPut xml -> _ => // xml is a scala.xml.Node
- User.createFromXml(xml).map { u => u.save; u.toXml}
+Lift’s REST helper can also extract 
+\family typewriter
+XML
+\family default
+ or 
+\family typewriter
+JSON
+\family default
+ from a 
+\family typewriter
+POST
+\family default
+ or 
+\family typewriter
+PUT
+\family default
+ request and only dispatch the request if the XML or JSON is valid:
 \end_layout
 
 \begin_layout Standard
-case "api" :: "user" :: _ JsonPut json -> _ => // json is a net.liftweb.json.JsonAS
-T.JValue User.createFromJson(json).map { u => u.save; u.toJson} } There may be
- cases when you want to have a single piece of business logic to calculate
- a value, but then convert the value to a result based on the request type.
- That’s where serveJx comes in … it’ll serve a response for JSON and XML
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serve { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "user" :: _ XmlPut xml -> _ => // xml is a scala.xml.Node
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+    User.createFromXml(xml).map { u => u.save; u.toXml}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  case "api" :: "user" :: _ JsonPut json -> _ => // json is a net.liftweb.json.Json
+AST.JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+    User.createFromJson(json).map { u => u.save; u.toJson} 
+\end_layout
+
+\begin_layout Plain Layout
+
+} 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There may be cases when you want to have a single piece of business logic
+ to calculate a value, but then convert the value to a result based on the
+ request type.
+ That’s where 
+\family typewriter
+serveJx
+\family default
+ comes in … it’ll serve a response for 
+\family typewriter
+JSON
+\family default
+ and 
+\family typewriter
+XML
+\family default
  requests.
- If you define a trait called Convertable:
+ If you define a trait called 
+\family typewriter
+Convertable
+\family default
+:
 \end_layout
 
 \begin_layout Standard
-trait Convertable { def toXml: Elem def toJson: JValue } Then define a pattern
- that will convert from a Convertable to a JSON or XML:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+trait Convertable {
+\end_layout
+
+\begin_layout Plain Layout
+
+  def toXml: Elem 
+\end_layout
+
+\begin_layout Plain Layout
+
+  def toJson: JValue 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then define a pattern that will convert from a 
+\family typewriter
+Convertable
+\family default
+ to a 
+\family typewriter
+JSON
+\family default
+ or 
+\family typewriter
+XML
+\family default
+:
 \end_layout
 
 \begin_layout Standard
 implicit def cvt: JxCvtPF[Convertable] = { case (JsonSelect, c, _) => c.toJson
- case (XmlSelect, c, _) => c.toXml } And anywhere you use serveJx and your
- pattern results in a Box[Convertable], the cvt pattern is used to generate
- the appropriate response:
+ case (XmlSelect, c, _) => c.toXml } 
 \end_layout
 
 \begin_layout Standard
-serveJx { case Get("api" :: "info" :: Info(info) :: _, _) => Full(info)
- } Or:
+And anywhere you use 
+\family typewriter
+serveJx
+\family default
+ and your pattern results in a 
+\family typewriter
+Box[Convertable]
+\family default
+, the 
+\family typewriter
+cvt
+\family default
+ pattern is used to generate the appropriate response:
 \end_layout
 
 \begin_layout Standard
-// extract the parameters, create a user // return the appropriate response
- def addUser(): Box[UserInfo] = for { firstname <- S.param("firstname") ?~
- "firstname parameter missing" ~> 400 lastname <- S.param("lastname") ?~
- "lastname parameter missing" email <- S.param("email") ?~ "email parameter
- missing" } yield { val u = User.create.firstName(firstname).
- lastName(lastname).email(email)
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+serveJx { 
+\end_layout
+
+\begin_layout Plain Layout
+
+  case Get("api" :: "info" :: Info(info) :: _, _) => Full(info) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-S.param("password") foreach u.password.set
+Or:
 \end_layout
 
 \begin_layout Standard
-u.saveMe }
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+// extract the parameters, create a user 
+\end_layout
+
+\begin_layout Plain Layout
+
+// return the appropriate response 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def addUser(): Box[UserInfo] = 
+\end_layout
+
+\begin_layout Plain Layout
+
+  for { 
+\end_layout
+
+\begin_layout Plain Layout
+
+    firstname <- S.param("firstname") ?~ "firstname parameter missing" ~>
+ 400 
+\end_layout
+
+\begin_layout Plain Layout
+
+    lastname <- S.param("lastname") ?~ "lastname parameter missing" 
+\end_layout
+
+\begin_layout Plain Layout
+
+    email <- S.param("email") ?~ "email parameter missing" 
+\end_layout
+
+\begin_layout Plain Layout
+
+  } yield { 
+\end_layout
+
+\begin_layout Plain Layout
+
+    val u = User.create.firstName(firstname).
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+      lastName(lastname).email(email)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    S.param("password") foreach u.password.set
+\end_layout
+
+\begin_layout Plain Layout
+
+    u.saveMe 
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+serveJx {
+\end_layout
+
+\begin_layout Plain Layout
+
+  case Post("api" :: "add_user" :: _, _) => addUser() 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-serveJx { case Post("api" :: "add_user" :: _, _) => addUser() } In the above
- example, if the firstname parameter is missing, the response will be a
- 400 with the response body “firstname parameter missing”.
- If the lastname parameter is missing, the response will be a 404 with the
- response body “lastname parameter missing”.
+In the above example, if the 
+\family typewriter
+firstname
+\family default
+ parameter is missing, the response will be a 400 with the response body
+ “firstname parameter missing”.
+ If the 
+\family typewriter
+lastname
+\family default
+ parameter is missing, the response will be a 404 with the response body
+ “lastname parameter missing”.
 \end_layout
 
 \begin_layout Chapter
@@ -4473,14 +4497,14 @@ I've looked at Atmosphere and CometD (both JVM-oriented Comet technologies).
  per page or connection starvation avoidance.
 \end_layout
 
-\begin_layout Chapter
-\begin_inset CommandInset label
-LatexCommand label
-name "cha:Snippet-Resolution"
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/advanced_concepts.lyx"
 
 \end_inset
 
-Snippet Resolution
+
 \end_layout
 
 \begin_layout Standard

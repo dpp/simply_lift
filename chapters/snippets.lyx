@@ -78,6 +78,12 @@ String
  that the objects will not change state.
 \end_layout
 
+\begin_layout Subsection
+Snippet 
+\family typewriter
+NodeSeq => NodeSeq
+\end_layout
+
 \begin_layout Standard
 Transformation provides an alternative to 
 \begin_inset Quotes eld
@@ -113,7 +119,8 @@ status open
 
 \begin_layout Plain Layout
 
-<span class="foo lift:WhatTime">The time is <span>currentTime</span></span>
+<span class="foo lift:WhatTime">The time is <span id="current_time">currentTime<
+/span></span>
 \end_layout
 
 \end_inset
@@ -137,7 +144,7 @@ object WhatTime {
 
 \begin_layout Plain Layout
 
-  def render = "span" #> (new Date).toString
+  def render = "#current_time" #> (new Date).toString
 \end_layout
 
 \begin_layout Plain Layout
@@ -171,14 +178,206 @@ status open
 \end_layout
 
 \begin_layout Standard
-See 
+Let's walk through how this works.
+ First, the class attribute in the 
+\family typewriter
+<span>
+\family default
+ has two classes, 
+\family typewriter
+foo
+\family default
+ and 
+\family typewriter
+lift:WhatTime
+\family default
+.
+ Any class attribute that starts with 
+\family typewriter
+lift:
+\family default
+ indicates a snippet invocation.
+ A snippet is a function that transforms HTML to HTML, or in Scala, 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Lift looks up the snippet named 
+\family typewriter
+WhatTime
+\family default
+ (See 
 \begin_inset CommandInset ref
 LatexCommand prettyref
-reference "cha:Snippet-Resolution"
+reference "sec:Snippet-Resolution"
+
+\end_inset
+
+) which in this case resolves to a singleton and invokes the 
+\family typewriter
+render
+\family default
+ method.
+ The render method returns a 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ built using Lift's CSS Selector Transforms (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+).
+ The parameter to the function is the 
+\family typewriter
+Element
+\family default
+ that caused the snippet invocation with the actual snippet invocation removed
+ from the 
+\family typewriter
+class
+\family default
+ attribute: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<span class="foo">The time is <span id="current_time">currentTime</span></span>
+\end_layout
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The function is then applied and the resulting 
+\family typewriter
+NodeSeq
+\family default
+ is inserted in the page where the original 
+\family typewriter
+Element
+\family default
+ was.
+ Because the page is composed of immutable XML objects, we can transform
+ 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ and not worry about anything getting changed out from under us.
+ We also know that we've got valid markup through the entire page transformation
+ process.
+\end_layout
+
+\begin_layout Standard
+Further, retaining the page as a well formed XML document allows certain
+ tags to be put in the 
+\family typewriter
+<head>
+\family default
+ tag and other tags to be inserted just before the close of the 
+\family typewriter
+</body>
+\family default
+ tag (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Page-rewriting"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+But the simplicity of the transform is simulateously easy to understand
+ and very powerful.
+\end_layout
+
+\begin_layout Subsection
+Snippet instances
+\end_layout
+
+\begin_layout Standard
+The snippet could also be defined as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+class WhatTime {
+\end_layout
+
+\begin_layout Plain Layout
+
+  private var x = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  def render = {
+\end_layout
+
+\begin_layout Plain Layout
+
+    x += 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    "#current_time" #> ((new Date).toString + " and you've seen this message
+ "+x+" times)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Multiple methods on a snippet class
+\end_layout
+
+\begin_layout Subsection
+Inter-snippet communication
+\end_layout
+
+\begin_layout Subsection
+Recursive Snippets
+\end_layout
+
+\begin_layout Subsection
+Snippet parameters
 \end_layout
 
 \end_body
