@@ -303,6 +303,15 @@ Dogscape</a>
 // <span class"foo">Dogscape</span> -> <span class"foo error">Dogscape</span>
 \end_layout
 
+\begin_layout Itemize
+
+\family typewriter
+^^
+\family default
+ - lifts the selected element to the root of the elements that are returned
+ making it possible to choose an element from a template
+\end_layout
+
 \begin_layout Standard
 The right hand side of the CSS Selector Transform can be one of the following:
 \end_layout
@@ -409,9 +418,42 @@ List[NodeSeq => NodeSeq], Box[NodeSeq => NodeSeq], Option[NodeSeq => NodeSeq]
 Note that if you bind to the children of a selected element, multiple copies
  of the element result from bind to an IterableConst (if the element has
  an id attribute, the id attribute will be stripped after the first element):
- "#line *" #> List("a", "b", "c") // <li id="line>sample</li> -> <li id="line">a
-</li><li>b</li><li>c</li> "#age *" #> (None: Option[NodeSeq]) // <span><span
- id="age">Dunno</span></span> -> <span/>
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+"#line *" #> List("a", "b", "c") // <li id="line>sample</li> -> 
+\end_layout
+
+\begin_layout Plain Layout
+
+                              // <li id="line">a</li><li>b</li><li>c</li>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+"#age *" #> (None: Option[NodeSeq]) // <span><span id="age">Dunno</span></span>
+ -> 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                    // <span/>
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

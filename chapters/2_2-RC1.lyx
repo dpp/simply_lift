@@ -1,0 +1,330 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Lift 2.2-RC1
+\end_layout
+
+\begin_layout Date
+December 8, 2010
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset CommandInset href
+LatexCommand href
+name "Lift"
+target "http://liftweb.net/"
+
+\end_inset
+
+Lift team is pleased to announce 
+\begin_inset CommandInset href
+LatexCommand href
+name "Lift 2.2-RC1"
+target "http://liftweb.net/download.html"
+
+\end_inset
+
+.
+ In the month since the 2.2-M1 release, the team has closed 53 tickets and
+ made significant improvements to Lift based on 
+\begin_inset CommandInset href
+LatexCommand href
+name "community"
+target "http://groups.google.com/group/liftweb"
+
+\end_inset
+
+ feedback.
+\end_layout
+
+\begin_layout Standard
+Lift is an elegant, expressive framework that allows any size team build
+ and maintain secure, highly interactive, scalable web applications quickly
+ and efficiently.
+ Lift is built on 
+\begin_inset CommandInset href
+LatexCommand href
+name "Scala"
+target "http://scala-lang.org"
+
+\end_inset
+
+ and compiles to JVM byte-code.
+ Lift applications deploy as WAR files on popular application servers and
+ web containers including Jetty, Glassfish and Tomcat.
+ Lift applications can be monitored and managed with the same proven infrastruct
+ure used to manage and monitor any Java web application.
+ Lift is open source licensed under an Apache 2.0 license.
+\end_layout
+
+\begin_layout Subsection*
+Lift features include:
+\end_layout
+
+\begin_layout Itemize
+Community...
+ the Lift community is 2,400 members strong, super-active and always there
+ to help with questions
+\end_layout
+
+\begin_layout Itemize
+Best Comet (server-push) support that allows the creation of dynamic application
+ such as 
+\begin_inset CommandInset href
+LatexCommand href
+name "Novell Vibe"
+target "http://vibe.novell.com"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Super simple Ajax for creating highly interactive web applications without
+ worrying about HTTP plumbing
+\end_layout
+
+\begin_layout Itemize
+Secure by default...
+ Lift apps are resistant to the OWASP top 10 vulnerabilities including XSS,
+ XSRF, and parameter tampering
+\end_layout
+
+\begin_layout Itemize
+Concise and Maintainable...
+ Lift apps typically contain fewer lines of code than corresponding Rails
+ apps, yet are type safe so that many errors are flagged by the compiler
+\end_layout
+
+\begin_layout Itemize
+Scalable...
+ Lift apps scale to millions of users across many servers, yet are highly
+ efficient for single-box implementations
+\end_layout
+
+\begin_layout Itemize
+Compatible...
+ Lift apps can take advantage of any Java library as well as the growing
+ collection of Scala libraries
+\end_layout
+
+\begin_layout Subsection*
+Lift 2.2-RC1 improvements include:
+\end_layout
+
+\begin_layout Itemize
+HTML5 Support: Lift supports parsing HTML5 input files and rendering HTML5
+ to the browser in addition to Lift's XHTML support
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Wiring"
+target "http://demo.liftweb.net/invoice_wiring"
+
+\end_inset
+
+: Spreadsheets meet web application yielding an automatic mechanism for
+ updating dependent elements on a page, making it even easier to build dynamic
+ apps with Lift
+\end_layout
+
+\begin_layout Itemize
+Wizard and Screen Improvements: Build complex screens more easily with new
+ helper methods for creating form elements and improved life-cycle callbacks
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "CSS Selector Transforms"
+target "http://stable.simply.liftweb.net/#sec:CSS-Selector-Transforms"
+
+\end_inset
+
+ Improvements: including appending attributes, multiple selectors applying
+ to a single element, and element lifting
+\end_layout
+
+\begin_layout Itemize
+Support for migratory sessions: 
+\family typewriter
+ContainerVars
+\family default
+ provide type-safe, guaranteed serializable session variables that can migrate
+ across application servers in a cluster
+\end_layout
+
+\begin_layout Itemize
+Improved i18n: including per-page localization strings and localization
+ strings and HTML stored in templates rather than Java resource files which
+ makes editing much easier
+\end_layout
+
+\begin_layout Itemize
+Security Improvements: including creation of new sessions on login
+\end_layout
+
+\begin_layout Itemize
+MongoDB Improvements: performance improvements as well as new features
+\end_layout
+
+\begin_layout Itemize
+Support for Scala 2.8.1 as well as 2.8.0 and 2.7.7
+\end_layout
+
+\begin_layout Itemize
+ProtoUser support for Record: Lift's 
+\family typewriter
+ProtoUser
+\family default
+ and 
+\family typewriter
+CRUDify
+\family default
+ can be used on Record-based persistence classes as well as Mapper-based
+ persistence classes
+\end_layout
+
+\begin_layout Itemize
+Squeryl integration improvements: Lift is updated to use the latest version
+ of Squeryl
+\end_layout
+
+\begin_layout Subsection*
+Lift-powered sites include:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Foursquare"
+target "http://foursquare.com/"
+
+\end_inset
+
+: the multi-million user location based service that services millions of
+ check-ins a day on their Lift-powered system
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Novell Vibe"
+target "http://vibe.novell.com"
+
+\end_inset
+
+: enterprise collaboration software platform based on Google Wave
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Innovation Games"
+target "http://innovationgames.com/"
+
+\end_inset
+
+: The fun way to do serious business -- seriously
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Xerox/XMPie"
+target "http://www.xmpie.com/"
+
+\end_inset
+
+: the leading provider of software for cross-media, variable data one-to-one
+ marketing
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Exchango"
+target "http://exchango.com/"
+
+\end_inset
+
+: The easy and convenient way to give and get free stuff.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Snapsort"
+target "http://snapsort.com/"
+
+\end_inset
+
+: Compare and decide on cameras
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "No Fouls"
+target "http://nofouls.com/"
+
+\end_inset
+
+: Find pickup basketball games
+\end_layout
+
+\begin_layout Standard
+Please join the Lift community and help use grow Lift.
+ And a super-big thanks to the 30+ Lift committers who have grown the Lift
+ community and code-base to what it is today...
+ and what it will be in the future!
+\end_layout
+
+\end_body
+\end_document
