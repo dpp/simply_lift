@@ -3974,138 +3974,14 @@ MVC (If you really want it)
 Recipes
 \end_layout
 
-\begin_layout Chapter
-Dynamically choosing content
-\end_layout
-
-\begin_layout Section
-Problem
-\end_layout
-
 \begin_layout Standard
-I want to to keep design completely separated from logic and I am bit stuck.
- I have a page that loads different pieces of html depending on some variables
- and it also has some ajax code so it may load new pieces of html.
- So far, that page uses only one snippet that has the logic to decide what
- html should be loaded.
- So here is the question, how should the snippet get an only-with-design
- piece of html to bind data to it.
-\end_layout
-
-\begin_layout Section
-Solution
-\end_layout
-
-\begin_layout Standard
-Snippets are evaluated recursively...
- this means that you can return markup from a snippet that contains other
- snippets.
-\end_layout
-
-\begin_layout Standard
-The other thing to pay attention to is the 
-\family typewriter
-<lift:embed>
-\family default
- snippet (See 
-\begin_inset CommandInset ref
-LatexCommand prettyref
-reference "sec:Embed"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-Combining the two:
-\end_layout
-
-\begin_layout Standard
-Main page:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<html><body> Stuff here
-\end_layout
-
-\begin_layout Plain Layout
-
-<div class="lift:ChooseBehavior">Different behavior will go here</div>
-\end_layout
-
-\begin_layout Plain Layout
-
-</body></html>
-\end_layout
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/Recipes.lyx"
 
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-The snippet:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-object ChooseBehavior {
-\end_layout
-
-\begin_layout Plain Layout
-
-  def render = someState match {
-\end_layout
-
-\begin_layout Plain Layout
-
-    case ShowData => <lift:embed what="_showData" />
-\end_layout
-
-\begin_layout Plain Layout
-
-    case EditData => <lift:embed what="_editData" />
-\end_layout
-
-\begin_layout Plain Layout
-
-    case AjaxThing => <lift:embed what="_ajaxThing" />
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Then your designer need only edit the main page and each of the templates,
- and then you wire them together.
-\end_layout
-
-\begin_layout Chapter
-Ajax Forms
 \end_layout
 
 \begin_layout Part

@@ -1,0 +1,379 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Dynamic html tables created from 
+\family typewriter
+DB.runQuery()
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Standard
+What I'm trying is:
+\end_layout
+
+\begin_layout Standard
+1.
+ query the SQL server via 
+\family typewriter
+DB.runQuery()
+\end_layout
+
+\begin_layout Standard
+2.
+ put the result (multiple, rows and columns) into a Table structure like
+ this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<table>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <thead>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <tr><th></th></tr>
+\end_layout
+
+\begin_layout Plain Layout
+
+  </thead>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <tbody>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <tr><td></td></tr>
+\end_layout
+
+\begin_layout Plain Layout
+
+  </tbody>
+\end_layout
+
+\begin_layout Plain Layout
+
+</table>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Solution
+\end_layout
+
+\begin_layout Standard
+The DB.runQuery(sql_query_string) method returns (List[String], List[List[String]
+]), to put that in a table, your view looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<table class="lift:MySnippet">
+\end_layout
+
+\begin_layout Plain Layout
+
+  <thead>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <tr><th id="my_th">Field Name</td></tr>
+\end_layout
+
+\begin_layout Plain Layout
+
+  </thead>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <tbody>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <tr id="my_tr"><td>An item</td></tr>
+\end_layout
+
+\begin_layout Plain Layout
+
+  </tbody>
+\end_layout
+
+\begin_layout Plain Layout
+
+</table>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And your snippet uses CSS Selector Transforms (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+) and looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object MySnippet {
+\end_layout
+
+\begin_layout Plain Layout
+
+  def render = {
+\end_layout
+
+\begin_layout Plain Layout
+
+    val (fieldNames: List[String], fieldValues: List[List[String]]) = DB.runQuery
+(...)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    "#my_th *" #> fieldNames &
+\end_layout
+
+\begin_layout Plain Layout
+
+    "#my_tr *" #> fieldValues.map(values => "td *" #> values)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Dynamically choosing content
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Standard
+I want to to keep design completely separated from logic and I am bit stuck.
+ I have a page that loads different pieces of html depending on some variables
+ and it also has some ajax code so it may load new pieces of html.
+ So far, that page uses only one snippet that has the logic to decide what
+ html should be loaded.
+ So here is the question, how should the snippet get an only-with-design
+ piece of html to bind data to it.
+\end_layout
+
+\begin_layout Section
+Solution
+\end_layout
+
+\begin_layout Standard
+Snippets are evaluated recursively...
+ this means that you can return markup from a snippet that contains other
+ snippets.
+\end_layout
+
+\begin_layout Standard
+The other thing to pay attention to is the 
+\family typewriter
+<lift:embed>
+\family default
+ snippet (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Embed"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Combining the two:
+\end_layout
+
+\begin_layout Standard
+Main page:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<html><body> Stuff here
+\end_layout
+
+\begin_layout Plain Layout
+
+<div class="lift:ChooseBehavior">Different behavior will go here</div>
+\end_layout
+
+\begin_layout Plain Layout
+
+</body></html>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The snippet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object ChooseBehavior {
+\end_layout
+
+\begin_layout Plain Layout
+
+  def render = someState match {
+\end_layout
+
+\begin_layout Plain Layout
+
+    case ShowData => <lift:embed what="_showData" />
+\end_layout
+
+\begin_layout Plain Layout
+
+    case EditData => <lift:embed what="_editData" />
+\end_layout
+
+\begin_layout Plain Layout
+
+    case AjaxThing => <lift:embed what="_ajaxThing" />
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then your designer need only edit the main page and each of the templates,
+ and then you wire them together.
+\end_layout
+
+\begin_layout Chapter
+Ajax Forms
+\end_layout
+
+\end_body
+\end_document
