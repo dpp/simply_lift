@@ -375,5 +375,157 @@ Then your designer need only edit the main page and each of the templates,
 Ajax Forms
 \end_layout
 
+\begin_layout Chapter
+Protecting REST APIs
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Standard
+
+I want to expose part of my site as authenticated REST, but with custom
+ authentication (not the HTTP based authentication).
+\end_layout
+
+\begin_layout Standard
+
+Right now, I'm thinking of using a custom dispatch, but that means I'll
+ have to check every request in the request handler itself to see if it
+ is authenticated, right?
+\end_layout
+
+\begin_layout Standard
+
+Authentication is just a SessionVar on the server, so it also implies I
+ need a way to pass the session identifier back and forth between the REST
+ client and the service.
+ If it were a cookie I think it would be transparent, but I think Lift adds
+ te session ids to the URLs (at least that's what I see in my address bar).
+\end_layout
+
+\begin_layout Standard
+
+So, assuming I have a public "login" REST call that sets a SessionVar, how
+ do I pass this transarently to the REST client? I have thought about a
+ token system as well, but that seems like copying the session system.
+\end_layout
+
+\begin_layout Standard
+
+Any suggestions? 
+\end_layout
+
+\begin_layout Section
+
+Solution
+\end_layout
+
+\begin_layout Standard
+
+If you've got a:
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object MyService extends RestHelper {
+\end_layout
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+And:
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+val ensureSession: PartialFunction[Req, Unit] = {
+\end_layout
+
+\begin_layout Plain Layout
+
+  case _ if isLoggedIn => 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+then in Boot:
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import net.liftweb.util.Helpers._
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+LiftRules.dispatch.append(ensureSession guard MyService)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+This is a simple way to compose 
+\family typewriter
+PartialFunctions
+\family default
+ and put a guard around all the elements of a 
+\family typewriter
+PartialFunction
+\family default
+.
+\end_layout
+
 \end_body
 \end_document
