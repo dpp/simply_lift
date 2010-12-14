@@ -30,6 +30,8 @@ target
 lib_managed
 src_managed
 */project/boot
+*/*/project/boot
+*/*/*/project/boot
 
 # db
 lift_proto*
