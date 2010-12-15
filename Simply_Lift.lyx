@@ -3984,6 +3984,234 @@ filename "chapters/Recipes.lyx"
 
 \end_layout
 
+\begin_layout Chapter
+Embedding JavaScript in an HTML page
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Standard
+What am I doing wrong? I'm trying to output a javascript object into the
+ page (so my front end guy can do some stuff with the data without parsing
+ it out of elements by id) but it's replacing all the double quotes with
+ 
+\family typewriter
+&quot;
+\family default
+ (only in view source - if I inspect it then firebug converts them to double
+ quotes again)
+\end_layout
+
+\begin_layout Standard
+I've copied the example from 
+\noun on
+Exploring Lift
+\noun default
+, but it still does the same:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+& ".data_as_object *" #> {
+\end_layout
+
+\begin_layout Plain Layout
+
+   JsCrVar("myObject", JsObj(("persons", JsArray(
+\end_layout
+
+\begin_layout Plain Layout
+
+       JsObj(("name", "Thor"), ("race", "Asgard")),
+\end_layout
+
+\begin_layout Plain Layout
+
+       JsObj(("name", "Todd"), ("race", "Wraith")),
+\end_layout
+
+\begin_layout Plain Layout
+
+       JsObj(("name", "Rodney"), ("race", "Human"))
+\end_layout
+
+\begin_layout Plain Layout
+
+   ))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Becomes:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<div class="data_as_object" style="display: none;">var myObject =
+\end_layout
+
+\begin_layout Plain Layout
+
+{&quot;persons&quot;: [{&quot;name&quot;: &quot;Thor&quot;,
+\end_layout
+
+\begin_layout Plain Layout
+
+&quot;race&quot;: &quot;Asgard&quot;}, {&quot;name&quot;:
+\end_layout
+
+\begin_layout Plain Layout
+
+&quot;Todd&quot;, &quot;race&quot;: &quot;Wraith&quot;},
+\end_layout
+
+\begin_layout Plain Layout
+
+{&quot;name&quot;: &quot;Rodney&quot;, &quot;race&quot;:
+\end_layout
+
+\begin_layout Plain Layout
+
+&quot;Human&quot;}]
+\end_layout
+
+\begin_layout Plain Layout
+
+};</div>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+I've noticed that if what I'm outputting is a number rather than a string
+ then it's fine.
+\end_layout
+
+\begin_layout Section
+Solution
+\end_layout
+
+\begin_layout Standard
+Try:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+& ".data_as_object *" #> {
+\end_layout
+
+\begin_layout Plain Layout
+
+   Script(JsCrVar("myObject", JsObj(("persons", JsArray(
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+       JsObj(("name", "Thor"), ("race", "Asgard")),
+\end_layout
+
+\begin_layout Plain Layout
+
+       JsObj(("name", "Todd"), ("race", "Wraith")),
+\end_layout
+
+\begin_layout Plain Layout
+
+       JsObj(("name", "Rodney"), ("race", "Human"))
+\end_layout
+
+\begin_layout Plain Layout
+
+   )))))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+JsExp
+\family default
+ are also 
+\family typewriter
+Node
+\family default
+s, so they render out, but they render out escaped.
+ Putting 
+\family typewriter
+Script()
+\family default
+ around them turns them into:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<script>
+\end_layout
+
+\begin_layout Plain Layout
+
+// <![CDATA[
+\end_layout
+
+\begin_layout Plain Layout
+
+....
+\end_layout
+
+\begin_layout Plain Layout
+
+]]>
+\end_layout
+
+\begin_layout Plain Layout
+
+</script>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Part
 Questions and Answers
 \end_layout

@@ -346,6 +346,7 @@ S.mapSnippet
 S.mapSnippet
 \family default
 .
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -381,77 +382,317 @@ loc.snippet(snippetName)
 \end_layout
 
 \begin_layout Itemize
-LiftRules.snippets (split at '.' or ':')
+
+\family typewriter
+LiftRules.snippets
+\family default
+ - next, the snippet name is split at the '.' character to determine the
+ snippet name and snippet method name.
+ The 
+\family typewriter
+snippets
+\family default
+ 
+\family typewriter
+RulesSeq
+\family default
+ is tested for a match between the 
+\family typewriter
+List[String]
+\family default
+ that results from splitting the name at the period and 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
 \end_layout
 
 \begin_layout Itemize
-LiftSession.findSnippetInstance
+If the above mechanisms do not result in a NodeSeq => NodeSeq, Lift looks
+ for a 
+\family typewriter
+Class
+\family default
+ that matches the name.
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-S.snippetForClass - previously marked dispatch snippets
+
+\family typewriter
+S.snippetForClass
+\family default
+ - is checked to see if a 
+\family typewriter
+Class
+\family default
+ has been associated with the snippet name.
+ If none is found...
 \end_layout
 
 \begin_layout Itemize
+
+\family typewriter
 LiftRules.snippetDispatch
+\family default
+ is checked to see if theres an instance of 
+\family typewriter
+DispatchSnippet
+\family default
+ that matches to snippet name.
+ Lift's built-in snippets are registered with 
+\family typewriter
+LiftRules.snippetDispatch
+\family default
+.
+ If there's no match...
 \end_layout
 
 \begin_layout Itemize
-LiftRules.buildPackages (LiftRules.addToPackages) + "lift.app.snippet" + packageSuff
-ix) :: ("net.liftweb.builtin.snippet" -- search for a class
+Lift tries reflection to find a matching class name (note that Lift will
+ try camel case and snake case for class names, so the 
+\family typewriter
+foo_bar
+\family default
+ snippet will match the class 
+\family typewriter
+foo_bar
+\family default
+ as well as 
+\family typewriter
+FooBar
+\family default
+).
+ Lift looks for classes in the 
+\family typewriter
+snippet
+\family default
+ subpackage of all the packages added via 
+\family typewriter
+LiftRules.addToPackages
+\family default
+.
+ So if you call 
+\family typewriter
+LiftRules.addToPackages("foo.bar")
+\family default
+ in 
+\family typewriter
+Boot.scala
+\family default
+, then Lift will search for the classes 
+\family typewriter
+foo.bar.snippet.foo_bar
+\family default
+ and 
+\family typewriter
+foo.bar.snippet.FooBar
+\family default
+.
+\end_layout
+
+\begin_layout Itemize
+Once the class is found, Lift will try to instantiate the class the following
+ ways:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-instantiate via Loc param + Session or Loc Param or
+Lift will look at the current location (
+\family typewriter
+S.location
+\family default
+) and if the parameter type of the 
+\family typewriter
+Loc
+\family default
+ is not 
+\family typewriter
+Unit
+\family default
+, Lift get the current parameter and look for a constructor that matches
+ the current parameter type or 
+\family typewriter
+Box
+\family default
+ of current parameter type (and superclasses of both).
+ If there's a match the constructor will be called with the parameters.
+ For example, if the current page is a 
+\family typewriter
+Loc[Dog]
+\family default
+ and 
+\family typewriter
+Dog
+\family default
+ is a subclass of 
+\family typewriter
+Animal
+\family default
+, the following constructors will match:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+class MySnippet(dog: Dog)
 \end_layout
 
 \begin_layout Itemize
-instantiate via empty constructor or
+
+\family typewriter
+class MySnippet(animal: Animal)
 \end_layout
 
 \begin_layout Itemize
-look for object singleton
+
+\family typewriter
+class MySnippet(dog: Box[Dog])
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+class MySnippet(animal: Box[Animal])
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+class MySnippet(dog: Dog, session: LiftSession)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+class MySnippet(animal: Animal, session: LiftSession)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+class MySnippet(dog: Box[Dog], session: LiftSession)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+class MySnippet(animal: Box[Animal], session: LiftSession)
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-If it's a StatefulSnippet, register with S.overrideSnippetForClass
+If a typed constructor cannot be found, try the zero argument constructor;
 \end_layout
 
 \begin_layout Itemize
-Update LiftSession snippetMap RequestVar so subsequent references to the
- snippet during the same extended request use same instance
+If the zero argument constructor cannot be found, try to treat the 
+\family typewriter
+Class
+\family default
+ as a Scala 
+\family typewriter
+object
+\family default
+ singleton and get the instance that the singleton refers to.
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
-Method invocation
+Once we've got an instance of the potential snippet handling class:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-StatefulSnippet add hidden registration for forms
+If it's a 
+\family typewriter
+StatefulSnippet
+\family default
+, register with 
+\family typewriter
+S.overrideSnippetForClass
+\family default
+;
 \end_layout
 
 \begin_layout Itemize
-Stateful and Dispatch use dispatch method to find the NodeSeq => NodeSeq
+Update the 
+\family typewriter
+LiftSession
+\family default
+ 
+\family typewriter
+snippetMap
+\family default
+ 
+\family typewriter
+RequestVar
+\family default
+ so subsequent references to the snippet during the same extended request
+ uses same instance (that way if any instance variables are set on the class
+ instance, they are picked up by subsequent accesses to the same snippet);
+\end_layout
+
+\begin_layout Itemize
+Next, Lift attempts to invoke the snippet method.
+ If no explicit method is given, the 
+\family typewriter
+render
+\family default
+ method is used.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Stateful and Dispatch use 
+\family typewriter
+dispatch
+\family default
+ method to find the 
+\family typewriter
+NodeSeq => NodeSeq
 \end_layout
 
 \begin_layout Itemize
 Non-dispatch, do the following method lookup:
 \end_layout
 
-\begin_deeper
 \begin_layout Itemize
-method that takes no parameters and returns CssBindFunc, NodeSeq => NodeSeq,
- invoke the method and apply the function to the children
+method that takes no parameters and returns 
+\family typewriter
+CssBindFunc
+\family default
+, 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+, invoke the method and apply the function to the children; or
 \end_layout
 
 \begin_layout Itemize
-try to invoke the named method with Group(children) (NodeSeq signature)
- or invoke it with no parameters.
- If the return value is NodeSeq, Node, or Seq[Node], then it was successful
+try to invoke the named method with 
+\family typewriter
+Group(children)
+\family default
+ (
+\family typewriter
+NodeSeq
+\family default
+ signature) or invoke it with no parameters.
+ If the return value is 
+\family typewriter
+NodeSeq
+\family default
+, 
+\family typewriter
+Node
+\family default
+, or 
+\family typewriter
+Seq[Node]
+\family default
+, then it was successful.
 \end_layout
 
 \end_deeper
@@ -462,7 +703,7 @@ Post-processing of results
 \end_layout
 
 \begin_layout Standard
-asdsadsa
+
 \end_layout
 
 \begin_layout Itemize

@@ -384,20 +384,17 @@ Problem
 \end_layout
 
 \begin_layout Standard
-
 I want to expose part of my site as authenticated REST, but with custom
  authentication (not the HTTP based authentication).
 \end_layout
 
 \begin_layout Standard
-
 Right now, I'm thinking of using a custom dispatch, but that means I'll
  have to check every request in the request handler itself to see if it
  is authenticated, right?
 \end_layout
 
 \begin_layout Standard
-
 Authentication is just a SessionVar on the server, so it also implies I
  need a way to pass the session identifier back and forth between the REST
  client and the service.
@@ -406,29 +403,24 @@ Authentication is just a SessionVar on the server, so it also implies I
 \end_layout
 
 \begin_layout Standard
-
 So, assuming I have a public "login" REST call that sets a SessionVar, how
  do I pass this transarently to the REST client? I have thought about a
  token system as well, but that seems like copying the session system.
 \end_layout
 
 \begin_layout Standard
-
 Any suggestions? 
 \end_layout
 
 \begin_layout Section
-
 Solution
 \end_layout
 
 \begin_layout Standard
-
 If you've got a:
 \end_layout
 
 \begin_layout Standard
-
 \begin_inset listings
 inline false
 status open
@@ -454,12 +446,10 @@ object MyService extends RestHelper {
 \end_layout
 
 \begin_layout Standard
-
 And:
 \end_layout
 
 \begin_layout Standard
-
 \begin_inset listings
 inline false
 status open
@@ -485,12 +475,10 @@ val ensureSession: PartialFunction[Req, Unit] = {
 \end_layout
 
 \begin_layout Standard
-
 then in Boot:
 \end_layout
 
 \begin_layout Standard
-
 \begin_inset listings
 inline false
 status open
@@ -515,7 +503,6 @@ LiftRules.dispatch.append(ensureSession guard MyService)
 \end_layout
 
 \begin_layout Standard
-
 This is a simple way to compose 
 \family typewriter
 PartialFunctions
