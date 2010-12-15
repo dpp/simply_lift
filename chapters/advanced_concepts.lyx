@@ -56,6 +56,423 @@ name "sec:Snippet-Resolution"
 Snippet Resolution
 \end_layout
 
+\begin_layout Standard
+Lift snippets transform markup to dynamic content.
+ The are functions that transform 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Snippets can be invoked from templates via tags:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<lift:surround with="default" at="content">
+\end_layout
+
+\begin_layout Plain Layout
+
+  <p>
+\end_layout
+
+\begin_layout Plain Layout
+
+    You have reached this page, but you can only get here if you've logged
+ in
+\end_layout
+
+\begin_layout Plain Layout
+
+    first.
+\end_layout
+
+\begin_layout Plain Layout
+
+  </p>
+\end_layout
+
+\begin_layout Plain Layout
+
+</lift:surround>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+or via class attributes.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<p class="lift:surround?with=default;at=content">
+\end_layout
+
+\begin_layout Plain Layout
+
+  You have reached this page, but you can only get here if you've logged
+ in
+\end_layout
+
+\begin_layout Plain Layout
+
+  first.
+\end_layout
+
+\begin_layout Plain Layout
+
+</p>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In both cases, the surround (See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "sec:Surround"
+
+\end_inset
+
+) snippet will be invoked with attribute 
+\family typewriter
+with
+\family default
+ set to 
+\family typewriter
+default
+\family default
+ and 
+\family typewriter
+at
+\family default
+ set to 
+\family typewriter
+content
+\family default
+.
+ The parameter passed to the surround 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ function is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<p>
+\end_layout
+
+\begin_layout Plain Layout
+
+  You have reached this page, but you can only get here if you've logged
+ in
+\end_layout
+
+\begin_layout Plain Layout
+
+  first.
+\end_layout
+
+\begin_layout Plain Layout
+
+</p>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Lift will resolve from the snippet name to a function in the following steps.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+LiftSession.liftTagProcessing
+\end_layout
+
+\begin_layout Standard
+Lift consults a 
+\family typewriter
+List[PartialFunction[(String, Elem, MetaData, NodeSeq, String), NodeSeq]]
+\family default
+ located in LiftSession.liftTagProcessing for the rules to use to evaluate
+ the snippet name, attributes, etc.
+ into the resulting 
+\family typewriter
+NodeSeq
+\family default
+.
+ 
+\family typewriter
+LiftSession.liftTagProcessing
+\family default
+ is the result of 
+\family typewriter
+LiftRules.liftTagProcessing
+\family default
+ or else the default Lift tag processor.
+ If you need special snippet resolution mechanisms, you can place them in
+ 
+\family typewriter
+LiftRules.liftTagProcessing
+\family default
+.
+ By default, the snippets get processed by 
+\family typewriter
+LiftSession.processSnippet.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+LiftRules.liftTagProcessing
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+LiftRules.liftTagProcessing
+\family default
+ looks for the 
+\family typewriter
+form
+\family default
+ attribute and sets the 
+\family typewriter
+isForm
+\family default
+ variable.
+ Next, Lift determines if the contents of the snippet should be evaluated
+ eagerly by looking for one of 
+\family typewriter
+eager_eval
+\family default
+, 
+\family typewriter
+l:eager_eval
+\family default
+, or 
+\family typewriter
+lift:eager_eval
+\family default
+ attributes.
+\end_layout
+
+\begin_layout Standard
+If the snippet is an eager evaluation, the child tags will be evaluated
+ for any snippets.
+\end_layout
+
+\begin_layout Standard
+Either the originally passed children or the eagerly evaluated children
+ will be referred to as children in the next section.
+\end_layout
+
+\begin_layout Subsection
+Snippet name resolution
+\end_layout
+
+\begin_layout Standard
+Lift looks for the named snippet in the following locations in order:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+S.locateMappedSnippet
+\family default
+ - the complete snippet name without any camel or snake application is used
+ to look up a 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ in within the scope of the current extended request
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+For the purposes of this discussion, the extended request is the scope of
+ a 
+\family typewriter
+RequestVar
+\family default
+.
+ This is the scope of a full page render plus any subsequent Ajax operations
+ that originate from that page.
+ This means that a snippet may be registered using 
+\family typewriter
+S.mapSnippet
+\family default
+ during page rendering and the same snippet function with the same scope
+ binding will be used by any Ajax commands.
+\end_layout
+
+\end_inset
+
+.
+ Snippets may be registered using 
+\family typewriter
+S.mapSnippet
+\family default
+.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+SiteMap
+\family default
+ 
+\family typewriter
+Loc
+\family default
+ snippet - the current 
+\family typewriter
+SiteMap
+\family default
+ 
+\family typewriter
+Loc
+\family default
+ (
+\family typewriter
+S.location
+\family default
+) will be queried to see if it has a 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ that matches the current snippet name (
+\family typewriter
+loc.snippet(snippetName)
+\family default
+).
+\end_layout
+
+\begin_layout Itemize
+LiftRules.snippets (split at '.' or ':')
+\end_layout
+
+\begin_layout Itemize
+LiftSession.findSnippetInstance
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+S.snippetForClass - previously marked dispatch snippets
+\end_layout
+
+\begin_layout Itemize
+LiftRules.snippetDispatch
+\end_layout
+
+\begin_layout Itemize
+LiftRules.buildPackages (LiftRules.addToPackages) + "lift.app.snippet" + packageSuff
+ix) :: ("net.liftweb.builtin.snippet" -- search for a class
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+instantiate via Loc param + Session or Loc Param or
+\end_layout
+
+\begin_layout Itemize
+instantiate via empty constructor or
+\end_layout
+
+\begin_layout Itemize
+look for object singleton
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+If it's a StatefulSnippet, register with S.overrideSnippetForClass
+\end_layout
+
+\begin_layout Itemize
+Update LiftSession snippetMap RequestVar so subsequent references to the
+ snippet during the same extended request use same instance
+\end_layout
+
+\begin_layout Itemize
+Method invocation
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+StatefulSnippet add hidden registration for forms
+\end_layout
+
+\begin_layout Itemize
+Stateful and Dispatch use dispatch method to find the NodeSeq => NodeSeq
+\end_layout
+
+\begin_layout Itemize
+Non-dispatch, do the following method lookup:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+method that takes no parameters and returns CssBindFunc, NodeSeq => NodeSeq,
+ invoke the method and apply the function to the children
+\end_layout
+
+\begin_layout Itemize
+try to invoke the named method with Group(children) (NodeSeq signature)
+ or invoke it with no parameters.
+ If the return value is NodeSeq, Node, or Seq[Node], then it was successful
+\end_layout
+
+\end_deeper
+\end_deeper
+\end_deeper
+\begin_layout Subsection
+Post-processing of results
+\end_layout
+
+\begin_layout Standard
+asdsadsa
+\end_layout
+
+\begin_layout Itemize
+LiftRules.snippetDispatch (built in snippets registered here)
+\end_layout
+
+\begin_layout Standard
+parallel snippets
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
