@@ -1,0 +1,422 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Snippets and SiteMap
+\end_layout
+
+\begin_layout Standard
+Lift services HTTP request in three ways: generating HTML pages, low level
+ HTTP responses (e.g., REST), and responding to Ajax/Comet requests.
+ Lift treats each type of request differently to make the semantics for
+ responding to each type of request most natural.
+ Put another way, it's different to build a complex HTML page with lots
+ of different components than to send back some JSON data that corresponds
+ to a database record.
+\end_layout
+
+\begin_layout Standard
+In this chapter, we're going to explore how Lift does dynamic HTML page
+ generation based on the incoming HTTP request and URL including putting
+ 
+\begin_inset Quotes eld
+\end_inset
+
+chrome
+\begin_inset Quotes erd
+\end_inset
+
+ around the HTML page (menus, etc.), placing dynamic content on each page,
+ and site navigation including access control.
+\end_layout
+
+\begin_layout Standard
+The code for this chapter can be found in the 
+\family typewriter
+samples/snippet_and_sitemap
+\family default
+ directory of the 
+\emph on
+Simply Lift
+\emph default
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "distribution"
+target "https://github.com/dpp/simply_lift/tarball/master"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Starting at the beginning: 
+\family typewriter
+Boot.scala
+\end_layout
+
+\begin_layout Standard
+When your Lift application first starts up, it executes the code in Boot.scala:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/bootstrap/liftweb/Boot.scala"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rather than keeping configuration parameters in XML files, Lift keeps configurat
+ion parameters in code in 
+\family typewriter
+Boot
+\family default
+.
+ Boot is executed once when the servlet container loads the Lift application.
+ You can change many of Lift's execution rules in the 
+\family typewriter
+LiftRules
+\family default
+ singleton during boot, but after boot, these parameters are frozen.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+LiftRules
+\family default
+ rules
+\end_layout
+
+\begin_layout Standard
+Most of the configuration parameters that define how Lift will convert an
+ HTTP request into a response are contained in the 
+\family typewriter
+LiftRules
+\family default
+ singleton.
+ Some of the parameters for 
+\family typewriter
+LiftRules
+\family default
+ are used commonly and some are very infrequently changed from their default.
+ LiftRules can be changed during boot, but not at other times.
+ So, set all your configuration in boot (or in methods that are called from
+ boot).
+\end_layout
+
+\begin_layout Subsection
+Properties and Run modes
+\end_layout
+
+\begin_layout Standard
+While many properties for your running application can be defined in 
+\family typewriter
+Boot.scala
+\family default
+, there are some properties that are best defined in a text file.
+ Lift supports multiple properties files per project.
+ The properties files are loaded based on the user, machine and run mode.
+\end_layout
+
+\begin_layout Standard
+If you want to provide a configuration file for a subset of your application
+ or for a specific environment, Lift expects configuration files to be named
+ in a manner relating to the context in which they are being used.
+ The standard name format is:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+modeName.userName.hostName.props
+\end_layout
+
+\begin_layout Standard
+examples:
+\family typewriter
+
+\begin_inset Newline newline
+\end_inset
+
+dpp.yak.props
+\begin_inset Newline newline
+\end_inset
+
+test.dpp.yak.props
+\begin_inset Newline newline
+\end_inset
+
+production.moose.props
+\begin_inset Newline newline
+\end_inset
+
+staging.dpp.props
+\begin_inset Newline newline
+\end_inset
+
+test.default.props
+\begin_inset Newline newline
+\end_inset
+
+default.props
+\end_layout
+
+\begin_layout Standard
+with hostName and userName being optional, and modeName being one of "test",
+ "staging", "production", "pilot", "profile", or blank (for development
+ mode).
+ The standard Lift properties file extension is "props".
+\end_layout
+
+\begin_layout Standard
+Place properties files in the 
+\family typewriter
+src/main/resources/props
+\family default
+ directory in your project and they will be packaged up as part of the build
+ process.
+\end_layout
+
+\begin_layout Standard
+When you're developing your Lift application, the run mode (see 
+\family typewriter
+net.liftweb.util.Props.mode
+\family default
+) will be 
+\family typewriter
+Development
+\family default
+.
+ When you deploy your application, pass 
+\family typewriter
+-Drun.mode=production
+\family default
+ to your web container.
+ In production mode, Lift aggressively caches templates, snippet classes,
+ etc.
+\end_layout
+
+\begin_layout Subsection
+By convention
+\end_layout
+
+\begin_layout Standard
+Lift, like Rails, will look for items in certain locations by convention.
+ For example, Lift will look for classes that implement snippets in the
+ 
+\family typewriter
+xxx.snippet
+\family default
+ package where the xxx part is the main package for your application.
+ You define one or more packages for Lift to look in with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // where to search snippet
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.addToPackages("code")
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, we've added the 
+\family typewriter
+code
+\family default
+ package to the list of packages that Lift will search through.
+ You can also do 
+\family typewriter
+LiftRules.addToPackages("com.fruitbat.mydivision.myapplication")
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Misc Rules
+\end_layout
+
+\begin_layout Standard
+We'll skip the sitemap definition until the next section.
+ This rule defines how to show a spinning icon during Ajax calls (Lift will
+ automatically show the spinning icon if this function is enabled):
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    //Show the spinny image when an Ajax call starts
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.ajaxStart =
+\end_layout
+
+\begin_layout Plain Layout
+
+      Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And this rule sets the default character encoding to UTF-8 rather than the
+ default platform encoding:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // Force the request to be UTF-8
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Okay...
+ you get the idea...
+ there are plenty of parameters to tune during boot.
+\end_layout
+
+\begin_layout Subsection
+Html5
+\end_layout
+
+\begin_layout Standard
+Prior to Lift 2.2, Lift treated all templates as XHTML and emitted XHTML
+ to the browser.
+ When the Lift project started in early 2007, this seemed like a Really
+ Good Idea™.
+ Turns out the world has not adopted XHTML and some JavaScript libraries,
+ e.g.
+ Google Maps, doesn't work on XHTML pages.
+ Lift 2.2 introduced optional Html5 support both in the parser (so it could
+ read Html5 templates rather than requiring well formed XML in templates)
+ and emits Html5 to the browser.
+ Lift still processes pages as Scala 
+\family typewriter
+NodeSeq
+\family default
+ elements, so no changes are required to the application.
+\end_layout
+
+\begin_layout Standard
+In order to keep Lift 2.2 apps backward compatible with Lift's XHTML support,
+ by default the XHTML parser/serializer are used.
+ However, it's recommended to use the Html5 support which can be turned
+ on in boot with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // Use HTML5 for rendering
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.htmlProperties.default.set((r: Req) =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      new Html5Properties(r.userAgent))  
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+SiteMap
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\end_body
+\end_document
