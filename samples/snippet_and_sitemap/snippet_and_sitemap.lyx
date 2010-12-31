@@ -110,6 +110,7 @@ When your Lift application first starts up, it executes the code in Boot.scala:
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/scala/bootstrap/liftweb/Boot.scala"
+lstparams "caption={Boot.scala}"
 
 \end_inset
 
@@ -1060,7 +1061,23 @@ currentValue
 \end_layout
 
 \begin_layout Standard
-It's possible to hand-write Loc implementation that will match 
+It's possible to hand-write Loc implementation that will match many URL
+ parameters.
+\end_layout
+
+\begin_layout Standard
+For information on accessing the captured parameters (in this case the 
+\family typewriter
+ParamInfo
+\family default
+), see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sub:Param-Example"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -1190,7 +1207,7 @@ Let's look at the page source:
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/webapp/index.html"
-lstparams "language=xml"
+lstparams "caption={index.html},language=xml"
 
 \end_inset
 
@@ -1617,7 +1634,7 @@ dynamic.html
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/webapp/dynamic.html"
-lstparams "language=xml"
+lstparams "caption={dynamic.html},language=xml"
 
 \end_inset
 
@@ -1640,6 +1657,7 @@ HelloWorld.scala
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/scala/code/snippet/HelloWorld.scala"
+lstparams "caption={HelloWorld.scala}"
 
 \end_inset
 
@@ -1789,6 +1807,7 @@ Embedded.scala
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/scala/code/snippet/Embedded.scala"
+lstparams "caption={Embedded.scala}"
 
 \end_inset
 
@@ -1849,6 +1868,12 @@ location
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Param-Example"
+
+\end_inset
+
 Param Example
 \end_layout
 
@@ -1869,7 +1894,7 @@ Loc[ParamInfo]
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/webapp/param.html"
-lstparams "language=xml"
+lstparams "caption={param.html},language=xml"
 
 \end_inset
 
@@ -1888,6 +1913,7 @@ ParamInfo
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/scala/code/snippet/Param.scala"
+lstparams "caption={Param.scala}"
 
 \end_inset
 
@@ -1979,6 +2005,14 @@ currentValue
 \end_layout
 
 \begin_layout Subsection
+Recursive
+\end_layout
+
+\begin_layout Standard
+FIXME example and discussion of recursive snippets
+\end_layout
+
+\begin_layout Subsection
 Summary
 \end_layout
 
@@ -2016,8 +2050,7 @@ SiteMap
 \end_layout
 
 \begin_layout Standard
-In the next chapter, we'll take a dive into Lift's low-level support for
- HTTP.
+In the next chapter, we'll take a dive into Lift's form handling.
 \end_layout
 
 \end_body

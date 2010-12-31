@@ -1011,6 +1011,16 @@ filename "samples/snippet_and_sitemap/snippet_and_sitemap.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
+filename "samples/forms/forms.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
 filename "samples/http_rest/http_rest.lyx"
 
 \end_inset
