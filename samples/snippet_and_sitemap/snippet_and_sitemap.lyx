@@ -4,6 +4,11 @@
 \begin_header
 \textclass book
 \use_default_options true
+\begin_modules
+eqs-within-sections
+figs-within-sections
+theorems-ams
+\end_modules
 \language english
 \inputencoding auto
 \font_roman default
@@ -36,6 +41,7 @@
 \paperpagestyle default
 \tracking_changes false
 \output_changes false
+\author "" 
 \author "" 
 \end_header
 
@@ -415,7 +421,1603 @@ SiteMap
 \end_layout
 
 \begin_layout Standard
+Lift has an optional feature called SiteMap.
+ You don't have to use it.
+ But if you do set a sitemap in boot, then Lift will use the sitemap as
+ a white list of HTML pages for your site (note that REST URLs do not need
+ to be listed in the sitemap).
+ SiteMap defines navigation and access control, allows you to create hierarchica
+l menus, grouped menu items, display the entire sitemap, a relative sitemap,
+ as well breadcrumbs.
+ This section will discuss some of SiteMap's capabilities.
+\end_layout
 
+\begin_layout Subsection
+Defining the 
+\family typewriter
+SiteMap
+\end_layout
+
+\begin_layout Standard
+The SiteMap must be defined in boot and is only defined once
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+In development mode, the sitemap can be changed dynamically to support changes
+ to site content without having to re-start your application each time navigatio
+n changes.
+ This is a development-time feature only.
+ There are significant performance penalties associated with rebuilding
+ the sitemap on each page load including forcing the serialization of serving
+ pages.
+ There are plenty of features in SiteMap that allow you to enable/disable
+ menu items and have dynamically generated submenus.
+ Don't rely on Lift's development-mode menu reloading for your application
+ design.
+\end_layout
+
+\end_inset
+
+.
+ Typcially, you will define a function that returns a SiteMap instance:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // Build SiteMap
+\end_layout
+
+\begin_layout Plain Layout
+
+    def sitemap(): SiteMap = ...
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And then define the 
+\family typewriter
+SiteMap
+\family default
+ in 
+\family typewriter
+LiftRules
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // set the sitemap.
+  Note if you don't want access control for
+\end_layout
+
+\begin_layout Plain Layout
+
+    // each page, just comment this line out.
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.setSiteMapFunc(() => sitemap())
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In development mode, the function will be called on each page load to rebuilt
+ the SiteMap.
+ In all other Lift run modes, the sitemap will be built once during boot.
+\end_layout
+
+\begin_layout Standard
+A 
+\family typewriter
+SiteMap
+\family default
+ is a collection of 
+\family typewriter
+Menu
+\family default
+ instances.
+ Each 
+\family typewriter
+Menu
+\family default
+ has one 
+\family typewriter
+Loc[_]
+\family default
+ and a set of 
+\family typewriter
+Menu
+\family default
+ instances as submenus (zero or more).
+ Each 
+\family typewriter
+Menu
+\family default
+ instance has a unique name.
+\end_layout
+
+\begin_layout Standard
+If an HTML page is not defined in the sitemap, Lift will not serve it.
+ SiteMap is a white list of pages to serve.
+ Further, the 
+\family typewriter
+Loc[_]
+\family default
+ has parameters that can include multiple access control rules.
+\end_layout
+
+\begin_layout Subsection
+Simplest 
+\family typewriter
+SiteMap
+\end_layout
+
+\begin_layout Standard
+The simplest sitemap defines a single page:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    def sitemap(): SiteMap = SiteMap(Menu.i("Home") / "index")
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a SiteMap with a single menu item.
+ The Menu has the name 
+\begin_inset Quotes eld
+\end_inset
+
+Home
+\begin_inset Quotes erd
+\end_inset
+
+ and will be displayed as the localized (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Localization"
+
+\end_inset
+
+) string 
+\begin_inset Quotes eld
+\end_inset
+
+Home
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The Menu.i method generates a 
+\family typewriter
+Menu
+\family default
+ with a 
+\family typewriter
+Loc[Unit]
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+Menu
+\family default
+ and 
+\family typewriter
+Loc[_]
+\end_layout
+
+\begin_layout Standard
+You may be wondering why a 
+\family typewriter
+Menu
+\family default
+ and a 
+\family typewriter
+Loc[_]
+\family default
+ (short for location, pronouned 
+\begin_inset Quotes eld
+\end_inset
+
+Loke
+\begin_inset Quotes erd
+\end_inset
+
+) are separate and why the Loc takes a type parameter.
+\end_layout
+
+\begin_layout Standard
+A 
+\family typewriter
+Menu
+\family default
+ contains a location and many submenus.
+ The original thought was that you could have a single 
+\family typewriter
+Loc[_]
+\family default
+ that might be placed in different places in the menu hierarchy.
+ So, historically, they are separated, but there's a one to one relation
+ between them.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+Loc[_]
+\family default
+ takes a type parameter which defines a current value type for the 
+\family typewriter
+Loc
+\family default
+.
+ For example, if the 
+\family typewriter
+Loc
+\family default
+ refers to a page that will display a wiki page, then the type parameter
+ of the 
+\family typewriter
+Loc
+\family default
+ would be 
+\family typewriter
+WikiPage
+\family default
+: 
+\family typewriter
+Loc[WikiPage]
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Each 
+\family typewriter
+Loc
+\family default
+ can have many parameters (know as 
+\family typewriter
+LocParam
+\family default
+, 
+\begin_inset Quotes eld
+\end_inset
+
+loke param
+\begin_inset Quotes erd
+\end_inset
+
+) that define behavior for the 
+\family typewriter
+Loc[_]
+\family default
+.
+ These parameters include access control testing, template definition, title,
+ group, etc.
+\end_layout
+
+\begin_layout Subsection
+Access Control
+\end_layout
+
+\begin_layout Standard
+You can control access to the URL/page represented by the 
+\family typewriter
+Loc
+\family default
+ with the 
+\family typewriter
+If()
+\family default
+ LocParam:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Calculate if the page should be displayed.
+\end_layout
+
+\begin_layout Plain Layout
+
+   * In this case, it will be visible every other minute
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def displaySometimes_? : Boolean = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    (millis / 1000L / 60L) % 2 == 0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+      Menu.i("Sometimes") / "sometimes" >> If(displaySometimes_? _,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                            S ? "Can't view now")
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define a method that returns 
+\family typewriter
+true
+\family default
+ if access is allowed.
+ Adding the 
+\family typewriter
+If()
+\family default
+ 
+\family typewriter
+LocParam
+\family default
+ will restrict access to the page unless the function returns true.
+ Menu items will not be visible for pages that do not pass the access control
+ rules and even if the user types the URL into the browser, the page will
+ not be displayed (by default, the user will be redirected by to the home
+ page and an error will be displayed.)
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+Hidden
+\family default
+ and 
+\family typewriter
+Group
+\end_layout
+
+\begin_layout Standard
+Menu items can be hidden from the default menu hierarchy even if the page
+ is accessible.
+ The Hidden LocParam says 
+\begin_inset Quotes eld
+\end_inset
+
+hide from default menu.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ Menu.i("About") / "about" >> Hidden >> LocGroup("bottom")
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Menu items can also be grouped together in a named group and then displayed:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ <span class="lift:Menu.group?group=bottom"></span>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which results in:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ <a href="/about">About</a> <a href="/feedback">Feedback</a> <a href="/sitemap">
+Sitemap</a> 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Submenus
+\end_layout
+
+\begin_layout Standard
+You can nest menus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+      // A menu with submenus
+\end_layout
+
+\begin_layout Plain Layout
+
+      Menu.i("Info") / "info" submenus(
+\end_layout
+
+\begin_layout Plain Layout
+
+        Menu.i("About") / "about" >> Hidden >> LocGroup("bottom"),
+\end_layout
+
+\begin_layout Plain Layout
+
+        Menu.i("Contact") / "contact",
+\end_layout
+
+\begin_layout Plain Layout
+
+        Menu.i("Feedback") / "feedback" >> LocGroup("bottom"))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The About, Contant and Feedback pages are nested under the Info page.
+\end_layout
+
+\begin_layout Subsection
+Parameters
+\end_layout
+
+\begin_layout Standard
+You can parse the incoming URL and extract parameters from it into type-safe
+ variables:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+// capture the page parameter information
+\end_layout
+
+\begin_layout Plain Layout
+
+case class ParamInfo(theParam: String)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  // Create a menu for /param/somedata
+\end_layout
+
+\begin_layout Plain Layout
+
+  val menu = Menu.param[ParamInfo]("Param", "Param", 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                   s => Full(ParamInfo(s)), 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                   pi => pi.theParam) / "param"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above code creates a menu called 
+\begin_inset Quotes eld
+\end_inset
+
+Param
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The menu is for the url 
+\family typewriter
+/param/xxx
+\family default
+ where 
+\family typewriter
+xxx
+\family default
+ can match anything.
+\end_layout
+
+\begin_layout Standard
+When the URL 
+\family typewriter
+/param/dogfood
+\family default
+ or 
+\family typewriter
+/param/fruitbat
+\family default
+ is presented, it matches the 
+\family typewriter
+Loc
+\family default
+ and the function (
+\family typewriter
+s => Full(ParamInfo(s))
+\family default
+) is invoked.
+ If it returns a 
+\family typewriter
+Full
+\family default
+ 
+\family typewriter
+Box
+\family default
+, the value is placed in the 
+\family typewriter
+Loc
+\family default
+'s 
+\family typewriter
+currentValue
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+It's possible to hand-write Loc implementation that will match 
+\end_layout
+
+\begin_layout Subsection
+Wildcards
+\end_layout
+
+\begin_layout Standard
+You can create menus that match all the contents of a given path.
+ In this case, all the html files in 
+\family typewriter
+/static/
+\family default
+ will be served.
+ That includes 
+\family typewriter
+/static/index
+\family default
+, 
+\family typewriter
+/static/fruitbat
+\family default
+, and 
+\family typewriter
+/static/moose/frog/wombat/meow
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+      // more complex because this menu allows anything in the
+\end_layout
+
+\begin_layout Plain Layout
+
+      // /static path to be visible
+\end_layout
+
+\begin_layout Plain Layout
+
+      Menu.i("Static") / "static" / **
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that Lift will not serve any files or directories that start with 
+\family typewriter
+.
+
+\family default
+ (period) or 
+\family typewriter
+_
+\family default
+ (underscore) or end with 
+\family typewriter
+-hidden
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Summary
+\end_layout
+
+\begin_layout Standard
+We've demonstrated how to create a 
+\family typewriter
+SiteMap
+\family default
+ with many different kinds of menu items.
+ Next, let's look at the views.
+\end_layout
+
+\begin_layout Section
+View First
+\end_layout
+
+\begin_layout Standard
+Once the access control is granted by SiteMap, Lift loads the view related
+ to the URL.
+ There are many mechanisms that Lift uses to resolve a path to a view, but
+ the simplest is a one to one mapping between the URL path and the files
+ in 
+\family typewriter
+/src/main/webapp
+\family default
+.
+ If the URL is 
+\family typewriter
+/index
+\family default
+, then Lift will look for the localized (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Localization"
+
+\end_inset
+
+) version of 
+\family typewriter
+/src/main/webapp/index.html
+\family default
+.
+ Once Lift loads the template, Lift processes it to transform it into the
+ dynamic content you want to return in response to the URL input.
+\end_layout
+
+\begin_layout Subsection
+Page source
+\end_layout
+
+\begin_layout Standard
+Let's look at the page source:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/index.html"
+lstparams "language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can open the page in our browser:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename raw.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Dynamic content
+\end_layout
+
+\begin_layout Standard
+The template is a legal HTML page.
+ But there are marker in the page to tell Lift how to interpret the HTML.
+\end_layout
+
+\begin_layout Standard
+If the 
+\family typewriter
+<body>
+\family default
+ tag contains a 
+\family typewriter
+class
+\family default
+ attribute 
+\family typewriter
+lift:content_id=xxxx
+\family default
+, then Lift will find the element with the matching 
+\family typewriter
+id
+\family default
+ and use that as the starting point for rendering the page.
+ This allows your designers to edit and maintain the pages in the same hierarchy
+ that you use for your application.
+\end_layout
+
+\begin_layout Subsection
+Surround and page chrome
+\end_layout
+
+\begin_layout Standard
+The template processing starts with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ <div id="main" class="lift:surround?with=default&at=content">
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+class
+\family default
+ attribute 
+\family typewriter
+lift:surround?with=default;at=content
+\family default
+ instructs Lift to surround the current Element with the template named
+ default.html (typically located in the 
+\family typewriter
+/templates-hidden/
+\family default
+ directory), and place the current page's content at the element with the
+ 
+\begin_inset Quotes eld
+\end_inset
+
+content
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\family typewriter
+id
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+This pattern allows us to wrap a common chrome around every page on our
+ site.
+ You can also specify different template to use for surrounding.
+ Further, the template itself can choose different templates to use for
+ surrounding.
+\end_layout
+
+\begin_layout Subsection
+Embed
+\end_layout
+
+\begin_layout Standard
+In addition to surrounding the page with chrome, you can also embed another
+ file.
+ For example, you could have a shopping cart component that is embedded
+ in certain pages.
+ We embed with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<span class="lift:embed?what=_embedme">
+\end_layout
+
+\begin_layout Plain Layout
+
+  replaced with embedded content
+\end_layout
+
+\begin_layout Plain Layout
+
+</span>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Once again, the command is signalled with a 
+\family typewriter
+class
+\family default
+ attribute that starts with 
+\family typewriter
+lift:
+\family default
+.
+ In this case, we embed a template from the file 
+\family typewriter
+_embedme.html
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Results
+\end_layout
+
+\begin_layout Standard
+The resulting dynamically generated page looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename browser.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Snippets and Dynamic content
+\end_layout
+
+\begin_layout Standard
+Lift templates contain no executable code.
+ They are pure, raw, valid HTML.
+\end_layout
+
+\begin_layout Standard
+Lift uses snippets to transform sections of the HTML page from static to
+ dynamic.
+ The key word is transform.
+\end_layout
+
+\begin_layout Standard
+Lift's snippets are Scala functions: 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+ A 
+\family typewriter
+NodeSeq
+\family default
+ is a collection of XML nodes.
+ An snippet can only transform input 
+\family typewriter
+NodeSeq
+\family default
+ to output 
+\family typewriter
+NodeSeq
+\family default
+.
+ Well, not exactly...
+ a snippet may also have side effects including setting cookies, doing database
+ transactions, etc.
+ But the core transformation concept is important.
+ First, it isolates snippet functionality to discrete parts of the page.
+ This means that each snippet, each 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+, is a component.
+ Second, it means that pages are recursively built, but remain as valid
+ HTML at all times.
+ This means that the developer has to work hard to introduce a cross site
+ scripting vulnerability.
+ Third, the designers don't have to worry about learning to program anything
+ in order to design HTML pages because the program execution is abstracted
+ away from the HTML rather than embedded in the HTML.
+\end_layout
+
+\begin_layout Subsection
+Snippets in markup
+\end_layout
+
+\begin_layout Standard
+In order to indicate that content is dynamic, the markup contains a snippet
+ invocation.
+ That typically takes the form 
+\family typewriter
+class="someclass someothercss lift:mysnippet"
+\family default
+.
+ If a class attribute contains 
+\family typewriter
+lift:xxx
+\family default
+, the 
+\family typewriter
+xxx
+\family default
+ will be resolved to a snippet.
+ The snippet may take attributes.
+ Attributes are encoded like URL parameters...
+ offset by a 
+\family typewriter
+?
+\family default
+ (question mark), then 
+\family typewriter
+name=value
+\family default
+, separted by 
+\family typewriter
+?
+\family default
+ (question mark), 
+\family typewriter
+;
+\family default
+ (semicolon) or 
+\family typewriter
+&
+\family default
+ (ampersand).
+ 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+value
+\family default
+ are URL encoded.
+\end_layout
+
+\begin_layout Standard
+You may also invoke snippets with XML tags:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<lift:my_snippet cat="foo">
+\end_layout
+
+\begin_layout Plain Layout
+
+  <div>xxxx</div>
+\end_layout
+
+\begin_layout Plain Layout
+
+</lift:my_snippet>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the Html5 parser will force all tags to lower case so 
+\family typewriter
+<lift:MySnipet>
+\family default
+ will become 
+\family typewriter
+<lift:mysnippet>
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Lift 2.3 will also allow snippet invocation in the for 
+\family typewriter
+<div l="mysnippet?param=value">xxx</div>
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The latter two mechanisms for invoking snippets will not result in valid
+ Html5 templates.
+\end_layout
+
+\begin_layout Subsection
+Snippet resolution
+\end_layout
+
+\begin_layout Standard
+Lift has a very complex set of rules to resolve from snippet name to NodeSeq
+ => NodeSeq (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Snippet-Resolution"
+
+\end_inset
+
+).
+ For now, the simplest mechanism is to have a 
+\family typewriter
+class
+\family default
+ or 
+\family typewriter
+object
+\family default
+ in the 
+\family typewriter
+snippet
+\family default
+ package that matches the snippet name.
+\end_layout
+
+\begin_layout Standard
+So 
+\family typewriter
+lift:HelloWorld
+\family default
+ will look for the 
+\family typewriter
+code.snippet.HelloWorld
+\family default
+ class and invoke the 
+\family typewriter
+render
+\family default
+ method.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+lift:CatFood.fruitbat
+\family default
+ will look for the 
+\family typewriter
+code.snippet.CatFood
+\family default
+ class and invoke the 
+\family typewriter
+fruitbat
+\family default
+ method.
+\end_layout
+
+\begin_layout Subsection
+Dynamic Example
+\end_layout
+
+\begin_layout Standard
+Let's look at the 
+\family typewriter
+dynamic.html
+\family default
+ page:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/dynamic.html"
+lstparams "language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This template invokes the 
+\family typewriter
+HelloWorld
+\family default
+ snippet defined in 
+\family typewriter
+HelloWorld.scala
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/HelloWorld.scala"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the dynamic content becomes:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<span>Thu Dec 30 16:31:13 PST 2010</span>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+HelloWorld
+\family default
+ snippet code is simple.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+lazy val date: Box[Date] = DependencyFactory.inject[Date]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Uses dependency injection (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Dependency-Injection"
+
+\end_inset
+
+) to get a 
+\family typewriter
+Date
+\family default
+ instance.
+\end_layout
+
+\begin_layout Standard
+Then:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def render = "* *" #> date.map(_.toString)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Creates a CSS Selector Transform (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+) that inserts the 
+\family typewriter
+String
+\family default
+ value of the injected 
+\family typewriter
+Date
+\family default
+ into the markup, in this case the 
+\family typewriter
+<span>
+\family default
+ that invoked the snippet.
+\end_layout
+
+\begin_layout Subsection
+Embedded Example
+\end_layout
+
+\begin_layout Standard
+We've seen how we can embed a template using: 
+\family typewriter
+<div class="lift:embed?what=_embedme">xxx</div>
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Let's look at the 
+\family typewriter
+_embedme.html
+\family default
+ template:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/_embedme.html"
+lstparams "language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the invoked 
+\family typewriter
+Embedded.scala
+\family default
+ program:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/Embedded.scala"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The template invokes the 
+\family typewriter
+from
+\family default
+ method on the 
+\family typewriter
+Embedded
+\family default
+ snippet.
+ In this case, the snippet is an 
+\family typewriter
+object
+\family default
+ singleton because it does not take any constructor parameters and has no
+ instance variabled.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+from
+\family default
+ method:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  def from = "*" #> S.location.map(_.name)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Creates a CSS Selector Transform that replaces the contents with the 
+\family typewriter
+name
+\family default
+ of the current 
+\family typewriter
+location
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Param Example
+\end_layout
+
+\begin_layout Standard
+Above, we saw how to create a 
+\family typewriter
+Loc[ParamInfo]
+\family default
+ to capture URL parameters.
+ Let's look at the 
+\family typewriter
+/param/xxx
+\family default
+ page and see how we can access the parameters:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/param.html"
+lstparams "language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And let's look at two different snippets that can access the 
+\family typewriter
+ParamInfo
+\family default
+ for the page:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/Param.scala"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each snippet has a 
+\family typewriter
+render
+\family default
+ method.
+ However, the 
+\family typewriter
+ShowParam
+\family default
+ class takes a constructor parameter which contains the 
+\family typewriter
+ParamInfo
+\family default
+ from the current 
+\family typewriter
+Loc[_]
+\family default
+.
+ If the current 
+\family typewriter
+Loc
+\family default
+ does not have the type parameter 
+\family typewriter
+ParamInfo
+\family default
+, no instance of 
+\family typewriter
+ShowParam
+\family default
+ would be created and the snippet could not be resolved.
+ But we do have a Loc[ParamInfo], so Lift constructs a 
+\family typewriter
+ShowParam
+\family default
+ with the 
+\family typewriter
+Loc
+\family default
+'s 
+\family typewriter
+currentValue
+\family default
+ and then the 
+\family typewriter
+render
+\family default
+ method is invoked and it returns a CSS Selector Transform which is a 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+object Param
+\family default
+'s 
+\family typewriter
+render
+\family default
+ method accesses the 
+\family typewriter
+Loc[ParamInfo]
+\family default
+ directly.
+ The 
+\family typewriter
+render
+\family default
+ method gets the 
+\family typewriter
+Loc
+\family default
+'s 
+\family typewriter
+currentValue
+\family default
+ and uses that to calculate the return value, the CSS Selector Transform.
+\end_layout
+
+\begin_layout Subsection
+Summary
+\end_layout
+
+\begin_layout Standard
+We've seen some simple examples of Lift's snippet mechanism used to generate
+ dynamic content.
+ You can read more on snippets (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Snippets"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Section
+Wrap up
+\end_layout
+
+\begin_layout Standard
+In this chapter, we've seen how to define application behavior on 
+\family typewriter
+Boot.scala
+\family default
+.
+ We've explored Lift's 
+\family typewriter
+SiteMap
+\family default
+ which is used to generate navigation and enforce access control.
+ We've seen how Lift's templating system works (well, there are actually
+ a bunch of different ways to template in Lift, but we've explored to most
+ common mechanism.) We've seen how snippets work.
+\end_layout
+
+\begin_layout Standard
+In the next chapter, we'll take a dive into Lift's low-level support for
+ HTTP.
 \end_layout
 
 \end_body

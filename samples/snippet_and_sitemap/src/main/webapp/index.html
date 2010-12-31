@@ -5,9 +5,13 @@
     <title>Home</title>
   </head>
   <body class="lift:content_id=main">
-    <div id="main" class="lift:surround?with=default;at=content">
+    <div id="main" class="lift:surround?with=default&at=content">
       <div>Hello World.  Welcome to your Lift application.</div>
       <div>Check out a page with <a href="/param/foo">query parameters</a>.</div>
+
+      <span class="lift:embed?what=_embedme">
+        replaced with embedded content
+      </span>
     </div>
   </body>
 </html>

@@ -43,6 +43,12 @@
 \begin_body
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Localization"
+
+\end_inset
+
 Localization
 \end_layout
 

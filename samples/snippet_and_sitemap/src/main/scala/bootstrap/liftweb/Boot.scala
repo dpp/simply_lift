@@ -28,11 +28,11 @@ class Boot {
     LiftRules.addToPackages("code")
 
     // Build SiteMap
-    def sitemap() = SiteMap(
+    def sitemap(): SiteMap = SiteMap(
       Menu.i("Home") / "index", // the simple way to declare a menu
 
       Menu.i("Sometimes") / "sometimes" >> If(displaySometimes_? _,
-                                            "Can't view now"), 
+                                            S ? "Can't view now"), 
 
       // A menu with submenus
       Menu.i("Info") / "info" submenus(
@@ -41,22 +41,20 @@ class Boot {
         Menu.i("Feedback") / "feedback" >> LocGroup("bottom")
       ),
       
+
+      Menu.i("Sitemap") / "sitemap" >> Hidden >> LocGroup("bottom"),
+
       Menu.i("Dynamic") / "dynamic", // a page with dynamic content
 
-      // Create a menu for /param/somedata
-      Menu.param[ParamInfo]("Param", "Param", 
-                            s => Full(ParamInfo(s)), 
-                            pi => pi.theParam) / "param" ,
+      Param.menu,
       
-      
-
       // more complex because this menu allows anything in the
       // /static path to be visible
       Menu.i("Static") / "static" / **)
 
     // set the sitemap.  Note if you don't want access control for
     // each page, just comment this line out.
-    LiftRules.setSiteMapFunc(sitemap)
+    LiftRules.setSiteMapFunc(() => sitemap())
 
     //Show the spinny image when an Ajax call starts
     LiftRules.ajaxStart =

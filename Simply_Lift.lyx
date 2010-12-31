@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-12/14/2010
+12/30/2010
 \end_layout
 
 \begin_layout Standard
@@ -2251,6 +2251,13 @@ filename "localization.lyx"
 
 \begin_layout Section
 Dependency Injection
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Dependency-Injection"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
