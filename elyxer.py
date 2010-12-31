@@ -25,7 +25,6 @@
 
 
 import sys
-import os.path
 
 
 
@@ -192,12 +191,8 @@ class LineWriter(object):
 
 
 
-import codecs
 import os.path
-
-
-
-import codecs
+import sys
 
 
 class BibStylesConfig(object):
@@ -205,69 +200,81 @@ class BibStylesConfig(object):
 
   abbrvnat = {
       
-      u'@article':u'$author. $title. <i>$journal</i>,{ {$volume:}$pages,} $month $year.{ doi: $doi.}{ URL <a href="$url">$url</a>.}', 
-      u'cite':[u'$surname($year)',u'$rest',], 
-      u'default':u'$author. <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
+      u'@article':u'$authors. $title. <i>$journal</i>,{ {$volume:}$pages,} $month $year.{ doi: $doi.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'cite':u'$surname($year)', 
+      u'default':u'$authors. <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      }
+
+  alpha = {
+      
+      u'@article':u'$authors. $title.{ <i>$journal</i>{, {$volume}{($number)}}{: $pages}{, $year}.}{ <a href="$url">$url</a>.}{ <a href="$filename">$filename</a>.}{ $note.}', 
+      u'cite':u'$Sur$YY', 
+      u'default':u'$authors. $title.{ <i>$journal</i>,} $year.{ <a href="$url">$url</a>.}{ <a href="$filename">$filename</a>.}{ $note.}', 
       }
 
   authordate2 = {
       
-      u'@article':u'$author. $year. $title. <i>$journal</i>, <b>$volume</b>($number), $pages.{ URL <a href="$url">$url</a>.}', 
-      u'@book':u'$author. $year. <i>$title</i>. $publisher.{ URL <a href="$url">$url</a>.}', 
-      u'cite':[u'$surname',u' $year; $rest',], 
-      u'default':u'$author. $year. <i>$title</i>. $publisher.{ URL <a href="$url">$url</a>.}', 
+      u'@article':u'$authors. $year. $title. <i>$journal</i>, <b>$volume</b>($number), $pages.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@book':u'$authors. $year. <i>$title</i>. $publisher.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'cite':u'$surname, $year', 
+      u'default':u'$authors. $year. <i>$title</i>. $publisher.{ URL <a href="$url">$url</a>.}{ $note.}', 
       }
 
   default = {
       
-      u'@article':u'$author, “$title”, <i>$journal</i>, pp. $pages, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@book':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@booklet':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@conference':u'$author, “$title”, <i>$journal</i>, pp. $pages, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@inbook':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@incollection':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@inproceedings':u'$author, “$title”, <i>$journal</i>, pp. $pages, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@manual':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@mastersthesis':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@misc':u'$author, <i>$title</i>.{ $publisher,}{ $howpublished,} $year.{ URL <a href="$url">$url</a>.}', 
-      u'@phdthesis':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@proceedings':u'$author, “$title”, <i>$journal</i>, pp. $pages, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@techreport':u'$author, <i>$title</i>, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@unpublished':u'$author, “$title”, <i>$journal</i>, $year.{ URL <a href="$url">$url</a>.}', 
-      u'cite':[u'$index',u'$rest',], 
-      u'default':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
+      u'@article':u'$authors: “$title”, <i>$journal</i>,{ pp. $pages,} $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@book':u'{$authors: }<i>$title</i>{ ($editor, ed.)}.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@booklet':u'$authors: <i>$title</i>.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@conference':u'$authors: “$title”, <i>$journal</i>,{ pp. $pages,} $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@inbook':u'$authors: <i>$title</i>.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@incollection':u'$authors: <i>$title</i>{ in <i>$booktitle</i>{ ($editor, ed.)}}.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@inproceedings':u'$authors: “$title”, <i>$journal</i>,{ pp. $pages,} $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@manual':u'$authors: <i>$title</i>.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@mastersthesis':u'$authors: <i>$title</i>.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@misc':u'$authors: <i>$title</i>.{{ $publisher,}{ $howpublished,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@phdthesis':u'$authors: <i>$title</i>.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@proceedings':u'$authors: “$title”, <i>$journal</i>,{ pp. $pages,} $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@techreport':u'$authors: <i>$title</i>, $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@unpublished':u'$authors: “$title”, <i>$journal</i>, $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'cite':u'$index', 
+      u'default':u'$authors: <i>$title</i>.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      }
+
+  defaulttags = {
+      u'YY':u'??', u'authors':u'', u'surname':u'', 
       }
 
   ieeetr = {
       
-      u'@article':u'$author, “$title”, <i>$journal</i>, vol. $volume, no. $number, pp. $pages, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@book':u'$author, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
-      u'cite':[u'$index',u'$rest',], 
-      u'default':u'$author, “$title”. $year.{ URL <a href="$url">$url</a>.}', 
+      u'@article':u'$authors, “$title”, <i>$journal</i>, vol. $volume, no. $number, pp. $pages, $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@book':u'$authors, <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'cite':u'$index', 
+      u'default':u'$authors, “$title”. $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
       }
 
   plain = {
       
-      u'@article':u'$author. $title. <i>$journal</i>, $volumen($number):$pages, $year.{ URL <a href="$url">$url</a>.}', 
-      u'@book':u'$author. <i>$title</i>. $publisher, $month $year.{ URL <a href="$url">$url</a>.}', 
-      u'cite':[u'$index',u'$rest',], 
-      u'default':u'$author. <i>$title</i>. $publisher, $year.{ URL <a href="$url">$url</a>.}', 
+      u'@article':u'$authors. $title.{ <i>$journal</i>{, {$volume}{($number)}}{:$pages}{, $year}.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@book':u'$authors. <i>$title</i>. $publisher,{ $month} $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@incollection':u'$authors. $title.{ In <i>$booktitle</i> {($editor, ed.)}.} $publisher,{ $month} $year.{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'@inproceedings':u'$authors. $title. { <i>$booktitle</i>{, {$volume}{($number)}}{:$pages}{, $year}.}{ URL <a href="$url">$url</a>.}{ $note.}', 
+      u'cite':u'$index', 
+      u'default':u'{$authors. }$title.{{ $publisher,} $year.}{ URL <a href="$url">$url</a>.}{ $note.}', 
       }
 
   vancouver = {
       
-      u'@article':u'$author. $title. <i>$journal</i>, $year;<b>$volume</b>($number):$pages.{ Available from: <a href="$url">$url</a>.}', 
-      u'@book':u'$author. $title. {$publisher, }$year.{ Available from: <a href="$url">$url</a>.}', 
-      u'cite':[u'$index',u'$rest',], 
-      u'default':u'$author. $title; {$publisher, }$year.{ $howpublished.}{ Available from: <a href="$url">$url</a>.}', 
+      u'@article':u'$authors. $title. <i>$journal</i>, $year{;{<b>$volume</b>}{($number)}{:$pages}}.{ URL: <a href="$url">$url</a>.}{ $note.}', 
+      u'@book':u'$authors. $title. {$publisher, }$year.{ URL: <a href="$url">$url</a>.}{ $note.}', 
+      u'cite':u'$index', 
+      u'default':u'$authors. $title; {$publisher, }$year.{ $howpublished.}{ URL: <a href="$url">$url</a>.}{ $note.}', 
       }
 
 class BibTeXConfig(object):
   "Configuration class from config file"
 
-  escaped = {
-      u'--':u'—', u'..':u'.', u'\\"a':u'ä', u'\\"e':u'ë', u'\\"i':u'ï', 
-      u'\\"o':u'ö', u'\\"u':u'ü', 
+  replaced = {
+      u'--':u'—', u'..':u'.', 
       }
 
 class ContainerConfig(object):
@@ -275,12 +282,20 @@ class ContainerConfig(object):
 
   endings = {
       u'Align':u'\\end_layout', u'BarredText':u'\\bar', 
-      u'BoldText':u'\\series', u'Cell':u'</cell', u'ColorText':u'\\color', 
+      u'BoldText':u'\\series', u'Cell':u'</cell', 
+      u'ChangeDeleted':u'\\change_unchanged', 
+      u'ChangeInserted':u'\\change_unchanged', u'ColorText':u'\\color', 
       u'EmphaticText':u'\\emph', u'Hfill':u'\\hfill', u'Inset':u'\\end_inset', 
       u'Layout':u'\\end_layout', u'LyXFooter':u'\\end_document', 
       u'LyXHeader':u'\\end_header', u'Row':u'</row', u'ShapedText':u'\\shape', 
-      u'SizeText':u'\\size', u'TextFamily':u'\\family', 
-      u'VersalitasText':u'\\noun', 
+      u'SizeText':u'\\size', u'StrikeOut':u'\\strikeout', 
+      u'TextFamily':u'\\family', u'VersalitasText':u'\\noun', 
+      }
+
+  extracttext = {
+      u'allowed':[u'StringContainer',u'Constant',u'FormulaConstant',], 
+      u'cloned':[u'',], 
+      u'extracted':[u'PlainLayout',u'TaggedText',u'Align',u'Caption',u'TextFamily',u'EmphaticText',u'VersalitasText',u'BarredText',u'SizeText',u'ColorText',u'LangLine',u'Formula',u'Bracket',u'RawText',u'BibTag',u'FormulaNumber',u'AlphaCommand',u'EmptyCommand',u'OneParamFunction',u'SymbolFunction',u'TextFunction',u'FontFunction',u'CombiningFunction',u'DecoratingFunction',u'FormulaSymbol',u'BracketCommand',], 
       }
 
   startendings = {
@@ -295,6 +310,7 @@ class ContainerConfig(object):
       u'\\bar default':u'BlackBox', u'\\bar no':u'BlackBox', 
       u'\\begin_body':u'BlackBox', u'\\begin_deeper':u'DeeperList', 
       u'\\begin_document':u'BlackBox', u'\\begin_header':u'LyXHeader', 
+      u'\\begin_inset Argument':u'ShortTitle', 
       u'\\begin_inset Box':u'BoxInset', u'\\begin_inset Branch':u'Branch', 
       u'\\begin_inset Caption':u'Caption', 
       u'\\begin_inset CommandInset bibitem':u'BiblioEntry', 
@@ -304,6 +320,7 @@ class ContainerConfig(object):
       u'\\begin_inset CommandInset include':u'IncludeInset', 
       u'\\begin_inset CommandInset index_print':u'PrintIndex', 
       u'\\begin_inset CommandInset label':u'Label', 
+      u'\\begin_inset CommandInset line':u'LineInset', 
       u'\\begin_inset CommandInset nomencl_print':u'PrintNomenclature', 
       u'\\begin_inset CommandInset nomenclature':u'NomenclatureEntry', 
       u'\\begin_inset CommandInset ref':u'Reference', 
@@ -316,7 +333,8 @@ class ContainerConfig(object):
       u'\\begin_inset FloatList':u'ListOf', u'\\begin_inset Foot':u'Footnote', 
       u'\\begin_inset Formula':u'Formula', 
       u'\\begin_inset FormulaMacro':u'FormulaMacro', 
-      u'\\begin_inset Graphics':u'Image', u'\\begin_inset Index':u'IndexEntry', 
+      u'\\begin_inset Graphics':u'Image', 
+      u'\\begin_inset Index':u'IndexReference', 
       u'\\begin_inset Info':u'InfoInset', 
       u'\\begin_inset LatexCommand bibitem':u'BiblioEntry', 
       u'\\begin_inset LatexCommand bibtex':u'BibTeX', 
@@ -325,7 +343,7 @@ class ContainerConfig(object):
       u'\\begin_inset LatexCommand citep':u'BiblioCitation', 
       u'\\begin_inset LatexCommand citet':u'BiblioCitation', 
       u'\\begin_inset LatexCommand htmlurl':u'URL', 
-      u'\\begin_inset LatexCommand index':u'IndexEntry', 
+      u'\\begin_inset LatexCommand index':u'IndexReference', 
       u'\\begin_inset LatexCommand label':u'Label', 
       u'\\begin_inset LatexCommand nomenclature':u'NomenclatureEntry', 
       u'\\begin_inset LatexCommand prettyref':u'Reference', 
@@ -339,6 +357,7 @@ class ContainerConfig(object):
       u'\\begin_inset Newline':u'NewlineInset', 
       u'\\begin_inset Newpage':u'NewPageInset', u'\\begin_inset Note':u'Note', 
       u'\\begin_inset OptArg':u'ShortTitle', 
+      u'\\begin_inset Phantom':u'PhantomText', 
       u'\\begin_inset Quotes':u'QuoteContainer', 
       u'\\begin_inset Tabular':u'Table', u'\\begin_inset Text':u'InsetText', 
       u'\\begin_inset VSpace':u'VerticalSpace', u'\\begin_inset Wrap':u'Wrap', 
@@ -353,14 +372,17 @@ class ContainerConfig(object):
       u'\\begin_layout LyX-Code':u'LyXCode', 
       u'\\begin_layout Plain':u'PlainLayout', 
       u'\\begin_layout Standard':u'StandardLayout', 
-      u'\\begin_layout Title':u'Title', u'\\color':u'ColorText', 
+      u'\\begin_layout Title':u'Title', u'\\begin_preamble':u'LyXPreamble', 
+      u'\\change_deleted':u'ChangeDeleted', 
+      u'\\change_inserted':u'ChangeInserted', 
+      u'\\change_unchanged':u'BlackBox', u'\\color':u'ColorText', 
       u'\\color inherit':u'BlackBox', u'\\color none':u'BlackBox', 
       u'\\emph default':u'BlackBox', u'\\emph off':u'BlackBox', 
       u'\\emph on':u'EmphaticText', u'\\emph toggle':u'EmphaticText', 
       u'\\end_body':u'LyXFooter', u'\\family':u'TextFamily', 
       u'\\family default':u'BlackBox', u'\\family roman':u'BlackBox', 
       u'\\hfill':u'Hfill', u'\\labelwidthstring':u'BlackBox', 
-      u'\\lang':u'LangLine', u'\\length':u'BlackBox', 
+      u'\\lang':u'LangLine', u'\\length':u'InsetLength', 
       u'\\lyxformat':u'LyXFormat', u'\\lyxline':u'LyXLine', 
       u'\\newline':u'Newline', u'\\newpage':u'NewPage', 
       u'\\noindent':u'BlackBox', u'\\noun default':u'BlackBox', 
@@ -369,7 +391,8 @@ class ContainerConfig(object):
       u'\\series default':u'BlackBox', u'\\series medium':u'BlackBox', 
       u'\\shape':u'ShapedText', u'\\shape default':u'BlackBox', 
       u'\\shape up':u'BlackBox', u'\\size':u'SizeText', 
-      u'\\size normal':u'BlackBox', u'\\start_of_appendix':u'Appendix', 
+      u'\\size normal':u'BlackBox', u'\\start_of_appendix':u'StartAppendix', 
+      u'\\strikeout default':u'BlackBox', u'\\strikeout on':u'StrikeOut', 
       }
 
   string = {
@@ -412,34 +435,22 @@ class EscapeConfig(object):
       u' ':u' ', 
       }
 
-class FileConfig(object):
-  "Configuration class from config file"
-
-  parsing = {
-      u'encodings':[u'utf-8',u'Cp1252',], 
-      }
-
-class FootnoteConfig(object):
-  "Configuration class from config file"
-
-  constants = {
-      u'postfrom':u'] ', u'postto':u'→] ', u'prefrom':u'[→', u'preto':u' [', 
-      }
-
 class FormulaConfig(object):
   "Configuration class from config file"
 
   alphacommands = {
-      u'\\AA':u'Å', u'\\AE':u'Æ', u'\\L':u'Ł', u'\\O':u'Ø', u'\\OE':u'Œ', 
-      u'\\aa':u'å', u'\\ae':u'æ', u'\\alpha':u'α', u'\\beta':u'β', 
-      u'\\delta':u'δ', u'\\epsilon':u'ϵ', u'\\eta':u'η', u'\\gamma':u'γ', 
-      u'\\iota':u'ι', u'\\kappa':u'κ', u'\\l':u'ł', u'\\lambda':u'λ', 
-      u'\\mu':u'μ', u'\\nu':u'ν', u'\\o':u'ø', u'\\oe':u'œ', u'\\omega':u'ω', 
-      u'\\phi':u'φ', u'\\pi':u'π', u'\\psi':u'ψ', u'\\rho':u'ρ', 
-      u'\\sigma':u'σ', u'\\ss':u'ß', u'\\tau':u'τ', u'\\textcrh':u'ħ', 
-      u'\\theta':u'θ', u'\\upsilon':u'υ', u'\\varDelta':u'∆', 
-      u'\\varGamma':u'Γ', u'\\varLambda':u'Λ', u'\\varOmega':u'Ω', 
-      u'\\varPhi':u'Φ', u'\\varPi':u'Π', u'\\varPsi':u'Ψ', u'\\varSigma':u'Σ', 
+      u'\\AA':u'Å', u'\\AE':u'Æ', u'\\DH':u'Ð', u'\\L':u'Ł', u'\\O':u'Ø', 
+      u'\\OE':u'Œ', u'\\TH':u'Þ', u'\\aa':u'å', u'\\ae':u'æ', u'\\alpha':u'α', 
+      u'\\beta':u'β', u'\\delta':u'δ', u'\\dh':u'ð', u'\\epsilon':u'ϵ', 
+      u'\\eta':u'η', u'\\gamma':u'γ', u'\\i':u'ı', u'\\imath':u'ı', 
+      u'\\iota':u'ι', u'\\j':u'ȷ', u'\\jmath':u'ȷ', u'\\kappa':u'κ', 
+      u'\\l':u'ł', u'\\lambda':u'λ', u'\\mu':u'μ', u'\\nu':u'ν', u'\\o':u'ø', 
+      u'\\oe':u'œ', u'\\omega':u'ω', u'\\phi':u'φ', u'\\pi':u'π', 
+      u'\\psi':u'ψ', u'\\rho':u'ρ', u'\\sigma':u'σ', u'\\ss':u'ß', 
+      u'\\tau':u'τ', u'\\textcrh':u'ħ', u'\\th':u'þ', u'\\theta':u'θ', 
+      u'\\upsilon':u'υ', u'\\varDelta':u'∆', u'\\varGamma':u'Γ', 
+      u'\\varLambda':u'Λ', u'\\varOmega':u'Ω', u'\\varPhi':u'Φ', 
+      u'\\varPi':u'Π', u'\\varPsi':u'Ψ', u'\\varSigma':u'Σ', 
       u'\\varTheta':u'Θ', u'\\varUpsilon':u'Υ', u'\\varXi':u'Ξ', 
       u'\\varepsilon':u'ε', u'\\varkappa':u'ϰ', u'\\varphi':u'φ', 
       u'\\varpi':u'ϖ', u'\\varrho':u'ϱ', u'\\varsigma':u'ς', 
@@ -451,92 +462,114 @@ class FormulaConfig(object):
       u'rowseparator':u'\\\\', 
       }
 
+  bigbrackets = {
+      u'(':[u'⎛',u'⎜',u'⎝',], u')':[u'⎞',u'⎟',u'⎠',], u'[':[u'⎡',u'⎢',u'⎣',], 
+      u']':[u'⎤',u'⎥',u'⎦',], 
+      }
+
+  binomialfunctions = {
+      u'\\dbinom':[u'(',u')',], u'\\tbinom':[u'(',u')',], 
+      }
+
+  bracketcommands = {
+      u'\\left':u'span class="symbol"', 
+      u'\\left.':u'<span class="leftdot"></span>', 
+      u'\\middle':u'span class="symbol"', u'\\right':u'span class="symbol"', 
+      u'\\right.':u'<span class="rightdot"></span>', 
+      }
+
+  combiningfunctions = {
+      u'\\"':u'̈', u'\\\'':u'́', u'\\^':u'̂', u'\\`':u'̀', u'\\acute':u'́', 
+      u'\\bar':u'̄', u'\\breve':u'̆', u'\\c':u'̧', u'\\check':u'̌', 
+      u'\\dddot':u'⃛', u'\\ddot':u'̈', u'\\dot':u'̇', u'\\grave':u'̀', 
+      u'\\hat':u'̂', u'\\mathring':u'̊', u'\\overleftarrow':u'⃖', 
+      u'\\overrightarrow':u'⃗', u'\\r':u'̥', u'\\s':u'̩', 
+      u'\\textsubring':u'̥', u'\\tilde':u'̃', u'\\vec':u'⃗', u'\\~':u'̃', 
+      }
+
   commands = {
-      u'\\ ':u' ', u'\\!':u'', u'\\$':u'$', u'\\%':u'%', u'\\,':u' ', 
-      u'\\:':u' ', u'\\;':u' ', u'\\APLdownarrowbox':u'⍗', 
-      u'\\APLleftarrowbox':u'⍇', u'\\APLrightarrowbox':u'⍈', 
-      u'\\APLuparrowbox':u'⍐', u'\\Box':u'□', u'\\Bumpeq':u'≎', 
-      u'\\CIRCLE':u'●', u'\\Cap':u'⋒', u'\\CheckedBox':u'☑', u'\\Circle':u'○', 
-      u'\\Coloneqq':u'⩴', u'\\Corresponds':u'≙', u'\\Cup':u'⋓', 
-      u'\\Delta':u'Δ', u'\\Diamond':u'◇', u'\\Downarrow':u'⇓', u'\\EUR':u'€', 
-      u'\\Gamma':u'Γ', u'\\Im':u'ℑ', u'\\Join':u'⨝', u'\\LEFTCIRCLE':u'◖', 
-      u'\\LEFTcircle':u'◐', u'\\Lambda':u'Λ', u'\\Leftarrow':u'⇐', 
-      u'\\Leftrightarrow':u' ⇔ ', u'\\Lleftarrow':u'⇚', 
-      u'\\Longleftarrow':u'⟸', u'\\Longleftrightarrow':u'⟺', 
-      u'\\Longrightarrow':u'⟹', u'\\Lsh':u'↰', u'\\Mapsfrom':u'⇐|', 
-      u'\\Mapsto':u'|⇒', u'\\Omega':u'Ω', u'\\P':u'¶', u'\\Phi':u'Φ', 
-      u'\\Pi':u'Π', u'\\Pr':u'Pr', u'\\Psi':u'Ψ', u'\\RIGHTCIRCLE':u'◗', 
-      u'\\RIGHTcircle':u'◑', u'\\Re':u'ℜ', u'\\Rightarrow':u' ⇒ ', 
+      u'\\ ':u' ', u'\\!':u'', u'\\#':u'#', u'\\$':u'$', u'\\%':u'%', 
+      u'\\&#38;':u'&', u'\\,':u' ', u'\\:':u' ', u'\\;':u' ', 
+      u'\\APLdownarrowbox':u'⍗', u'\\APLleftarrowbox':u'⍇', 
+      u'\\APLrightarrowbox':u'⍈', u'\\APLuparrowbox':u'⍐', u'\\Box':u'□', 
+      u'\\Bumpeq':u'≎', u'\\CIRCLE':u'●', u'\\Cap':u'⋒', u'\\CheckedBox':u'☑', 
+      u'\\Circle':u'○', u'\\Coloneqq':u'⩴', u'\\Corresponds':u'≙', 
+      u'\\Cup':u'⋓', u'\\Delta':u'Δ', u'\\Diamond':u'◇', u'\\Downarrow':u'⇓', 
+      u'\\EUR':u'€', u'\\Gamma':u'Γ', u'\\Im':u'ℑ', u'\\Join':u'⨝', 
+      u'\\LEFTCIRCLE':u'◖', u'\\LEFTcircle':u'◐', u'\\Lambda':u'Λ', 
+      u'\\Leftarrow':u'⇐', u'\\Lleftarrow':u'⇚', u'\\Longleftarrow':u'⟸', 
+      u'\\Longleftrightarrow':u'⟺', u'\\Longrightarrow':u'⟹', u'\\Lsh':u'↰', 
+      u'\\Mapsfrom':u'⇐|', u'\\Mapsto':u'|⇒', u'\\Omega':u'Ω', u'\\P':u'¶', 
+      u'\\Phi':u'Φ', u'\\Pi':u'Π', u'\\Pr':u'Pr', u'\\Psi':u'Ψ', 
+      u'\\RIGHTCIRCLE':u'◗', u'\\RIGHTcircle':u'◑', u'\\Re':u'ℜ', 
       u'\\Rrightarrow':u'⇛', u'\\Rsh':u'↱', u'\\S':u'§', u'\\Sigma':u'Σ', 
       u'\\Square':u'☐', u'\\Subset':u'⋐', u'\\Supset':u'⋑', u'\\Theta':u'Θ', 
       u'\\Uparrow':u'⇑', u'\\Updownarrow':u'⇕', u'\\Upsilon':u'Υ', 
       u'\\Vdash':u'⊩', u'\\Vert':u'∥', u'\\Vvdash':u'⊪', u'\\XBox':u'☒', 
       u'\\Xi':u'Ξ', u'\\Yup':u'⅄', u'\\\\':u'<br/>', u'\\_':u'_', 
-      u'\\aleph':u'ℵ', u'\\amalg':u'∐', u'\\angle':u'∠', u'\\approx':u' ≈ ', 
-      u'\\aquarius':u'♒', u'\\arccos':u'arccos', u'\\arcsin':u'arcsin', 
-      u'\\arctan':u'arctan', u'\\arg':u'arg', u'\\aries':u'♈', u'\\ast':u'∗', 
-      u'\\asymp':u'≍', u'\\backepsilon':u'∍', u'\\backprime':u'‵', 
-      u'\\backsimeq':u'⋍', u'\\backslash':u'\\', u'\\barwedge':u'⊼', 
-      u'\\because':u'∵', u'\\beth':u'ℶ', u'\\between':u'≬', u'\\bigcap':u'∩', 
-      u'\\bigcirc':u'○', u'\\bigcup':u'∪', u'\\bigodot':u'⊙', 
-      u'\\bigoplus':u'⊕', u'\\bigotimes':u'⊗', u'\\bigsqcup':u'⊔', 
-      u'\\bigstar':u'★', u'\\bigtriangledown':u'▽', u'\\bigtriangleup':u'△', 
-      u'\\biguplus':u'⊎', u'\\bigvee':u'∨', u'\\bigwedge':u'∧', 
-      u'\\blacklozenge':u'⧫', u'\\blacksmiley':u'☻', u'\\blacksquare':u'■', 
-      u'\\blacktriangle':u'▲', u'\\blacktriangledown':u'▼', 
-      u'\\blacktriangleright':u'▶', u'\\bot':u'⊥', u'\\bowtie':u'⋈', 
-      u'\\box':u'▫', u'\\boxdot':u'⊡', u'\\bullet':u'•', u'\\bumpeq':u'≏', 
-      u'\\cancer':u'♋', u'\\cap':u'∩', u'\\capricornus':u'♑', u'\\cdot':u'⋅', 
-      u'\\cdots':u'⋯', u'\\centerdot':u'∙', u'\\checkmark':u'✓', u'\\chi':u'χ', 
-      u'\\circ':u'○', u'\\circeq':u'≗', u'\\circledR':u'®', 
-      u'\\circledast':u'⊛', u'\\circledcirc':u'⊚', u'\\circleddash':u'⊝', 
-      u'\\clubsuit':u'♣', u'\\coloneqq':u'≔', u'\\complement':u'∁', 
-      u'\\cong':u'≅', u'\\coprod':u'∐', u'\\copyright':u'©', u'\\cos':u'cos', 
-      u'\\cosh':u'cosh', u'\\cot':u'cot', u'\\coth':u'coth', u'\\csc':u'csc', 
-      u'\\cup':u'∪', u'\\curvearrowleft':u'↶', u'\\curvearrowright':u'↷', 
-      u'\\dag':u'†', u'\\dagger':u'†', u'\\daleth':u'ℸ', 
-      u'\\dashleftarrow':u'⇠', u'\\dashrightarrow':u' ⇢ ', u'\\dashv':u'⊣', 
-      u'\\ddag':u'‡', u'\\ddagger':u'‡', u'\\ddots':u'⋱', u'\\deg':u'deg', 
-      u'\\det':u'det', u'\\diagdown':u'╲', u'\\diagup':u'╱', u'\\diamond':u'◇', 
-      u'\\diamondsuit':u'♦', u'\\dim':u'dim', u'\\displaystyle':u'', 
-      u'\\div':u'÷', u'\\divideontimes':u'⋇', u'\\dotdiv':u'∸', 
-      u'\\doteq':u'≐', u'\\doteqdot':u'≑', u'\\dotplus':u'∔', u'\\dots':u'…', 
-      u'\\doublebarwedge':u'⌆', u'\\downarrow':u'↓', u'\\downdownarrows':u'⇊', 
-      u'\\downharpoonleft':u'⇃', u'\\downharpoonright':u'⇂', u'\\earth':u'♁', 
-      u'\\ell':u'ℓ', u'\\emptyset':u'∅', u'\\eqcirc':u'≖', u'\\eqcolon':u'≕', 
-      u'\\eqsim':u'≂', u'\\equiv':u' ≡ ', u'\\euro':u'€', u'\\exists':u'∃', 
-      u'\\exp':u'exp', u'\\fallingdotseq':u'≒', u'\\female':u'♀', 
-      u'\\flat':u'♭', u'\\forall':u'∀', u'\\frown':u'⌢', u'\\frownie':u'☹', 
-      u'\\gcd':u'gcd', u'\\ge':u' ≥ ', u'\\gemini':u'♊', u'\\geq':u' ≥ ', 
-      u'\\geq)':u'≥', u'\\geqq':u'≧', u'\\geqslant':u'≥', u'\\gets':u'←', 
-      u'\\gg':u'≫', u'\\ggg':u'⋙', u'\\gimel':u'ℷ', u'\\gneqq':u'≩', 
-      u'\\gnsim':u'⋧', u'\\gtrdot':u'⋗', u'\\gtreqless':u'⋚', 
+      u'\\aleph':u'ℵ', u'\\amalg':u'∐', u'\\angle':u'∠', u'\\aquarius':u'♒', 
+      u'\\arccos':u'arccos', u'\\arcsin':u'arcsin', u'\\arctan':u'arctan', 
+      u'\\arg':u'arg', u'\\aries':u'♈', u'\\ast':u'∗', u'\\asymp':u'≍', 
+      u'\\backepsilon':u'∍', u'\\backprime':u'‵', u'\\backsimeq':u'⋍', 
+      u'\\backslash':u'\\', u'\\barwedge':u'⊼', u'\\because':u'∵', 
+      u'\\beth':u'ℶ', u'\\between':u'≬', u'\\bigcap':u'∩', u'\\bigcirc':u'○', 
+      u'\\bigcup':u'∪', u'\\bigodot':u'⊙', u'\\bigoplus':u'⊕', 
+      u'\\bigotimes':u'⊗', u'\\bigsqcup':u'⊔', u'\\bigstar':u'★', 
+      u'\\bigtriangledown':u'▽', u'\\bigtriangleup':u'△', u'\\biguplus':u'⊎', 
+      u'\\bigvee':u'∨', u'\\bigwedge':u'∧', u'\\blacklozenge':u'⧫', 
+      u'\\blacksmiley':u'☻', u'\\blacksquare':u'■', u'\\blacktriangle':u'▲', 
+      u'\\blacktriangledown':u'▼', u'\\blacktriangleright':u'▶', u'\\bot':u'⊥', 
+      u'\\bowtie':u'⋈', u'\\box':u'▫', u'\\boxdot':u'⊡', u'\\bullet':u'•', 
+      u'\\bumpeq':u'≏', u'\\cancer':u'♋', u'\\cap':u'∩', u'\\capricornus':u'♑', 
+      u'\\cdot':u'⋅', u'\\cdots':u'⋯', u'\\centerdot':u'∙', 
+      u'\\checkmark':u'✓', u'\\chi':u'χ', u'\\circ':u'○', u'\\circeq':u'≗', 
+      u'\\circledR':u'®', u'\\circledast':u'⊛', u'\\circledcirc':u'⊚', 
+      u'\\circleddash':u'⊝', u'\\clubsuit':u'♣', u'\\coloneqq':u'≔', 
+      u'\\complement':u'∁', u'\\cong':u'≅', u'\\coprod':u'∐', 
+      u'\\copyright':u'©', u'\\cos':u'cos', u'\\cosh':u'cosh', u'\\cot':u'cot', 
+      u'\\coth':u'coth', u'\\csc':u'csc', u'\\cup':u'∪', 
+      u'\\curvearrowleft':u'↶', u'\\curvearrowright':u'↷', u'\\dag':u'†', 
+      u'\\dagger':u'†', u'\\daleth':u'ℸ', u'\\dashleftarrow':u'⇠', 
+      u'\\dashv':u'⊣', u'\\ddag':u'‡', u'\\ddagger':u'‡', u'\\ddots':u'⋱', 
+      u'\\deg':u'deg', u'\\det':u'det', u'\\diagdown':u'╲', u'\\diagup':u'╱', 
+      u'\\diamond':u'◇', u'\\diamondsuit':u'♦', u'\\dim':u'dim', 
+      u'\\displaystyle':u'', u'\\div':u'÷', u'\\divideontimes':u'⋇', 
+      u'\\dotdiv':u'∸', u'\\doteq':u'≐', u'\\doteqdot':u'≑', u'\\dotplus':u'∔', 
+      u'\\dots':u'…', u'\\doublebarwedge':u'⌆', u'\\downarrow':u'↓', 
+      u'\\downdownarrows':u'⇊', u'\\downharpoonleft':u'⇃', 
+      u'\\downharpoonright':u'⇂', u'\\earth':u'♁', u'\\ell':u'ℓ', 
+      u'\\emptyset':u'∅', u'\\eqcirc':u'≖', u'\\eqcolon':u'≕', u'\\eqsim':u'≂', 
+      u'\\euro':u'€', u'\\exists':u'∃', u'\\exp':u'exp', 
+      u'\\fallingdotseq':u'≒', u'\\female':u'♀', u'\\flat':u'♭', 
+      u'\\forall':u'∀', u'\\frown':u'⌢', u'\\frownie':u'☹', u'\\gcd':u'gcd', 
+      u'\\gemini':u'♊', u'\\geq)':u'≥', u'\\geqq':u'≧', u'\\geqslant':u'≥', 
+      u'\\gets':u'←', u'\\gg':u'≫', u'\\ggg':u'⋙', u'\\gimel':u'ℷ', 
+      u'\\gneqq':u'≩', u'\\gnsim':u'⋧', u'\\gtrdot':u'⋗', u'\\gtreqless':u'⋚', 
       u'\\gtreqqless':u'⪌', u'\\gtrless':u'≷', u'\\gtrsim':u'≳', 
       u'\\hbar':u'ℏ', u'\\heartsuit':u'♥', 
       u'\\hfill':u'<span class="hfill"> </span>', u'\\hom':u'hom', 
       u'\\hookleftarrow':u'↩', u'\\hookrightarrow':u'↪', u'\\hslash':u'ℏ', 
-      u'\\idotsint':u'∫⋯∫', u'\\iiint':u'∭', u'\\iint':u'∬', u'\\imath':u'ı', 
-      u'\\implies':u'  ⇒  ', u'\\in':u' ∈ ', u'\\inf':u'inf', u'\\infty':u'∞', 
-      u'\\int':u'<span class="bigsymbol">∫</span>', 
-      u'\\intop':u'<span class="bigsymbol">∫</span>', u'\\invneg':u'⌐', 
-      u'\\jmath':u'ȷ', u'\\jupiter':u'♃', u'\\ker':u'ker', u'\\land':u'∧', 
-      u'\\landupint':u'∱', u'\\langle':u'⟨', u'\\lbrace':u'{', 
-      u'\\lbrace)':u'{', u'\\lbrack':u'[', u'\\lceil':u'⌈', u'\\ldots':u'…', 
-      u'\\le':u'≤', u'\\leadsto':u'⇝', u'\\leftarrow':u' ← ', 
-      u'\\leftarrow)':u'←', u'\\leftarrowtail':u'↢', u'\\leftarrowtobar':u'⇤', 
+      u'\\idotsint':u'<span class="bigsymbol">∫⋯∫</span>', 
+      u'\\iiint':u'<span class="bigsymbol">∭</span>', 
+      u'\\iint':u'<span class="bigsymbol">∬</span>', u'\\imath':u'ı', 
+      u'\\inf':u'inf', u'\\infty':u'∞', u'\\invneg':u'⌐', u'\\jmath':u'ȷ', 
+      u'\\jupiter':u'♃', u'\\ker':u'ker', u'\\land':u'∧', 
+      u'\\landupint':u'<span class="bigsymbol">∱</span>', u'\\langle':u'⟨', 
+      u'\\lbrace':u'{', u'\\lbrace)':u'{', u'\\lbrack':u'[', u'\\lceil':u'⌈', 
+      u'\\ldots':u'…', u'\\leadsto':u'⇝', u'\\leftarrow)':u'←', 
+      u'\\leftarrowtail':u'↢', u'\\leftarrowtobar':u'⇤', 
       u'\\leftharpoondown':u'↽', u'\\leftharpoonup':u'↼', 
       u'\\leftleftarrows':u'⇇', u'\\leftleftharpoons':u'⥢', u'\\leftmoon':u'☾', 
       u'\\leftrightarrow':u'↔', u'\\leftrightarrows':u'⇆', 
       u'\\leftrightharpoons':u'⇋', u'\\leftthreetimes':u'⋋', u'\\leo':u'♌', 
-      u'\\leq':u' ≤ ', u'\\leq)':u'≤', u'\\leqq':u'≦', u'\\leqslant':u'≤', 
-      u'\\lessdot':u'⋖', u'\\lesseqgtr':u'⋛', u'\\lesseqqgtr':u'⪋', 
-      u'\\lessgtr':u'≶', u'\\lesssim':u'≲', u'\\lfloor':u'⌊', u'\\lg':u'lg', 
-      u'\\lhd':u'⊲', u'\\libra':u'♎', u'\\lightning':u'↯', u'\\lim':u'lim', 
-      u'\\liminf':u'liminf', u'\\limsup':u'limsup', u'\\ll':u'≪', 
-      u'\\lll':u'⋘', u'\\ln':u'ln', u'\\lneqq':u'≨', u'\\lnot':u'¬', 
-      u'\\lnsim':u'⋦', u'\\log':u'log', u'\\longleftarrow':u'⟵', 
-      u'\\longleftrightarrow':u'⟷', u'\\longmapsto':u'⟼', 
-      u'\\longrightarrow':u'⟶', u'\\looparrowleft':u'↫', 
+      u'\\leq)':u'≤', u'\\leqq':u'≦', u'\\leqslant':u'≤', u'\\lessdot':u'⋖', 
+      u'\\lesseqgtr':u'⋛', u'\\lesseqqgtr':u'⪋', u'\\lessgtr':u'≶', 
+      u'\\lesssim':u'≲', u'\\lfloor':u'⌊', u'\\lg':u'lg', u'\\lhd':u'⊲', 
+      u'\\libra':u'♎', u'\\lightning':u'↯', u'\\liminf':u'liminf', 
+      u'\\limsup':u'limsup', u'\\ll':u'≪', u'\\lll':u'⋘', u'\\ln':u'ln', 
+      u'\\lneqq':u'≨', u'\\lnot':u'¬', u'\\lnsim':u'⋦', u'\\log':u'log', 
+      u'\\longleftarrow':u'⟵', u'\\longleftrightarrow':u'⟷', 
+      u'\\longmapsto':u'⟼', u'\\longrightarrow':u'⟶', u'\\looparrowleft':u'↫', 
       u'\\looparrowright':u'↬', u'\\lor':u'∨', u'\\lozenge':u'◊', 
       u'\\ltimes':u'⋉', u'\\lyxlock':u'', u'\\male':u'♂', u'\\maltese':u'✠', 
       u'\\mapsfrom':u'↤', u'\\mapsto':u'↦', u'\\mathcircumflex':u'^', 
@@ -545,63 +578,65 @@ class FormulaConfig(object):
       u'\\mp':u'∓', u'\\multimap':u'⊸', u'\\nLeftarrow':u'⇍', 
       u'\\nLeftrightarrow':u'⇎', u'\\nRightarrow':u'⇏', u'\\nVDash':u'⊯', 
       u'\\nabla':u'∇', u'\\napprox':u'≉', u'\\natural':u'♮', u'\\ncong':u'≇', 
-      u'\\ne':u' ≠ ', u'\\nearrow':u'↗', u'\\neg':u'¬', u'\\neg)':u'¬', 
-      u'\\neptune':u'♆', u'\\neq':u' ≠ ', u'\\nequiv':u'≢', u'\\nexists':u'∄', 
+      u'\\nearrow':u'↗', u'\\neg':u'¬', u'\\neg)':u'¬', u'\\neptune':u'♆', 
+      u'\\nequiv':u'≢', u'\\newline':u'<br/>', u'\\nexists':u'∄', 
       u'\\ngeqslant':u'≱', u'\\ngtr':u'≯', u'\\ngtrless':u'≹', u'\\ni':u'∋', 
       u'\\ni)':u'∋', u'\\nleftarrow':u'↚', u'\\nleftrightarrow':u'↮', 
       u'\\nleqslant':u'≰', u'\\nless':u'≮', u'\\nlessgtr':u'≸', u'\\nmid':u'∤', 
       u'\\nonumber':u'', u'\\not':u'¬', u'\\not<':u'≮', u'\\not=':u'≠', 
-      u'\\not>':u'≯', u'\\not\\in':u' ∉ ', u'\\notbackslash':u'⍀', 
-      u'\\notin':u'∉', u'\\notni':u'∌', u'\\notslash':u'⌿', 
-      u'\\nparallel':u'∦', u'\\nprec':u'⊀', u'\\nrightarrow':u'↛', 
-      u'\\nsim':u'≁', u'\\nsimeq':u'≄', u'\\nsqsubset':u'⊏̸', 
-      u'\\nsubseteq':u'⊈', u'\\nsucc':u'⊁', u'\\nsucccurlyeq':u'⋡', 
-      u'\\nsupset':u'⊅', u'\\nsupseteq':u'⊉', u'\\ntriangleleft':u'⋪', 
-      u'\\ntrianglelefteq':u'⋬', u'\\ntriangleright':u'⋫', 
-      u'\\ntrianglerighteq':u'⋭', u'\\nvDash':u'⊭', u'\\nvdash':u'⊬', 
-      u'\\nwarrow':u'↖', u'\\odot':u'⊙', u'\\oiiint':u'∰', u'\\oiint':u'∯', 
-      u'\\oint':u'∮', u'\\ointclockwise':u'∲', u'\\ointctrclockwise':u'∳', 
+      u'\\not>':u'≯', u'\\notbackslash':u'⍀', u'\\notin':u'∉', u'\\notni':u'∌', 
+      u'\\notslash':u'⌿', u'\\nparallel':u'∦', u'\\nprec':u'⊀', 
+      u'\\nrightarrow':u'↛', u'\\nsim':u'≁', u'\\nsimeq':u'≄', 
+      u'\\nsqsubset':u'⊏̸', u'\\nsubseteq':u'⊈', u'\\nsucc':u'⊁', 
+      u'\\nsucccurlyeq':u'⋡', u'\\nsupset':u'⊅', u'\\nsupseteq':u'⊉', 
+      u'\\ntriangleleft':u'⋪', u'\\ntrianglelefteq':u'⋬', 
+      u'\\ntriangleright':u'⋫', u'\\ntrianglerighteq':u'⋭', u'\\nvDash':u'⊭', 
+      u'\\nvdash':u'⊬', u'\\nwarrow':u'↖', u'\\odot':u'⊙', 
+      u'\\officialeuro':u'€', u'\\oiiint':u'<span class="bigsymbol">∰</span>', 
+      u'\\oiint':u'<span class="bigsymbol">∯</span>', 
+      u'\\oint':u'<span class="bigsymbol">∮</span>', 
+      u'\\ointclockwise':u'<span class="bigsymbol">∲</span>', 
+      u'\\ointctrclockwise':u'<span class="bigsymbol">∳</span>', 
       u'\\ominus':u'⊖', u'\\oplus':u'⊕', u'\\oslash':u'⊘', u'\\otimes':u'⊗', 
       u'\\owns':u'∋', u'\\parallel':u'∥', u'\\partial':u'∂', u'\\perp':u'⊥', 
       u'\\pisces':u'♓', u'\\pitchfork':u'⋔', u'\\pluto':u'♇', u'\\pm':u'±', 
       u'\\pointer':u'➪', u'\\pounds':u'£', u'\\prec':u'≺', 
       u'\\preccurlyeq':u'≼', u'\\preceq':u'≼', u'\\precsim':u'≾', 
-      u'\\prime':u'′', u'\\prod':u'<span class="bigsymbol">∏</span>', 
-      u'\\prompto':u'∝', u'\\propto':u' ∝ ', u'\\qquad':u'  ', u'\\quad':u' ', 
+      u'\\prime':u'′', u'\\prompto':u'∝', u'\\qquad':u'  ', u'\\quad':u' ', 
       u'\\quarternote':u'♩', u'\\rangle':u'⟩', u'\\rbrace':u'}', 
       u'\\rbrace)':u'}', u'\\rbrack':u']', u'\\rceil':u'⌉', u'\\rfloor':u'⌋', 
-      u'\\rhd':u'⊳', u'\\rightarrow':u' → ', u'\\rightarrow)':u'→', 
-      u'\\rightarrowtail':u'↣', u'\\rightarrowtobar':u'⇥', 
-      u'\\rightharpoondown':u'⇁', u'\\rightharpoonup':u'⇀', 
-      u'\\rightharpooondown':u'⇁', u'\\rightharpooonup':u'⇀', 
-      u'\\rightleftarrows':u'⇄', u'\\rightleftharpoons':u'⇌', 
-      u'\\rightmoon':u'☽', u'\\rightrightarrows':u'⇉', 
-      u'\\rightrightharpoons':u'⥤', u'\\rightsquigarrow':u' ⇝ ', 
+      u'\\rhd':u'⊳', u'\\rightarrow)':u'→', u'\\rightarrowtail':u'↣', 
+      u'\\rightarrowtobar':u'⇥', u'\\rightharpoondown':u'⇁', 
+      u'\\rightharpoonup':u'⇀', u'\\rightharpooondown':u'⇁', 
+      u'\\rightharpooonup':u'⇀', u'\\rightleftarrows':u'⇄', 
+      u'\\rightleftharpoons':u'⇌', u'\\rightmoon':u'☽', 
+      u'\\rightrightarrows':u'⇉', u'\\rightrightharpoons':u'⥤', 
       u'\\rightthreetimes':u'⋌', u'\\risingdotseq':u'≓', u'\\rtimes':u'⋊', 
       u'\\sagittarius':u'♐', u'\\saturn':u'♄', u'\\scorpio':u'♏', 
       u'\\scriptscriptstyle':u'', u'\\scriptstyle':u'', u'\\searrow':u'↘', 
-      u'\\sec':u'sec', u'\\setminus':u'∖', u'\\sharp':u'♯', u'\\sim':u' ~ ', 
-      u'\\simeq':u'≃', u'\\sin':u'sin', u'\\sinh':u'sinh', u'\\slash':u'∕', 
-      u'\\smile':u'⌣', u'\\smiley':u'☺', u'\\spadesuit':u'♠', 
-      u'\\sphericalangle':u'∢', u'\\sqcap':u'⊓', u'\\sqcup':u'⊔', 
-      u'\\sqsubset':u'⊏', u'\\sqsubseteq':u'⊑', u'\\sqsupset':u'⊐', 
-      u'\\sqsupseteq':u'⊒', u'\\square':u'□', u'\\star':u'⋆', 
-      u'\\subset':u' ⊂ ', u'\\subseteq':u'⊆', u'\\subseteqq':u'⫅', 
+      u'\\sec':u'sec', u'\\setminus':u'∖', u'\\sharp':u'♯', u'\\simeq':u'≃', 
+      u'\\sin':u'sin', u'\\sinh':u'sinh', u'\\slash':u'∕', u'\\smile':u'⌣', 
+      u'\\smiley':u'☺', u'\\spadesuit':u'♠', u'\\sphericalangle':u'∢', 
+      u'\\sqcap':u'⊓', u'\\sqcup':u'⊔', u'\\sqsubset':u'⊏', 
+      u'\\sqsubseteq':u'⊑', u'\\sqsupset':u'⊐', u'\\sqsupseteq':u'⊒', 
+      u'\\square':u'□', u'\\star':u'⋆', u'\\subseteqq':u'⫅', 
       u'\\subsetneqq':u'⫋', u'\\succ':u'≻', u'\\succcurlyeq':u'≽', 
-      u'\\succeq':u'≽', u'\\succnsim':u'⋩', u'\\succsim':u'≿', 
-      u'\\sum':u'<span class="bigsymbol">∑</span>', u'\\sun':u'☼', 
-      u'\\sup':u'sup', u'\\supset':u' ⊃ ', u'\\supseteq':u'⊇', 
-      u'\\supseteqq':u'⫆', u'\\supsetneqq':u'⫌', u'\\surd':u'√', 
-      u'\\swarrow':u'↙', u'\\tan':u'tan', u'\\tanh':u'tanh', u'\\taurus':u'♉', 
-      u'\\textbackslash':u'\\', u'\\textstyle':u'', u'\\therefore':u'∴', 
-      u'\\times':u' × ', u'\\to':u'→', u'\\top':u'⊤', u'\\triangle':u'△', 
-      u'\\triangleleft':u'⊲', u'\\trianglelefteq':u'⊴', u'\\triangleq':u'≜', 
-      u'\\triangleright':u'▷', u'\\trianglerighteq':u'⊵', 
-      u'\\twoheadleftarrow':u'↞', u'\\twoheadrightarrow':u'↠', 
-      u'\\twonotes':u'♫', u'\\udot':u'⊍', u'\\unlhd':u'⊴', u'\\unrhd':u'⊵', 
-      u'\\unrhl':u'⊵', u'\\uparrow':u'↑', u'\\updownarrow':u'↕', 
-      u'\\upharpoonleft':u'↿', u'\\upharpoonright':u'↾', u'\\uplus':u'⊎', 
-      u'\\upuparrows':u'⇈', u'\\uranus':u'♅', u'\\vDash':u'⊨', 
+      u'\\succeq':u'≽', u'\\succnsim':u'⋩', u'\\succsim':u'≿', u'\\sun':u'☼', 
+      u'\\sup':u'sup', u'\\supseteqq':u'⫆', u'\\supsetneqq':u'⫌', 
+      u'\\surd':u'√', u'\\swarrow':u'↙', u'\\tan':u'tan', u'\\tanh':u'tanh', 
+      u'\\taurus':u'♉', u'\\textasciicircum':u'^', u'\\textasciitilde':u'~', 
+      u'\\textbackslash':u'\\', u'\\textendash':u'—', u'\\textgreater':u'>', 
+      u'\\textless':u'<', u'\\textordfeminine':u'ª', 
+      u'\\textordmasculine':u'º', u'\\textquotedblleft':u'“', 
+      u'\\textquotedblright':u'”', u'\\textregistered':u'®', 
+      u'\\textstyle':u'', u'\\texttrademark':u'™', u'\\therefore':u'∴', 
+      u'\\top':u'⊤', u'\\triangle':u'△', u'\\triangleleft':u'⊲', 
+      u'\\trianglelefteq':u'⊴', u'\\triangleq':u'≜', u'\\triangleright':u'▷', 
+      u'\\trianglerighteq':u'⊵', u'\\twoheadleftarrow':u'↞', 
+      u'\\twoheadrightarrow':u'↠', u'\\twonotes':u'♫', u'\\udot':u'⊍', 
+      u'\\unlhd':u'⊴', u'\\unrhd':u'⊵', u'\\unrhl':u'⊵', u'\\uparrow':u'↑', 
+      u'\\updownarrow':u'↕', u'\\upharpoonleft':u'↿', u'\\upharpoonright':u'↾', 
+      u'\\uplus':u'⊎', u'\\upuparrows':u'⇈', u'\\uranus':u'♅', u'\\vDash':u'⊨', 
       u'\\varclubsuit':u'♧', u'\\vardiamondsuit':u'♦', u'\\varheartsuit':u'♥', 
       u'\\varnothing':u'∅', u'\\varspadesuit':u'♤', u'\\vdash':u'⊢', 
       u'\\vdots':u'⋮', u'\\vee':u'∨', u'\\vee)':u'∨', u'\\veebar':u'⊻', 
@@ -610,112 +645,17 @@ class FormulaConfig(object):
       u'\\}':u'}', 
       }
 
+  decoratedcommand = {
+      
+      }
+
   decoratingfunctions = {
-      u'\\acute':u'´', u'\\acute{A}':u'Á', u'\\acute{C}':u'Ć', 
-      u'\\acute{E}':u'É', u'\\acute{G}':u'Ǵ', u'\\acute{I}':u'Í', 
-      u'\\acute{K}':u'Ḱ', u'\\acute{L}':u'Ĺ', u'\\acute{M}':u'Ḿ', 
-      u'\\acute{N}':u'Ń', u'\\acute{O}':u'Ó', u'\\acute{P}':u'Ṕ', 
-      u'\\acute{R}':u'Ŕ', u'\\acute{S}':u'Ś', u'\\acute{U}':u'Ú', 
-      u'\\acute{W}':u'Ẃ', u'\\acute{Y}':u'Ý', u'\\acute{Z}':u'Ź', 
-      u'\\acute{a}':u'á', u'\\acute{c}':u'ć', u'\\acute{e}':u'é', 
-      u'\\acute{g}':u'ǵ', u'\\acute{i}':u'í', u'\\acute{k}':u'ḱ', 
-      u'\\acute{l}':u'ĺ', u'\\acute{m}':u'ḿ', u'\\acute{n}':u'ń', 
-      u'\\acute{o}':u'ó', u'\\acute{p}':u'ṕ', u'\\acute{r}':u'ŕ', 
-      u'\\acute{s}':u'ś', u'\\acute{u}':u'ú', u'\\acute{w}':u'ẃ', 
-      u'\\acute{y}':u'ý', u'\\acute{z}':u'ź', u'\\bar{A}':u'Ā', 
-      u'\\bar{E}':u'Ē', u'\\bar{I}':u'Ī', u'\\bar{O}':u'Ō', u'\\bar{U}':u'Ū', 
-      u'\\bar{Y}':u'Ȳ', u'\\bar{a}':u'ā', u'\\bar{e}':u'ē', u'\\bar{o}':u'ō', 
-      u'\\bar{u}':u'ū', u'\\bar{y}':u'ȳ', u'\\breve':u'˘', u'\\breve{A}':u'Ă', 
-      u'\\breve{E}':u'Ĕ', u'\\breve{G}':u'Ğ', u'\\breve{I}':u'Ĭ', 
-      u'\\breve{O}':u'Ŏ', u'\\breve{U}':u'Ŭ', u'\\breve{a}':u'ă', 
-      u'\\breve{e}':u'ĕ', u'\\breve{g}':u'ğ', u'\\breve{o}':u'ŏ', 
-      u'\\breve{u}':u'ŭ', u'\\c':u'¸', u'\\check':u'ˇ', u'\\check{A}':u'Ǎ', 
-      u'\\check{C}':u'Č', u'\\check{D}':u'Ď', u'\\check{E}':u'Ě', 
-      u'\\check{G}':u'Ǧ', u'\\check{H}':u'Ȟ', u'\\check{I}':u'Ǐ', 
-      u'\\check{K}':u'Ǩ', u'\\check{N}':u'Ň', u'\\check{O}':u'Ǒ', 
-      u'\\check{R}':u'Ř', u'\\check{S}':u'Š', u'\\check{T}':u'Ť', 
-      u'\\check{U}':u'Ǔ', u'\\check{Z}':u'Ž', u'\\check{a}':u'ǎ', 
-      u'\\check{c}':u'č', u'\\check{d}':u'ď', u'\\check{e}':u'ě', 
-      u'\\check{g}':u'ǧ', u'\\check{h}':u'ȟ', u'\\check{k}':u'ǩ', 
-      u'\\check{n}':u'ň', u'\\check{o}':u'ǒ', u'\\check{r}':u'ř', 
-      u'\\check{s}':u'š', u'\\check{u}':u'ǔ', u'\\check{z}':u'ž', 
-      u'\\c{C}':u'Ç', u'\\c{D}':u'Ḑ', u'\\c{E}':u'Ȩ', u'\\c{G}':u'Ģ', 
-      u'\\c{H}':u'Ḩ', u'\\c{K}':u'Ķ', u'\\c{L}':u'Ļ', u'\\c{N}':u'Ņ', 
-      u'\\c{R}':u'Ŗ', u'\\c{S}':u'Ş', u'\\c{T}':u'Ţ', u'\\c{c}':u'ç', 
-      u'\\c{d}':u'ḑ', u'\\c{e}':u'ȩ', u'\\c{h}':u'ḩ', u'\\c{k}':u'ķ', 
-      u'\\c{l}':u'ļ', u'\\c{n}':u'ņ', u'\\c{r}':u'ŗ', u'\\c{s}':u'ş', 
-      u'\\c{t}':u'ţ', u'\\dacute{O}':u'Ő', u'\\dacute{U}':u'Ű', 
-      u'\\dacute{o}':u'ő', u'\\dacute{u}':u'ű', u'\\ddot':u'¨', 
-      u'\\ddot{A}':u'Ä', u'\\ddot{E}':u'Ë', u'\\ddot{H}':u'Ḧ', 
-      u'\\ddot{I}':u'Ï', u'\\ddot{O}':u'Ö', u'\\ddot{U}':u'Ü', 
-      u'\\ddot{W}':u'Ẅ', u'\\ddot{X}':u'Ẍ', u'\\ddot{Y}':u'Ÿ', 
-      u'\\ddot{a}':u'ä', u'\\ddot{e}':u'ë', u'\\ddot{h}':u'ḧ', 
-      u'\\ddot{o}':u'ö', u'\\ddot{t}':u'ẗ', u'\\ddot{u}':u'ü', 
-      u'\\ddot{w}':u'ẅ', u'\\ddot{x}':u'ẍ', u'\\ddot{y}':u'ÿ', 
-      u'\\dgrave{A}':u'Ȁ', u'\\dgrave{E}':u'Ȅ', u'\\dgrave{I}':u'Ȉ', 
-      u'\\dgrave{O}':u'Ȍ', u'\\dgrave{R}':u'Ȑ', u'\\dgrave{U}':u'Ȕ', 
-      u'\\dgrave{a}':u'ȁ', u'\\dgrave{e}':u'ȅ', u'\\dgrave{o}':u'ȍ', 
-      u'\\dgrave{r}':u'ȑ', u'\\dgrave{u}':u'ȕ', u'\\dot':u'˙', 
-      u'\\dot{A}':u'Ȧ', u'\\dot{B}':u'Ḃ', u'\\dot{C}':u'Ċ', u'\\dot{D}':u'Ḋ', 
-      u'\\dot{E}':u'Ė', u'\\dot{F}':u'Ḟ', u'\\dot{G}':u'Ġ', u'\\dot{H}':u'Ḣ', 
-      u'\\dot{I}':u'İ', u'\\dot{M}':u'Ṁ', u'\\dot{N}':u'Ṅ', u'\\dot{O}':u'Ȯ', 
-      u'\\dot{P}':u'Ṗ', u'\\dot{R}':u'Ṙ', u'\\dot{S}':u'Ṡ', u'\\dot{T}':u'Ṫ', 
-      u'\\dot{W}':u'Ẇ', u'\\dot{X}':u'Ẋ', u'\\dot{Y}':u'Ẏ', u'\\dot{Z}':u'Ż', 
-      u'\\dot{a}':u'ȧ', u'\\dot{b}':u'ḃ', u'\\dot{c}':u'ċ', u'\\dot{d}':u'ḋ', 
-      u'\\dot{e}':u'ė', u'\\dot{f}':u'ḟ', u'\\dot{g}':u'ġ', u'\\dot{h}':u'ḣ', 
-      u'\\dot{m}':u'ṁ', u'\\dot{n}':u'ṅ', u'\\dot{o}':u'ȯ', u'\\dot{p}':u'ṗ', 
-      u'\\dot{r}':u'ṙ', u'\\dot{s}':u'ṡ', u'\\dot{t}':u'ṫ', u'\\dot{w}':u'ẇ', 
-      u'\\dot{x}':u'ẋ', u'\\dot{y}':u'ẏ', u'\\dot{z}':u'ż', u'\\grave':u'`', 
-      u'\\grave{A}':u'À', u'\\grave{E}':u'È', u'\\grave{I}':u'Ì', 
-      u'\\grave{N}':u'Ǹ', u'\\grave{O}':u'Ò', u'\\grave{U}':u'Ù', 
-      u'\\grave{W}':u'Ẁ', u'\\grave{Y}':u'Ỳ', u'\\grave{a}':u'à', 
-      u'\\grave{e}':u'è', u'\\grave{n}':u'ǹ', u'\\grave{o}':u'ò', 
-      u'\\grave{u}':u'ù', u'\\grave{w}':u'ẁ', u'\\grave{y}':u'ỳ', 
-      u'\\hat':u'^', u'\\hat{A}':u'Â', u'\\hat{C}':u'Ĉ', u'\\hat{E}':u'Ê', 
-      u'\\hat{G}':u'Ĝ', u'\\hat{H}':u'Ĥ', u'\\hat{I}':u'Î', u'\\hat{J}':u'Ĵ', 
-      u'\\hat{O}':u'Ô', u'\\hat{S}':u'Ŝ', u'\\hat{U}':u'Û', u'\\hat{W}':u'Ŵ', 
-      u'\\hat{Y}':u'Ŷ', u'\\hat{Z}':u'Ẑ', u'\\hat{a}':u'â', u'\\hat{c}':u'ĉ', 
-      u'\\hat{e}':u'ê', u'\\hat{g}':u'ĝ', u'\\hat{h}':u'ĥ', u'\\hat{o}':u'ô', 
-      u'\\hat{s}':u'ŝ', u'\\hat{u}':u'û', u'\\hat{w}':u'ŵ', u'\\hat{y}':u'ŷ', 
-      u'\\hat{z}':u'ẑ', u'\\mathring':u'°', u'\\ogonek{A}':u'Ą', 
-      u'\\ogonek{E}':u'Ę', u'\\ogonek{I}':u'Į', u'\\ogonek{O}':u'Ǫ', 
-      u'\\ogonek{U}':u'Ų', u'\\ogonek{a}':u'ą', u'\\ogonek{e}':u'ę', 
-      u'\\ogonek{i}':u'į', u'\\ogonek{o}':u'ǫ', u'\\ogonek{u}':u'ų', 
-      u'\\overleftarrow':u'⟵', u'\\overrightarrow':u'⟶', u'\\rcap{A}':u'Ȃ', 
-      u'\\rcap{E}':u'Ȇ', u'\\rcap{I}':u'Ȋ', u'\\rcap{O}':u'Ȏ', 
-      u'\\rcap{R}':u'Ȓ', u'\\rcap{U}':u'Ȗ', u'\\rcap{a}':u'ȃ', 
-      u'\\rcap{e}':u'ȇ', u'\\rcap{o}':u'ȏ', u'\\rcap{r}':u'ȓ', 
-      u'\\rcap{u}':u'ȗ', u'\\slashed{O}':u'Ø', u'\\slashed{o}':u'ø', 
-      u'\\subdot{A}':u'Ạ', u'\\subdot{B}':u'Ḅ', u'\\subdot{D}':u'Ḍ', 
-      u'\\subdot{E}':u'Ẹ', u'\\subdot{H}':u'Ḥ', u'\\subdot{I}':u'Ị', 
-      u'\\subdot{K}':u'Ḳ', u'\\subdot{L}':u'Ḷ', u'\\subdot{M}':u'Ṃ', 
-      u'\\subdot{N}':u'Ṇ', u'\\subdot{O}':u'Ọ', u'\\subdot{R}':u'Ṛ', 
-      u'\\subdot{S}':u'Ṣ', u'\\subdot{T}':u'Ṭ', u'\\subdot{U}':u'Ụ', 
-      u'\\subdot{V}':u'Ṿ', u'\\subdot{W}':u'Ẉ', u'\\subdot{Y}':u'Ỵ', 
-      u'\\subdot{Z}':u'Ẓ', u'\\subdot{a}':u'ạ', u'\\subdot{b}':u'ḅ', 
-      u'\\subdot{d}':u'ḍ', u'\\subdot{e}':u'ẹ', u'\\subdot{h}':u'ḥ', 
-      u'\\subdot{i}':u'ị', u'\\subdot{k}':u'ḳ', u'\\subdot{l}':u'ḷ', 
-      u'\\subdot{m}':u'ṃ', u'\\subdot{n}':u'ṇ', u'\\subdot{o}':u'ọ', 
-      u'\\subdot{r}':u'ṛ', u'\\subdot{s}':u'ṣ', u'\\subdot{t}':u'ṭ', 
-      u'\\subdot{u}':u'ụ', u'\\subdot{v}':u'ṿ', u'\\subdot{w}':u'ẉ', 
-      u'\\subdot{y}':u'ỵ', u'\\subdot{z}':u'ẓ', u'\\subhat{D}':u'Ḓ', 
-      u'\\subhat{E}':u'Ḙ', u'\\subhat{L}':u'Ḽ', u'\\subhat{N}':u'Ṋ', 
-      u'\\subhat{T}':u'Ṱ', u'\\subhat{U}':u'Ṷ', u'\\subhat{d}':u'ḓ', 
-      u'\\subhat{e}':u'ḙ', u'\\subhat{l}':u'ḽ', u'\\subhat{n}':u'ṋ', 
-      u'\\subhat{t}':u'ṱ', u'\\subhat{u}':u'ṷ', u'\\subring{A}':u'Ḁ', 
-      u'\\subring{a}':u'ḁ', u'\\subtilde{E}':u'Ḛ', u'\\subtilde{I}':u'Ḭ', 
-      u'\\subtilde{U}':u'Ṵ', u'\\subtilde{e}':u'ḛ', u'\\subtilde{i}':u'ḭ', 
-      u'\\subtilde{u}':u'ṵ', u'\\tilde':u'˜', u'\\tilde{A}':u'Ã', 
-      u'\\tilde{E}':u'Ẽ', u'\\tilde{I}':u'Ĩ', u'\\tilde{N}':u'Ñ', 
-      u'\\tilde{O}':u'Õ', u'\\tilde{U}':u'Ũ', u'\\tilde{V}':u'Ṽ', 
-      u'\\tilde{Y}':u'Ỹ', u'\\tilde{a}':u'ã', u'\\tilde{e}':u'ẽ', 
-      u'\\tilde{n}':u'ñ', u'\\tilde{o}':u'õ', u'\\tilde{u}':u'ũ', 
-      u'\\tilde{v}':u'ṽ', u'\\tilde{y}':u'ỹ', u'\\vec':u'→', 
+      u'\\overleftarrow':u'⟵', u'\\overrightarrow':u'⟶', u'\\widehat':u'^', 
       }
 
   definingfunctions = {
-      u'\\newcommand':[u'[$n!][$1][$2][$3][$4][$5][$6][$7][$8][$9]{$d}',u'',], 
-      u'\\renewcommand':[u'[$n!][$1][$2][$3][$4][$5][$6][$7][$8][$9]{$d}',u'',], 
+      u'\\newcommand':u'[$n!][$1][$2][$3][$4][$5][$6][$7][$8][$9]{$d}', 
+      u'\\renewcommand':u'[$n!][$1][$2][$3][$4][$5][$6][$7][$8][$9]{$d}', 
       }
 
   endings = {
@@ -752,21 +692,29 @@ class FormulaConfig(object):
 
   hybridfunctions = {
       
-      u'\\binom':[u'{$1}{$2}',u'f3{(}f0{f1{$1}f2{$2}}f3{)}',u'span class="binom"',u'span class="upbinom"',u'span class="downbinom"',u'span class="bigsymbol"',], 
-      u'\\cfrac':[u'[$p!]{$1}{$2}',u'f0{f1{$1}f2{$2}}',u'span class="fullfraction"',u'span class="numerator$p"',u'span class="denominator"',], 
-      u'\\dbinom':[u'{$1}{$2}',u'f3{(}f0{f1{$1}f2{$2}}f3{)}',u'span class="fullbinom"',u'span class="upbinom"',u'span class="downbinom"',u'span class="bigsymbol"',], 
-      u'\\dfrac':[u'{$1}{$2}',u'f0{f1{$1}f2{$2}}',u'span class="fullfraction"',u'span class="numerator"',u'span class="denominator"',], 
-      u'\\frac':[u'{$1}{$2}',u'f0{f1{$1}f2{$2}}',u'span class="fraction"',u'span class="numerator"',u'span class="denominator"',], 
+      u'\\binom':[u'{$1}{$2}',u'f2{(}f0{f1{$1}f1{$2}}f2{)}',u'span class="binom"',u'span class="binomstack"',u'span class="bigsymbol"',], 
+      u'\\boxed':[u'{$1}',u'f0{$1}',u'span class="boxed"',], 
+      u'\\cfrac':[u'[$p!]{$1}{$2}',u'f0{f3{(}f1{$1}f3{)/(}f2{$2}f3{)}}',u'span class="fullfraction"',u'span class="numerator align-$p"',u'span class="denominator"',u'span class="ignored"',], 
+      u'\\color':[u'{$p!}{$1}',u'f0{$1}',u'span style="color: $p;"',], 
+      u'\\colorbox':[u'{$p!}{$1}',u'f0{$1}',u'span class="colorbox" style="background: $p;"',], 
+      u'\\dfrac':[u'{$1}{$2}',u'f0{f3{(}f1{$1}f3{)/(}f2{$2}f3{)}}',u'span class="fullfraction"',u'span class="numerator"',u'span class="denominator"',u'span class="ignored"',], 
+      u'\\fbox':[u'{$1}',u'f0{$1}',u'span class="fbox"',], 
+      u'\\fcolorbox':[u'{$p!}{$q!}{$1}',u'f0{$1}',u'span class="boxed" style="border-color: $p; background: $q;"',], 
+      u'\\frac':[u'{$1}{$2}',u'f0{f3{(}f1{$1}f3{)/(}f2{$2}f3{)}}',u'span class="fraction"',u'span class="numerator"',u'span class="denominator"',u'span class="ignored"',], 
+      u'\\framebox':[u'[$p!][$q!]{$1}',u'f0{$1}',u'span class="framebox align-$q" style="width: $p;"',], 
+      u'\\href':[u'[$o]{$u!}{$t!}',u'f0{$t}',u'a href="$u"',], 
       u'\\hspace':[u'{$p!}',u'f0{ }',u'span class="hspace" style="width: $p;"',], 
       u'\\leftroot':[u'{$p!}',u'f0{ }',u'span class="leftroot" style="width: $p;px"',], 
-      u'\\nicefrac':[u'{$1}{$2}',u'f0{f1{$1}⁄f2{$2}}',u'span class="fraction"',u'sup class="numerator"',u'sub class="denominator"',], 
+      u'\\nicefrac':[u'{$1}{$2}',u'f0{f1{$1}⁄f2{$2}}',u'span class="fraction"',u'sup class="numerator"',u'sub class="denominator"',u'span class="ignored"',], 
       u'\\raisebox':[u'{$p!}{$1}',u'f0{$1}',u'span class="raisebox" style="vertical-align: $p;"',], 
       u'\\renewenvironment':[u'{$1!}{$2!}{$3!}',u'',], 
-      u'\\sqrt':[u'[$0]{$1}',u'f1{$0}f0{f2{√}f3{$1}}',u'span class="sqrt"',u'sup',u'span class="radical"',u'span class="root"',], 
-      u'\\tbinom':[u'{$1}{$2}',u'f3{(}f0{f1{$1}f2{$2}}f3{)}',u'span class="fullbinom"',u'span class="upbinom"',u'span class="downbinom"',u'span class="bigsymbol"',], 
+      u'\\sqrt':[u'[$0]{$1}',u'f0{f1{$0}f2{√}f4{(}f3{$1}f4{)}}',u'span class="sqrt"',u'sup class="root"',u'span class="radical"',u'span class="root"',u'span class="ignored"',], 
+      u'\\stackrel':[u'{$1}{$2}',u'f0{f1{$1}f2{$2}}',u'span class="stackrel"',u'span class="upstackrel"',u'span class="downstackrel"',], 
+      u'\\textcolor':[u'{$p!}{$1}',u'f0{$1}',u'span style="color: $p;"',], 
       u'\\unit':[u'[$0]{$1}',u'$0f0{$1.font}',u'span class="unit"',], 
       u'\\unitfrac':[u'[$0]{$1}{$2}',u'$0f0{f1{$1.font}⁄f2{$2.font}}',u'span class="fraction"',u'sup class="unit"',u'sub class="unit"',], 
       u'\\uproot':[u'{$p!}',u'f0{ }',u'span class="uproot" style="width: $p;px"',], 
+      u'\\url':[u'{$u!}',u'f0{$u}',u'a href="$u"',], 
       u'\\vspace':[u'{$p!}',u'f0{ }',u'span class="vspace" style="height: $p;"',], 
       }
 
@@ -774,8 +722,11 @@ class FormulaConfig(object):
       u'\\label':u'a name="#"', 
       }
 
-  limits = {
-      u'commands':[u'\\sum',u'\\int',u'\\intop',], u'operands':[u'^',u'_',], 
+  limitcommands = {
+      u'\\int':[u'<span class="bigsymbol">∫</span>',u'⌠',u'⌡',], 
+      u'\\intop':[u'<span class="bigsymbol">∫</span>',u'⌠',u'⌡',], 
+      u'\\lim':[u'lim',], u'\\prod':[u'∏',], u'\\smallint':[u'∫',], 
+      u'\\sum':[u'<span class="bigsymbol">∑</span>',u'⎲',u'⎳',], 
       }
 
   modified = {
@@ -790,20 +741,31 @@ class FormulaConfig(object):
       u'\\big':u'span class="symbol"', u'\\bigg':u'span class="largesymbol"', 
       u'\\bigl':u'span class="bigsymbol"', u'\\bigr':u'span class="bigsymbol"', 
       u'\\ensuremath':u'span class="ensuremath"', 
-      u'\\hphantom':u'span class="phantom"', u'\\left':u'span class="symbol"', 
-      u'\\left.':u'<span class="leftdot"></span>', 
-      u'\\middle':u'span class="symbol"', 
+      u'\\hphantom':u'span class="phantom"', 
       u'\\overbrace':u'span class="overbrace"', 
       u'\\overline':u'span class="overline"', 
-      u'\\phantom':u'span class="phantom"', u'\\right':u'span class="symbol"', 
-      u'\\right.':u'<span class="rightdot"></span>', 
+      u'\\phantom':u'span class="phantom"', 
       u'\\underbrace':u'span class="underbrace"', u'\\underline':u'u', 
       u'\\vphantom':u'span class="phantom"', 
       }
 
+  preamblefunctions = {
+      u'\\setcounter':[u'{$p!}{$n!}',u'setcounter',], 
+      }
+
+  spacedcommands = {
+      u'\\Leftrightarrow':u'⇔', u'\\Rightarrow':u'⇒', u'\\approx':u'≈', 
+      u'\\dashrightarrow':u'⇢', u'\\equiv':u'≡', u'\\ge':u'≥', u'\\geq':u'≥', 
+      u'\\implies':u' ⇒ ', u'\\in':u'∈', u'\\le':u'≤', u'\\leftarrow':u'←', 
+      u'\\leq':u'≤', u'\\ne':u'≠', u'\\neq':u'≠', u'\\not\\in':u'∉', 
+      u'\\propto':u'∝', u'\\rightarrow':u'→', u'\\rightsquigarrow':u'⇝', 
+      u'\\sim':u'~', u'\\subset':u'⊂', u'\\subseteq':u'⊆', u'\\supset':u'⊃', 
+      u'\\supseteq':u'⊇', u'\\times':u'×', u'\\to':u'→', 
+      }
+
   starts = {
       u'beginafter':u'}', u'beginbefore':u'\\begin{', u'bracket':u'{', 
-      u'command':u'\\', u'complex':u'\\[', u'simple':u'$', 
+      u'command':u'\\', u'comment':u'%', u'complex':u'\\[', u'simple':u'$', 
       u'squarebracket':u'[', u'unnumbered':u'*', 
       }
 
@@ -814,14 +776,11 @@ class FormulaConfig(object):
   textfunctions = {
       u'\\mbox':u'span class="mbox"', u'\\text':u'span class="text"', 
       u'\\textbf':u'b', u'\\textipa':u'span class="textipa"', u'\\textit':u'i', 
-      u'\\textrm':u'span class="mathrm"', 
+      u'\\textnormal':u'span class="textnormal"', 
+      u'\\textrm':u'span class="textrm"', 
       u'\\textsc':u'span class="versalitas"', 
-      u'\\textsf':u'span class="mathsf"', u'\\textsl':u'i', u'\\texttt':u'tt', 
+      u'\\textsf':u'span class="textsf"', u'\\textsl':u'i', u'\\texttt':u'tt', 
       u'\\textup':u'span class="normal"', 
-      }
-
-  underdecoratingfunctions = {
-      u'\\r':u'∘', u'\\s':u'ˌ', u'\\textsubring':u'∘', 
       }
 
   unmodified = {
@@ -833,7 +792,7 @@ class GeneralConfig(object):
   "Configuration class from config file"
 
   version = {
-      u'date':u'2010-05-13', u'lyxformat':u'345', u'number':u'0.98', 
+      u'date':u'2010-12-23', u'lyxformat':u'398', u'number':u'1.1.2', 
       }
 
 class HeaderConfig(object):
@@ -843,7 +802,8 @@ class HeaderConfig(object):
       u'beginpreamble':u'\\begin_preamble', u'branch':u'\\branch', 
       u'documentclass':u'\\textclass', u'endbranch':u'\\end_branch', 
       u'endpreamble':u'\\end_preamble', u'language':u'\\language', 
-      u'lstset':u'\\lstset', u'paragraphseparation':u'\\paragraph_separation', 
+      u'lstset':u'\\lstset', u'outputchanges':u'\\output_changes', 
+      u'paragraphseparation':u'\\paragraph_separation', 
       u'pdftitle':u'\\pdf_title', u'secnumdepth':u'\\secnumdepth', 
       u'tocdepth':u'\\tocdepth', 
       }
@@ -851,6 +811,7 @@ class HeaderConfig(object):
   styles = {
       
       u'article':[u'article',u'aastex',u'aapaper',u'acmsiggraph',u'sigplanconf',u'achemso',u'amsart',u'apa',u'arab-article',u'armenian-article',u'article-beamer',u'chess',u'dtk',u'elsarticle',u'heb-article',u'IEEEtran',u'iopart',u'kluwer',u'scrarticle-beamer',u'scrartcl',u'extarticle',u'paper',u'mwart',u'revtex4',u'spie',u'svglobal3',u'ltugboat',u'agu-dtd',u'jgrga',u'agums',u'entcs',u'egs',u'ijmpc',u'ijmpd',u'singlecol-new',u'doublecol-new',u'isprs',u'tarticle',u'jsarticle',u'jarticle',u'jss',u'literate-article',u'siamltex',u'cl2emult',u'llncs',u'svglobal',u'svjog',u'svprobth',], 
+      u'book':[u'book',u'amsbook',u'scrbook',u'extbook',u'tufte-book',u'report',u'extreport',u'scrreprt',u'memoir',u'tbook',u'jsbook',u'jbook',u'mwbk',u'svmono',u'svmult',u'treport',u'jreport',u'mwrep',], 
       }
 
 class ImageConfig(object):
@@ -858,17 +819,24 @@ class ImageConfig(object):
 
   converters = {
       
-      u'imagemagick':u'convert [-density $scale] [-pepito $juanito] [-tonto $decapi] -define pdf:use-cropbox=true "$input" "$output"', 
+      u'imagemagick':u'convert[ -density $scale][ -define $format:use-cropbox=true] "$input" "$output"', 
       u'inkscape':u'inkscape "$input" --export-png="$output"', 
       }
 
-  formats = {
-      u'default':u'.png', u'raster':[u'.png',u'.jpg',], 
-      u'vector':[u'.svg',u'.eps',], 
+  cropboxformats = {
+      u'.eps':u'ps', u'.pdf':u'pdf', u'.ps':u'ps', 
       }
 
-  size = {
-      u'ignoredtexts':[u'col',u'text',u'line',u'page',u'theight',u'pheight',], 
+  formats = {
+      u'default':u'.png', u'vector':[u'.svg',u'.eps',], 
+      }
+
+class LayoutConfig(object):
+  "Configuration class from config file"
+
+  groupable = {
+      
+      u'allowed':[u'StringContainer',u'Constant',u'TaggedText',u'Align',u'TextFamily',u'EmphaticText',u'VersalitasText',u'BarredText',u'SizeText',u'ColorText',u'LangLine',u'Formula',], 
       }
 
 class NewfangleConfig(object):
@@ -885,11 +853,22 @@ class NumberingConfig(object):
   layouts = {
       
       u'ordered':[u'Chapter',u'Section',u'Subsection',u'Subsubsection',u'Paragraph',], 
-      u'unique':[u'Part',u'Book',], 
+      u'roman':[u'Part',u'Book',], 
+      }
+
+  sequence = {
+      u'symbols':[u'*',u'**',u'†',u'‡',u'§',u'§§',u'¶',u'¶¶',u'#',u'##',], 
       }
 
 class StyleConfig(object):
   "Configuration class from config file"
+
+  hspaces = {
+      u'\\enskip{}':u' ', u'\\hfill{}':u'<span class="hfill"> </span>', 
+      u'\\hspace*{\\fill}':u' ', u'\\hspace*{}':u'', u'\\hspace{}':u' ', 
+      u'\\negthinspace{}':u'', u'\\qquad{}':u'  ', u'\\quad{}':u' ', 
+      u'\\space{}':u' ', u'\\thinspace{}':u' ', u'~':u' ', 
+      }
 
   quotes = {
       u'ald':u'»', u'als':u'›', u'ard':u'«', u'ars':u'‹', u'eld':u'“', 
@@ -899,11 +878,36 @@ class StyleConfig(object):
       u'sld':u'”', u'srd':u'”', 
       }
 
-  spaces = {
-      u'\\enskip{}':u' ', u'\\hfill{}':u'<span class="hfill"> </span>', 
-      u'\\hspace*{\\fill}':u' ', u'\\hspace*{}':u'', u'\\hspace{}':u' ', 
-      u'\\negthinspace{}':u'', u'\\qquad{}':u'  ', u'\\quad{}':u' ', 
-      u'\\space{}':u' ', u'\\thinspace{}':u' ', u'~':u' ', 
+  referenceformats = {
+      u'eqref':u'(@↕)', u'pageref':u'#↕', u'ref':u'@↕', 
+      u'vpageref':u'on-page#↕', u'vref':u'@on-page#↕', 
+      }
+
+  size = {
+      u'ignoredtexts':[u'col',u'text',u'line',u'page',u'theight',u'pheight',], 
+      }
+
+  vspaces = {
+      u'bigskip':u'<div class="bigskip"> </div>', 
+      u'defskip':u'<div class="defskip"> </div>', 
+      u'medskip':u'<div class="medskip"> </div>', 
+      u'smallskip':u'<div class="smallskip"> </div>', 
+      u'vfill':u'<div class="vfill"> </div>', 
+      }
+
+class TOCConfig(object):
+  "Configuration class from config file"
+
+  extractplain = {
+      
+      u'allowed':[u'StringContainer',u'Constant',u'TaggedText',u'Align',u'TextFamily',u'EmphaticText',u'VersalitasText',u'BarredText',u'SizeText',u'ColorText',u'LangLine',u'Formula',], 
+      u'cloned':[u'',], u'extracted':[u'',], 
+      }
+
+  extracttitle = {
+      u'allowed':[u'StringContainer',u'Constant',u'Space',], 
+      u'cloned':[u'TextFamily',u'EmphaticText',u'VersalitasText',u'BarredText',u'SizeText',u'ColorText',u'LangLine',u'Formula',], 
+      u'extracted':[u'PlainLayout',u'TaggedText',u'Align',u'Caption',u'StandardLayout',], 
       }
 
 class TagConfig(object):
@@ -920,6 +924,12 @@ class TagConfig(object):
   flex = {
       u'CharStyle:Code':u'span class="code"', 
       u'CharStyle:MenuItem':u'span class="menuitem"', 
+      u'Code':u'span class="code"', u'MenuItem':u'span class="menuitem"', 
+      u'Noun':u'span class="noun"', u'Strong':u'span class="strong"', 
+      }
+
+  group = {
+      u'layouts':[u'Quotation',u'Quote',], 
       }
 
   layouts = {
@@ -944,26 +954,33 @@ class TranslationConfig(object):
   "Configuration class from config file"
 
   constants = {
-      u'Book':u'Book', u'Chapter':u'Chapter', u'Paragraph':u'Paragraph', 
-      u'Part':u'Part', u'Section':u'Section', u'Subsection':u'Subsection', 
-      u'Subsubsection':u'Subsubsection', u'abstract':u'Abstract', 
-      u'bibliography':u'Bibliography', u'figure':u'figure', 
-      u'float-algorithm':u'Algorithm ', u'float-figure':u'Figure ', 
-      u'float-listing':u'Listing ', u'float-table':u'Table ', 
-      u'float-tableau':u'Tableau ', u'index':u'Index', 
+      u'Appendix':u'Appendix', u'Book':u'Book', u'Chapter':u'Chapter', 
+      u'Paragraph':u'Paragraph', u'Part':u'Part', u'Section':u'Section', 
+      u'Subsection':u'Subsection', u'Subsubsection':u'Subsubsection', 
+      u'abstract':u'Abstract', u'bibliography':u'Bibliography', 
+      u'figure':u'figure', u'float-algorithm':u'Algorithm ', 
+      u'float-figure':u'Figure ', u'float-listing':u'Listing ', 
+      u'float-table':u'Table ', u'float-tableau':u'Tableau ', 
+      u'footnotes':u'Footnotes', u'generated-by':u'Document generated by ', 
+      u'generated-on':u' on ', u'index':u'Index', 
       u'jsmath-enable':u'Please enable JavaScript on your browser.', 
       u'jsmath-requires':u' requires JavaScript to correctly process the mathematics on this page. ', 
       u'jsmath-warning':u'Warning: ', u'list-algorithm':u'List of Algorithms', 
       u'list-figure':u'List of Figures', u'list-table':u'List of Tables', 
-      u'list-tableau':u'List of Tableaux', u'next':u'Next', 
-      u'nomenclature':u'Nomenclature', u'on-page':u' on page ', 
-      u'prev':u'Previous', u'toc':u'Table of Contents', u'up':u'Up', 
+      u'list-tableau':u'List of Tableaux', u'main-page':u'Main page', 
+      u'next':u'Next', u'nomenclature':u'Nomenclature', 
+      u'on-page':u' on page ', u'prev':u'Previous', 
+      u'references':u'References', u'toc':u'Table of Contents', 
+      u'toc-for':u'Contents for ', u'up':u'Up', 
       }
 
   languages = {
-      u'deutsch':u'de', u'dutch':u'nl', u'english':u'en', u'french':u'fr', 
-      u'ngerman':u'de', u'spanish':u'es', 
+      u'american':u'en', u'british':u'en', u'deutsch':u'de', u'dutch':u'nl', 
+      u'english':u'en', u'french':u'fr', u'ngerman':u'de', u'spanish':u'es', 
       }
+
+
+
 
 
 
@@ -992,11 +1009,11 @@ class CommandLineParser(object):
     del args[0]
     if '=' in arg:
       return self.readequals(arg, args)
-    key = arg
+    key = arg.replace('-', '')
     if not hasattr(self.options, key):
       return None, key
     current = getattr(self.options, key)
-    if current.__class__ == bool:
+    if isinstance(current, bool):
       return key, True
     # read value
     if len(args) == 0:
@@ -1007,6 +1024,9 @@ class CommandLineParser(object):
       return key, self.readquoted(args, initial)
     value = args[0]
     del args[0]
+    if isinstance(current, list):
+      current.append(value)
+      return key, current
     return key, value
 
   def readquoted(self, args, initial):
@@ -1024,6 +1044,8 @@ class CommandLineParser(object):
     "Read a value with equals"
     split = arg.split('=', 1)
     key = split[0]
+    if not hasattr(self.options, key):
+      return None, key
     value = split[1]
     if not value.startswith('"'):
       return key, value
@@ -1038,6 +1060,7 @@ class Options(object):
 
   location = None
   nocopy = False
+  copyright = False
   debug = False
   quiet = False
   version = False
@@ -1048,7 +1071,7 @@ class Options(object):
   showlines = True
   unicode = False
   iso885915 = False
-  css = 'css/lyx.css'
+  css = []
   title = None
   directory = None
   destdirectory = None
@@ -1062,11 +1085,28 @@ class Options(object):
   lowmem = False
   nobib = False
   converter = 'imagemagick'
-  numberfoot = False
   raw = False
   jsmath = None
   mathjax = None
-  nofooter = None
+  nofooter = False
+  template = None
+  noconvert = False
+  notoclabels = False
+  letterfoot = True
+  numberfoot = False
+  symbolfoot = False
+  hoverfoot = True
+  marginfoot = False
+  endfoot = False
+  supfoot = True
+  alignfoot = False
+  footnotes = None
+  imageformat = None
+  copyimages = False
+  embedcss = []
+
+  # DCB : Add some stuff for syntax highlighting
+  defaultbrush = None
 
   branches = dict()
 
@@ -1100,6 +1140,13 @@ class Options(object):
         self.usage()
     if Options.lowmem or Options.toc:
       Options.memory = False
+    self.parsefootnotes()
+    if Options.forceformat and not Options.imageformat:
+      Options.imageformat = Options.forceformat
+    if Options.imageformat == 'copy':
+      Options.copyimages = True
+    if Options.css == []:
+      Options.css = ['http://elyxer.nongnu.org/lyx.css']
     # set in Trace if necessary
     for param in dir(Options):
       if hasattr(Trace, param + 'mode'):
@@ -1113,56 +1160,96 @@ class Options(object):
     Trace.error('Main program of the eLyXer package (http://elyxer.nongnu.org/).')
     self.showoptions()
 
+  def parsefootnotes(self):
+    "Parse footnotes options."
+    if not Options.footnotes:
+      return
+    Options.marginfoot = False
+    Options.letterfoot = False
+    options = Options.footnotes.split(',')
+    for option in options:
+      footoption = option + 'foot'
+      if hasattr(Options, footoption):
+        setattr(Options, footoption, True)
+      else:
+        Trace.error('Unknown footnotes option: ' + option)
+    if not Options.endfoot and not Options.marginfoot and not Options.hoverfoot:
+      Options.hoverfoot = True
+    if not Options.numberfoot and not Options.symbolfoot:
+      Options.letterfoot = True
+
   def showoptions(self):
     "Show all possible options"
     Trace.error('  Common options:')
-    Trace.error('    --nocopy:               disables the copyright notice at the bottom')
+    Trace.error('    --help:                 show this online help')
     Trace.error('    --quiet:                disables all runtime messages')
+    Trace.error('')
+    Trace.error('  Advanced options:')
     Trace.error('    --debug:                enable debugging messages (for developers)')
+    Trace.error('    --version:              show version number and release date')
+    Trace.error('    --lyxformat:            return the highest LyX version supported')
+    Trace.error('  Options for HTML output:')
     Trace.error('    --title "title":        set the generated page title')
-    Trace.error('    --directory "img_dir":  look for images in the specified directory')
-    Trace.error('    --destdirectory "dest": put converted images into this directory')
     Trace.error('    --css "file.css":       use a custom CSS file')
+    Trace.error('    --embedcss "file.css":  embed styles from a CSS file into the output')
     Trace.error('    --html:                 output HTML 4.0 instead of the default XHTML')
     Trace.error('    --unicode:              full Unicode output')
     Trace.error('    --iso885915:            output a document with ISO-8859-15 encoding')
-    Trace.error('')
-    Trace.error('  Esoteric options:')
-    Trace.error('    --version:              show version number and release date')
-    Trace.error('    --nofooter:             remove the footer "create by eLyXer"')
-    Trace.error('    --forceformat ".ext":   force image output format')
-    Trace.error('    --lyxformat:            return the highest LyX version supported')
+    Trace.error('    --nofooter:             remove the footer "generated by eLyXer"')
+    Trace.error('    --defaultbrush:         the default SyntaxHighlighter brush to use for listings')
+    Trace.error('  Options for image output:')
+    Trace.error('    --directory "img_dir":  look for images in the specified directory')
+    Trace.error('    --destdirectory "dest": put converted images into this directory')
+    Trace.error('    --imageformat ".ext":   image output format, or "copy" to copy images')
+    Trace.error('    --noconvert:            do not convert images, use in original locations')
+    Trace.error('    --converter "inkscape": use an alternative program to convert images')
+    Trace.error('  Options for footnote display:')
+    Trace.error('    --numberfoot:           mark footnotes with numbers instead of letters')
+    Trace.error('    --symbolfoot:           mark footnotes with symbols (*, **...)')
+    Trace.error('    --hoverfoot:            show footnotes as hovering text (default)')
+    Trace.error('    --marginfoot:           show footnotes with numbers instead of letters')
+    Trace.error('    --endfoot:              show footnotes at the end of the page')
+    Trace.error('    --supfoot:              use superscript for footnote markers (default)')
+    Trace.error('    --alignfoot:            use aligned text for footnote markers')
+    Trace.error('    --footnotes "options":  specify several comma-separated footnotes options')
+    Trace.error('      Available options are: "number", "symbol", "hover", "margin", "end",')
+    Trace.error('        "sup", "align"')
+    Trace.error('  Advanced output options:')
+    Trace.error('    --splitpart "depth":    split the resulting webpage at the given depth')
     Trace.error('    --toc:                  create a table of contents')
     Trace.error('    --target "frame":       make all links point to the given frame')
+    Trace.error('    --toctarget "page":     generate a TOC that points to the given page')
+    Trace.error('    --notoclabels:          omit the part labels in the TOC, such as Chapter')
     Trace.error('    --lowmem:               do the conversion on the fly (conserve memory)')
-    Trace.error('    --converter inkscape:   use Inkscape to convert images')
-    Trace.error('    --numberfoot:           label footnotes with numbers instead of letters')
     Trace.error('    --raw:                  generate HTML without header or footer.')
     Trace.error('    --jsmath "URL":         use jsMath from the given URL to display equations')
     Trace.error('    --mathjax "URL":        use MathJax from the given URL to display equations')
-    exit()
+    Trace.error('    --template "file":      use a template, put everything in <!--$content-->')
+    Trace.error('    --copyright:            add a copyright notice at the bottom')
+    Trace.error('    --nocopy (deprecated):  no effect, maintained for backwards compatibility')
+    sys.exit()
 
   def showversion(self):
     "Return the current eLyXer version string"
     string = 'eLyXer version ' + GeneralConfig.version['number']
     string += ' (' + GeneralConfig.version['date'] + ')'
     Trace.error(string)
-    exit()
+    sys.exit()
 
   def showhardversion(self):
     "Return just the version string"
     Trace.message(GeneralConfig.version['number'])
-    exit()
+    sys.exit()
 
   def showversiondate(self):
     "Return just the version dte"
     Trace.message(GeneralConfig.version['date'])
-    exit()
+    sys.exit()
 
   def showlyxformat(self):
     "Return just the lyxformat parameter"
     Trace.message(GeneralConfig.version['lyxformat'])
-    exit()
+    sys.exit()
 
 class BranchOptions(object):
   "A set of options for a branch"
@@ -1195,7 +1282,334 @@ class BranchOptions(object):
 
 
 
-import codecs
+
+
+
+
+
+
+import gettext
+
+
+
+
+
+class DocumentParameters(object):
+  "Global parameters for the document."
+
+  pdftitle = None
+  indentstandard = False
+  tocdepth = 10
+  startinglevel = 0
+  maxdepth = 10
+  language = None
+  bibliography = None
+  outputchanges = False
+  displaymode = False
+
+
+
+class Translator(object):
+  "Reads the configuration file and tries to find a translation."
+  "Otherwise falls back to the messages in the config file."
+
+  instance = None
+
+  def translate(cls, key):
+    "Get the translated message for a key."
+    return cls.instance.getmessage(key)
+
+  translate = classmethod(translate)
+
+  def __init__(self):
+    self.translation = None
+    self.first = True
+
+  def findtranslation(self):
+    "Find the translation for the document language."
+    self.langcodes = None
+    if not DocumentParameters.language:
+      Trace.error('No language in document')
+      return
+    if not DocumentParameters.language in TranslationConfig.languages:
+      Trace.error('Unknown language ' + DocumentParameters.language)
+      return
+    if TranslationConfig.languages[DocumentParameters.language] == 'en':
+      return
+    langcodes = [TranslationConfig.languages[DocumentParameters.language]]
+    try:
+      self.translation = gettext.translation('elyxer', None, langcodes)
+    except IOError:
+      Trace.error('No translation for ' + unicode(langcodes))
+
+  def getmessage(self, key):
+    "Get the translated message for the given key."
+    if self.first:
+      self.findtranslation()
+      self.first = False
+    message = self.getuntranslated(key)
+    if not self.translation:
+      return message
+    try:
+      message = self.translation.ugettext(message)
+    except IOError:
+      pass
+    return message
+
+  def getuntranslated(self, key):
+    "Get the untranslated message."
+    if not key in TranslationConfig.constants:
+      Trace.error('Cannot translate ' + key)
+      return key
+    return TranslationConfig.constants[key]
+
+Translator.instance = Translator()
+
+
+
+class NumberCounter(object):
+  "A counter for numbers (by default)."
+  "The type can be changed to return letters, roman numbers..."
+
+  name = None
+  value = None
+  mode = None
+  master = None
+
+  letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  symbols = NumberingConfig.sequence['symbols']
+  romannumerals = [
+      ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400), ('C', 100),
+      ('XC', 90), ('L', 50), ('XL', 40), ('X', 10), ('IX', 9), ('V', 5),
+      ('IV', 4), ('I', 1)
+      ]
+
+  def __init__(self, name):
+    "Give a name to the counter."
+    self.name = name
+
+  def setmode(self, mode):
+    "Set the counter mode. Can be changed at runtime."
+    self.mode = mode
+    return self
+
+  def init(self, value):
+    "Set an initial value."
+    self.value = value
+
+  def increase(self):
+    "Increase the counter value and return the counter."
+    if not self.value:
+      self.value = 0
+    self.value += 1
+    return self
+
+  def gettext(self):
+    "Get the next value as a text string."
+    return unicode(self.value)
+
+  def getletter(self):
+    "Get the next value as a letter."
+    return self.getsequence(self.letters)
+
+  def getsymbol(self):
+    "Get the next value as a symbol."
+    return self.getsequence(self.symbols)
+
+  def getsequence(self, sequence):
+    "Get the next value from a sequence."
+    return sequence[(self.value - 1) % len(sequence)]
+
+  def getroman(self):
+    "Get the next value as a roman number."
+    result = ''
+    number = self.value
+    for numeral, value in self.romannumerals:
+      if number >= value:
+        result += numeral * (number / value)
+        number = number % value
+    return result
+
+  def getvalue(self):
+    "Get the current value as configured in the current mode."
+    if not self.mode or self.mode in ['text', '1']:
+      return self.gettext()
+    if self.mode == 'A':
+      return self.getletter()
+    if self.mode == 'a':
+      return self.getletter().lower()
+    if self.mode == 'I':
+      return self.getroman()
+    if self.mode == '*':
+      return self.getsymbol()
+    Trace.error('Unknown counter mode ' + self.mode)
+    return self.gettext()
+
+  def getnext(self):
+    "Get the next value as configured: increase() and getvalue()."
+    return self.increase().getvalue()
+
+  def reset(self):
+    "Reset the counter."
+    self.value = 0
+
+  def __unicode__(self):
+    "Return a printable representation."
+    result = 'Counter ' + self.name
+    if self.mode:
+      result += ' in mode ' + self.mode
+    return result
+
+class DependentCounter(NumberCounter):
+  "A counter which depends on another one (the master)."
+
+  def setmaster(self, master):
+    "Set the master counter."
+    self.master = master
+    self.last = self.master.getvalue()
+    return self
+
+  def increase(self):
+    "Increase or, if the master counter has changed, restart."
+    if self.last != self.master.getvalue():
+      self.reset()
+    NumberCounter.increase(self)
+    self.last = self.master.getvalue()
+    return self
+
+  def getvalue(self):
+    "Get the value of the combined counter: master.dependent."
+    return self.master.getvalue() + '.' + NumberCounter.getvalue(self)
+
+class NumberGenerator(object):
+  "A number generator for unique sequences and hierarchical structures. Used in:"
+  "  * ordered part numbers: Chapter 3, Section 5.3."
+  "  * unique part numbers: Footnote 15, Bibliography cite [15]."
+  "  * chaptered part numbers: Figure 3.15, Equation (8.3)."
+  "  * unique roman part numbers: Part I, Book IV."
+
+  chaptered = None
+  generator = None
+
+  romanlayouts = [x.lower() for x in NumberingConfig.layouts['roman']]
+  orderedlayouts = [x.lower() for x in NumberingConfig.layouts['ordered']]
+
+  counters = dict()
+  appendix = None
+
+  def deasterisk(self, type):
+    "Remove the possible asterisk in a layout type."
+    return type.replace('*', '')
+
+  def isunique(self, type):
+    "Find out if the layout type corresponds to a unique part."
+    return self.isroman(type)
+
+  def isroman(self, type):
+    "Find out if the layout type should have roman numeration."
+    return self.deasterisk(type).lower() in self.romanlayouts
+
+  def isinordered(self, type):
+    "Find out if the layout type corresponds to an (un)ordered part."
+    return self.deasterisk(type).lower() in self.orderedlayouts
+
+  def isnumbered(self, type):
+    "Find out if the type for a layout corresponds to a numbered layout."
+    if '*' in type:
+      return False
+    if self.isroman(type):
+      return True
+    if not self.isinordered(type):
+      return False
+    if self.getlevel(type) > DocumentParameters.maxdepth:
+      return False
+    return True
+
+  def isunordered(self, type):
+    "Find out if the type contains an asterisk, basically."
+    return '*' in type
+
+  def getlevel(self, type):
+    "Get the level that corresponds to a layout type."
+    if self.isunique(type):
+      return 0
+    if not self.isinordered(type):
+      Trace.error('Unknown layout type ' + type)
+      return 0
+    type = self.deasterisk(type).lower()
+    level = self.orderedlayouts.index(type) + 1
+    return level - DocumentParameters.startinglevel
+
+  def getparttype(self, type):
+    "Obtain the type for the part: without the asterisk, "
+    "and switched to Appendix if necessary."
+    if NumberGenerator.appendix and self.getlevel(type) == 1:
+      return 'Appendix'
+    return self.deasterisk(type)
+
+  def generate(self, type):
+    "Generate a number for a layout type."
+    "Unique part types such as Part or Book generate roman numbers: Part I."
+    "Ordered part types return dot-separated tuples: Chapter 5, Subsection 2.3.5."
+    "Everything else generates unique numbers: Bibliography [1]."
+    "Each invocation results in a new number."
+    return self.getcounter(type).getnext()
+
+  def getcounter(self, type):
+    "Get the counter for the given type."
+    type = type.lower()
+    if not type in self.counters:
+      self.counters[type] = self.create(type)
+    return self.counters[type]
+
+  def create(self, type):
+    "Create a counter for the given type."
+    if self.isnumbered(type) and self.getlevel(type) > 1:
+      index = self.orderedlayouts.index(type)
+      above = self.orderedlayouts[index - 1]
+      master = self.getcounter(above)
+      return self.createdependent(type, master)
+    counter = NumberCounter(type)
+    if self.isroman(type):
+      counter.setmode('I')
+    return counter
+
+  def getdependentcounter(self, type, master):
+    "Get (or create) a counter of the given type that depends on another."
+    if not type in self.counters or not self.counters[type].master:
+      self.counters[type] = self.createdependent(type, master)
+    return self.counters[type]
+
+  def createdependent(self, type, master):
+    "Create a dependent counter given the master."
+    return DependentCounter(type).setmaster(master)
+
+  def startappendix(self):
+    "Start appendices here."
+    firsttype = self.orderedlayouts[DocumentParameters.startinglevel]
+    counter = self.getcounter(firsttype)
+    counter.setmode('A').reset()
+    NumberGenerator.appendix = True
+
+class ChapteredGenerator(NumberGenerator):
+  "Generate chaptered numbers, as in Chapter.Number."
+  "Used in equations, figures: Equation (5.3), figure 8.15."
+
+  def generate(self, type):
+    "Generate a number which goes with first-level numbers (chapters). "
+    "For the article classes a unique number is generated."
+    if DocumentParameters.startinglevel > 0:
+      return NumberGenerator.generator.generate(type)
+    chapter = self.getcounter('Chapter')
+    return self.getdependentcounter(type, chapter).getnext()
+
+
+NumberGenerator.chaptered = ChapteredGenerator()
+NumberGenerator.generator = NumberGenerator()
+
+
+
+
 
 
 class Parser(object):
@@ -1249,7 +1663,7 @@ class Parser(object):
     attrs = dict()
     for attr in split:
       if not '=' in attr:
-        Trace.error('Erroneous attribute ' + attr)
+        Trace.error('Erroneous attribute for ' + key + ': ' + attr)
         attr += '="0"'
       parts = attr.split('=')
       attrkey = parts[0]
@@ -1259,6 +1673,9 @@ class Parser(object):
 
   def parseending(self, reader, process):
     "Parse until the current ending is found"
+    if not self.ending:
+      Trace.error('No ending for ' + unicode(self))
+      return
     while not reader.currentline().startswith(self.ending):
       process()
 
@@ -1284,9 +1701,11 @@ class TextParser(Parser):
 
   stack = []
 
-  def __init__(self, ending):
+  def __init__(self, container):
     Parser.__init__(self)
-    self.ending = ending
+    self.ending = None
+    if container.__class__.__name__ in ContainerConfig.endings:
+      self.ending = ContainerConfig.endings[container.__class__.__name__]
     self.endings = []
 
   def parse(self, reader):
@@ -1351,7 +1770,7 @@ class StringParser(Parser):
 
   def parse(self, reader):
     "Parse a single line"
-    contents = [reader.currentline()]
+    contents = reader.currentline()
     reader.nextline()
     return contents
 
@@ -1368,25 +1787,37 @@ class InsetParser(BoundedParser):
 
 
 
-import codecs
-import datetime
 
 
-class EmptyOutput(object):
-  "The output for some container"
+class ContainerOutput(object):
+  "The generic HTML output for a container."
 
   def gethtml(self, container):
-    "Return empty HTML code"
+    "Show an error."
+    Trace.error('gethtml() not implemented for ' + unicode(self))
+
+  def isempty(self):
+    "Decide if the output is empty: by default, not empty."
+    return False
+
+class EmptyOutput(ContainerOutput):
+
+  def gethtml(self, container):
+    "Return empty HTML code."
     return []
 
-class FixedOutput(object):
+  def isempty(self):
+    "This output is particularly empty."
+    return True
+
+class FixedOutput(ContainerOutput):
   "Fixed output"
 
   def gethtml(self, container):
     "Return constant HTML code"
     return container.html
 
-class ContentsOutput(object):
+class ContentsOutput(ContainerOutput):
   "Outputs the contents converted to HTML"
 
   def gethtml(self, container):
@@ -1402,190 +1833,173 @@ class ContentsOutput(object):
     return html
 
 class TaggedOutput(ContentsOutput):
-  "Outputs an HTML tag surrounding the contents"
+  "Outputs an HTML tag surrounding the contents."
 
-  def __init__(self):
-    self.breaklines = False
+  tag = None
+  breaklines = False
+  empty = False
 
-  def settag(self, tag, breaklines=False):
-    "Set the value for the tag"
+  def settag(self, tag, breaklines=False, empty=False):
+    "Set the value for the tag and other attributes."
     self.tag = tag
-    self.breaklines = breaklines
+    if breaklines:
+      self.breaklines = breaklines
+    if empty:
+      self.empty = empty
     return self
 
   def setbreaklines(self, breaklines):
-    "Set the value for breaklines"
+    "Set the value for breaklines."
     self.breaklines = breaklines
     return self
 
   def gethtml(self, container):
-    "Return the HTML code"
-    html = [self.getopen(container)]
+    "Return the HTML code."
+    if self.empty:
+      return [self.selfclosing(container)]
+    html = [self.open(container)]
     html += ContentsOutput.gethtml(self, container)
-    html.append(self.getclose(container))
+    html.append(self.close(container))
     return html
 
-  def getopen(self, container):
-    "Get opening line"
-    if self.tag == '':
+  def open(self, container):
+    "Get opening line."
+    if not self.checktag():
       return ''
     open = '<' + self.tag + '>'
     if self.breaklines:
-      return '\n' + open + '\n'
+      return open + '\n'
     return open
 
-  def getclose(self, container):
-    "Get closing line"
-    if self.tag == '':
+  def close(self, container):
+    "Get closing line."
+    if not self.checktag():
       return ''
     close = '</' + self.tag.split()[0] + '>'
     if self.breaklines:
-      return '\n' + close
+      return '\n' + close + '\n'
     return close
 
-class StringOutput(object):
+  def selfclosing(self, container):
+    "Get self-closing line."
+    if not self.checktag():
+      return ''
+    selfclosing = '<' + self.tag + '/>'
+    if self.breaklines:
+      return selfclosing + '\n'
+    return selfclosing
+
+  def checktag(self):
+    "Check that the tag is valid."
+    if not self.tag:
+      Trace.error('No tag in ' + unicode(container))
+      return False
+    if self.tag == '':
+      return False
+    return True
+
+class FilteredOutput(ContentsOutput):
+  "Returns the output in the contents, but filtered:"
+  "some strings are replaced by others."
+
+  def __init__(self):
+    "Initialize the filters."
+    self.filters = []
+
+  def addfilter(self, original, replacement):
+    "Add a new filter: replace the original by the replacement."
+    self.filters.append((original, replacement))
+
+  def gethtml(self, container):
+    "Return the HTML code"
+    result = []
+    html = ContentsOutput.gethtml(self, container)
+    for line in html:
+      result.append(self.filter(line))
+    return result
+
+  def filter(self, line):
+    "Filter a single line with all available filters."
+    for original, replacement in self.filters:
+      if original in line:
+        line = line.replace(original, replacement)
+    return line
+
+class StringOutput(ContainerOutput):
   "Returns a bare string as output"
 
   def gethtml(self, container):
     "Return a bare string"
     return [container.string]
 
-class HeaderOutput(object):
-  "Returns the HTML headers"
 
-  def gethtml(self, container):
-    "Return a constant header"
-    html = self.getheader(container)
-    if Options.jsmath or Options.mathjax:
-      html.append(u'<noscript>\n')
-      html.append(u'<div class="warning">\n')
-      html.append(TranslationConfig.constants['jsmath-warning'])
-      if Options.jsmath:
-        html.append(u'<a href="http://www.math.union.edu/locate/jsMath">jsMath</a>')
-      if Options.mathjax:
-        html.append(u'<a href="http://www.mathjax.org/">MathJax</a>')
-      html.append(TranslationConfig.constants['jsmath-requires'])
-      html.append(TranslationConfig.constants['jsmath-enable'] + '\n')
-      html.append(u'</div><hr/>\n')
-      html.append(u'</noscript>\n')
-    return html
 
-  def getheader(self, container):
-    "Get the header part."
-    if Options.raw:
-      return ['<!--starthtml-->\n']
-    if Options.iso885915:
-      encoding = 'ISO-8859-1'
+
+
+
+
+
+
+class Cloner(object):
+  "An object used to clone other objects."
+
+  def clone(cls, original):
+    "Return an exact copy of an object."
+    "The original object must have an empty constructor."
+    return cls.create(original.__class__)
+
+  def create(cls, type):
+    "Create an object of a given class."
+    clone = type.__new__(type)
+    clone.__init__()
+    return clone
+
+  clone = classmethod(clone)
+  create = classmethod(create)
+
+class ContainerExtractor(object):
+  "A class to extract certain containers."
+
+  def __init__(self, config):
+    "The config parameter is a map containing three lists: allowed, copied and extracted."
+    "Each of the three is a list of class names for containers."
+    "Allowed containers are included as is into the result."
+    "Cloned containers are cloned and placed into the result."
+    "Extracted containers are looked into."
+    "All other containers are silently ignored."
+    self.allowed = config['allowed']
+    self.cloned = config['cloned']
+    self.extracted = config['extracted']
+
+  def extract(self, container):
+    "Extract a group of selected containers from a container."
+    list = []
+    locate = lambda c: c.__class__.__name__ in self.allowed + self.cloned
+    recursive = lambda c: c.__class__.__name__ in self.extracted
+    process = lambda c: self.process(c, list)
+    container.recursivesearch(locate, recursive, process)
+    return list
+
+  def process(self, container, list):
+    "Add allowed containers, clone cloned containers and add the clone."
+    name = container.__class__.__name__
+    if name in self.allowed:
+      list.append(container)
+    elif name in self.cloned:
+      list.append(self.safeclone(container))
     else:
-      encoding = 'UTF-8'
-    if not Options.html:
-      html = [u'<?xml version="1.0" encoding="' + encoding + '"?>\n']
-      html.append(u'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n')
-      html.append(u'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">\n')
-    else:
-      html = [u'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n']
-      html.append(u'<html lang="en">\n')
-    html.append(u'<head>\n')
-    html.append(u'<meta http-equiv="Content-Type" content="text/html; charset=' + encoding + '"/>\n')
-    html.append(u'<meta name="generator" content="http://www.nongnu.org/elyxer/"/>\n')
-    html.append(u'<meta name="create-date" content="' + datetime.date.today().isoformat() + '"/>\n')
-    html.append(u'<link rel="stylesheet" href="' + Options.css + '" type="text/css" media="screen"/>\n')
-    html += TitleOutput().gethtml(container)
-    if Options.jsmath:
-      html.append(u'<script type="text/javascript" src="' + Options.jsmath + '/plugins/noImageFonts.js"></script>\n')
-      html.append(u'<script type="text/javascript" src="' + Options.jsmath + '/easy/load.js"></script>\n')
-    if Options.mathjax:
-      html.append(u'<script type="text/javascript" src="' + Options.mathjax + '/MathJax.js">\n')
-      html.append(u'  //  Load MathJax and get it running\n')
-      html.append(u'  MathJax.Hub.Config({ jax: ["input/TeX"],\n') # output/HTML-CSS
-      html.append(u'  config: ["MMLorHTML.js"],\n')
-      html.append(u'  extensions: ["TeX/AMSmath.js","TeX/AMSsymbols.js"],\n')
-      html.append(u'  "HTML-CSS": { imageFont: null }\n')
-      html.append(u'  });\n')
-      html.append(u'</script>\n')
-    html.append(u'<script type="text/javascript" src="scripts/shCore.js"></script>\n')
-    html.append(u'<script type="text/javascript" src="scripts/shBrushXml.js"></script>\n')
-    html.append(u'<script type="text/javascript" src="scripts/shBrushScala.js"></script>\n')
-    html.append(u'<script type="text/javascript" src="scripts/shBrushBash.js"></script>\n')
-    html.append(u'<link href="css/shCore.css" rel="stylesheet" type="text/css" />\n')
-    html.append(u'<link href="css/shThemeDefault.css" rel="stylesheet" type="text/css" />\n')
-    html.append('</head>\n')
-    html.append('<body>\n')
-    html.append('<div id="globalWrapper">\n')
-    if Options.mathjax:
-      html.append(u'<script type="math/tex">\n')
-      html.append(u'\\newcommand{\\lyxlock}{}\n')
-      html.append(u'</script>\n')
-    return html
+      Trace.error('Unknown container class ' + name)
 
-class TitleOutput(object):
-  "Return the HTML title tag"
-
-  pdftitle = None
-  title = None
-
-  def gethtml(self, container):
-    "Return the title tag"
-    return ['<title>' + self.gettitle() + '</title>\n']
-
-  def gettitle(self):
-    "Return the correct title from the option or the PDF title"
-    if Options.title:
-      return Options.title
-    if TitleOutput.title:
-      return TitleOutput.title
-    if TitleOutput.pdftitle:
-      return TitleOutput.pdftitle
-    return 'Converted document'
-
-class FooterOutput(object):
-  "Return the HTML code for the footer"
-
-  author = None
-
-  def gethtml(self, container):
-    "Footer HTML"
-    if Options.raw:
-      return ['\n\n<!--endhtml-->']
-    html = []
-    html.append('\n\n')
-    footer = self.createfooter()
-    if len(footer) > 0:
-      html.append('<hr class="footer"/>\n')
-      html += footer
-    html.append('</div>\n')
-    html.append('<script type="text/javascript">SyntaxHighlighter.all()</script>\n')
-    html.append('</body>\n')
-    html.append('</html>\n')
-    return html
-
-  def createfooter(self):
-    "Create the footer proper."
-    html = []
-    if FooterOutput.author and not Options.nocopy:
-      year = datetime.date.today().year
-      copyright = '<div class="footer">\nCopyright (C) ' + unicode(year)
-      copyright += ' ' + FooterOutput.author + '\n</div>\n'
-      html.append(copyright)
-    if not Options.nofooter:
-      version = GeneralConfig.version['number']
-      version += ' (' + GeneralConfig.version['date'] + ')'
-      creationdate = '<span class="create-date">' + datetime.datetime.now().isoformat() + '</span>'
-      versionp = '<div class="footer" id="generated-by">\nDocument generated by <a href="http://elyxer.nongnu.org/">eLyXer '
-      versionp += version + '</a> on ' + creationdate + '\n</div>\n'
-      html.append(versionp)
-    return html
+  def safeclone(self, container):
+    "Return a new container with contents only in a safe list, recursively."
+    clone = Cloner.clone(container)
+    clone.output = container.output
+    clone.contents = self.extract(container)
+    return clone
 
 
 
 
-
-
-
-
-
-
-import sys
 
 
 class Position(object):
@@ -1593,6 +2007,13 @@ class Position(object):
 
   def __init__(self):
     self.endinglist = EndingList()
+
+  def checkbytemark(self):
+    "Check for a Unicode byte mark and skip it."
+    if self.finished():
+      return
+    if ord(self.current()) == 0xfeff:
+      self.skipcurrent()
 
   def skip(self, string):
     "Skip a string"
@@ -1613,10 +2034,21 @@ class Position(object):
     Trace.error('Unimplemented current()')
     return ''
 
+  def extract(self, length):
+    "Extract the next string of the given length, or None if not enough text."
+    Trace.error('Unimplemented extract()')
+    return None
+
   def checkfor(self, string):
     "Check for a string at the given position."
-    Trace.error('Unimplemented checkfor()')
-    return False
+    return string == self.extract(len(string))
+
+  def checkforlower(self, string):
+    "Check for a string in lower case."
+    extracted = self.extract(len(string))
+    if not extracted:
+      return False
+    return string.lower() == self.extract(len(string)).lower()
 
   def finished(self):
     "Find out if the current formula has finished"
@@ -1625,7 +2057,7 @@ class Position(object):
       return True
     return self.endinglist.checkin(self)
 
-  def currentskip(self):
+  def skipcurrent(self):
     "Return the current character and skip it."
     current = self.current()
     self.skip(current)
@@ -1633,7 +2065,7 @@ class Position(object):
 
   def next(self):
     "Advance the position and return the next character."
-    self.currentskip()
+    self.skipcurrent()
     return self.current()
 
   def checkskip(self, string):
@@ -1654,6 +2086,10 @@ class Position(object):
   def globalpha(self):
     "Glob a bit of alpha text"
     return self.glob(lambda current: current.isalpha())
+
+  def globnumber(self):
+    "Glob a row of digits."
+    return self.glob(lambda current: current.isdigit())
 
   def checkidentifier(self):
     "Check if the current character belongs to an identifier."
@@ -1695,6 +2131,10 @@ class Position(object):
     self.skip(ending)
     return ending
 
+  def error(self, message):
+    "Show an error message and the position identifier."
+    Trace.error(message + ': ' + self.identifier())
+
 class TextPosition(Position):
   "A parse position based on a raw text."
 
@@ -1703,6 +2143,7 @@ class TextPosition(Position):
     Position.__init__(self)
     self.pos = 0
     self.text = text
+    self.checkbytemark()
 
   def skip(self, string):
     "Skip a string of characters."
@@ -1723,11 +2164,11 @@ class TextPosition(Position):
     "Return the current character, assuming we are not out."
     return self.text[self.pos]
 
-  def checkfor(self, string):
-    "Check for a string at the given position."
-    if self.pos + len(string) > len(self.text):
-      return False
-    return self.text[self.pos : self.pos + len(string)] == string
+  def extract(self, length):
+    "Extract the next string of the given length, or None if not enough text."
+    if self.pos + length > len(self.text):
+      return None
+    return self.text[self.pos : self.pos + length]
 
 class FilePosition(Position):
   "A parse position based on an underlying file."
@@ -1738,6 +2179,7 @@ class FilePosition(Position):
     self.reader = LineReader(filename)
     self.number = 1
     self.pos = 0
+    self.checkbytemark()
 
   def skip(self, string):
     "Skip a string of characters."
@@ -1776,11 +2218,11 @@ class FilePosition(Position):
       return '*'
     return self.reader.currentline()[self.pos]
 
-  def checkfor(self, string):
-    "Check for a string at the given position."
-    if self.pos + len(string) > len(self.reader.currentline()):
-      return False
-    return self.reader.currentline()[self.pos : self.pos + len(string)] == string
+  def extract(self, length):
+    "Extract the next string of the given length, or None if not enough text."
+    if self.pos + length > len(self.reader.currentline()):
+      return None
+    return self.reader.currentline()[self.pos : self.pos + length]
 
 class EndingList(object):
   "A list of position endings"
@@ -1800,6 +2242,9 @@ class EndingList(object):
 
   def pop(self, pos):
     "Remove the ending at the current position"
+    if pos.isout():
+      Trace.error('No ending out of bounds')
+      return ''
     ending = self.findending(pos)
     if not ending:
       Trace.error('No ending at ' + pos.current())
@@ -1861,6 +2306,10 @@ class PositionEnding(object):
 class Container(object):
   "A container for text and objects in a lyx file"
 
+  partkey = None
+  parent = None
+  begin = None
+
   def __init__(self):
     self.contents = list()
 
@@ -1912,7 +2361,7 @@ class Container(object):
         result += '&#' + codepoint[1:] + ';'
       else:
         result += pos.current()
-      pos.currentskip()
+      pos.skipcurrent()
     return result
 
   def searchall(self, type):
@@ -1923,14 +2372,10 @@ class Container(object):
 
   def searchremove(self, type):
     "Search for all containers of a type and remove them"
-    list = []
-    self.searchprocess(type, lambda container: self.appendremove(list, container))
+    list = self.searchall(type)
+    for container in list:
+      container.parent.contents.remove(container)
     return list
-
-  def appendremove(self, list, container):
-    "Append to a list and remove from own contents"
-    list.append(container)
-    container.parent.contents.remove(container)
 
   def searchprocess(self, type, process):
     "Search for elements of a given type and process them"
@@ -1943,13 +2388,21 @@ class Container(object):
       if locate(container):
         process(container)
 
+  def recursivesearch(self, locate, recursive, process):
+    "Perform a recursive search in the container."
+    for container in self.contents:
+      if recursive(container):
+        container.recursivesearch(locate, recursive, process)
+      if locate(container):
+        process(container)
+
   def extracttext(self):
-    "Search for all the strings and extract the text they contain"
-    text = ''
-    strings = self.searchall(StringContainer)
-    for string in strings:
-      text += string.string
-    return text
+    "Extract all text from allowed containers."
+    result = ''
+    constants = ContainerExtractor(ContainerConfig.extracttext).extract(self)
+    for constant in constants:
+      result += constant.string
+    return result
 
   def group(self, index, group, isingroup):
     "Group some adjoining elements into a group"
@@ -1970,23 +2423,37 @@ class Container(object):
     while len(container.contents) > 0:
       self.contents.insert(index, container.contents.pop())
 
-  def debug(self, level = 0):
-    "Show the contents in debug mode"
-    if not Trace.debugmode:
-      return
-    Trace.debug('  ' * level + unicode(self))
-    for element in self.contents:
-      element.debug(level + 1)
-
   def tree(self, level = 0):
     "Show in a tree"
     Trace.debug("  " * level + unicode(self))
     for container in self.contents:
       container.tree(level + 1)
 
+  def getparameter(self, name):
+    "Get the value of a parameter, if present."
+    if not name in self.parameters:
+      return None
+    return self.parameters[name]
+
+  def getparameterlist(self, name):
+    "Get the value of a comma-separated parameter as a list."
+    paramtext = self.getparameter(name)
+    if not paramtext:
+      return []
+    return paramtext.split(',')
+
+  def hasemptyoutput(self):
+    "Check if the parent's output is empty."
+    current = self.parent
+    while current:
+      if current.output.isempty():
+        return True
+      current = current.parent
+    return False
+
   def __unicode__(self):
     "Get a description"
-    if not hasattr(self, 'begin'):
+    if not self.begin:
       return self.__class__.__name__
     return self.__class__.__name__ + '@' + unicode(self.begin)
 
@@ -2005,10 +2472,14 @@ class LyXFormat(BlackBox):
     "Show warning if version < 276"
     version = int(self.header[1])
     if version < 276:
-      Trace.error('Warning: unsupported format version ' + str(version))
+      Trace.error('Warning: unsupported old format version ' + str(version))
+    if version > int(GeneralConfig.version['lyxformat']):
+      Trace.error('Warning: unsupported new format version ' + str(version))
 
 class StringContainer(Container):
   "A container for a single string"
+
+  parsed = None
 
   def __init__(self):
     self.parser = StringParser()
@@ -2017,9 +2488,9 @@ class StringContainer(Container):
 
   def process(self):
     "Replace special chars from the contents."
-    if len(self.contents) > 0:
-      self.string = self.replacespecial(self.contents[0])
-      self.contents = []
+    if self.parsed:
+      self.string = self.replacespecial(self.parsed)
+      self.parsed = None
 
   def replacespecial(self, line):
     "Replace all special chars from a line"
@@ -2027,7 +2498,10 @@ class StringContainer(Container):
     replaced = self.changeline(replaced)
     if ContainerConfig.string['startcommand'] in replaced and len(replaced) > 1:
       # unprocessed commands
-      message = 'Unknown command at ' + unicode(self.parser.begin) + ': '
+      if self.begin:
+        message = 'Unknown command at ' + unicode(self.begin) + ': '
+      else:
+        message = 'Unknown command: '
       Trace.error(message + replaced.strip())
     return replaced
 
@@ -2037,9 +2511,16 @@ class StringContainer(Container):
       return line
     line = self.escape(line, EscapeConfig.commands)
     return line
+
+  def extracttext(self):
+    "Return all text."
+    return self.string
   
   def __unicode__(self):
-    result = 'StringContainer@' + unicode(self.begin)
+    "Return a printable representation."
+    result = 'StringContainer'
+    if self.begin:
+      result += '@' + unicode(self.begin)
     ellipsis = '...'
     if len(self.string.strip()) <= 15:
       ellipsis = ''
@@ -2059,11 +2540,10 @@ class Constant(StringContainer):
 class TaggedText(Container):
   "Text inside a tag"
 
+  output = None
+
   def __init__(self):
-    ending = None
-    if self.__class__.__name__ in ContainerConfig.endings:
-      ending = ContainerConfig.endings[self.__class__.__name__]
-    self.parser = TextParser(ending)
+    self.parser = TextParser(self)
     self.output = TaggedOutput()
 
   def complete(self, contents, tag, breaklines=False):
@@ -2079,7 +2559,144 @@ class TaggedText(Container):
     return self.complete([constant], tag, breaklines)
 
   def __unicode__(self):
+    "Return a printable representation."
+    if not hasattr(self.output, 'tag'):
+      return 'Emtpy tagged text'
+    if not self.output.tag:
+      return 'Tagged <unknown tag>'
     return 'Tagged <' + self.output.tag + '>'
+
+
+
+
+
+
+class ContainerSize(object):
+  "The size of a container."
+
+  width = None
+  height = None
+  maxwidth = None
+  maxheight = None
+  scale = None
+
+  def set(self, width = None, height = None):
+    "Set the proper size with width and height."
+    self.setvalue('width', width)
+    self.setvalue('height', height)
+    return self
+
+  def setmax(self, maxwidth = None, maxheight = None):
+    "Set max width and/or height."
+    self.setvalue('maxwidth', maxwidth)
+    self.setvalue('maxheight', maxheight)
+    return self
+
+  def readparameters(self, container):
+    "Read some size parameters off a container."
+    self.setparameter(container, 'width')
+    self.setparameter(container, 'height')
+    self.setparameter(container, 'scale')
+    self.checkvalidheight(container)
+    return self
+
+  def setparameter(self, container, name):
+    "Read a size parameter off a container, and set it if present."
+    value = container.getparameter(name)
+    self.setvalue(name, value)
+
+  def setvalue(self, name, value):
+    "Set the value of a parameter name, only if it's valid."
+    value = self.processparameter(value)
+    if value:
+      setattr(self, name, value)
+
+  def checkvalidheight(self, container):
+    "Check if the height parameter is valid; otherwise erase it."
+    heightspecial = container.getparameter('height_special')
+    if self.height and self.extractnumber(self.height) == '1' and heightspecial == 'totalheight':
+      self.height = None
+
+  def processparameter(self, value):
+    "Do the full processing on a parameter."
+    if not value:
+      return None
+    if self.extractnumber(value) == '0':
+      return None
+    for ignored in StyleConfig.size['ignoredtexts']:
+      if ignored in value:
+        value = value.replace(ignored, '')
+    return value
+
+  def extractnumber(self, text):
+    "Extract the first number in the given text."
+    result = ''
+    decimal = False
+    for char in text:
+      if char.isdigit():
+        result += char
+      elif char == '.' and not decimal:
+        result += char
+        decimal = True
+      else:
+        return result
+    return result
+
+  def checkimage(self, width, height):
+    "Check image dimensions, set them if possible."
+    if width:
+      self.maxwidth = unicode(width) + 'px'
+      if self.scale and not self.width:
+        self.width = self.scalevalue(width)
+    if height:
+      self.maxheight = unicode(height) + 'px'
+      if self.scale and not self.height:
+        self.height = self.scalevalue(height)
+    if self.width and not self.height:
+      self.height = 'auto'
+    if self.height and not self.width:
+      self.width = 'auto'
+
+  def scalevalue(self, value):
+    "Scale the value according to the image scale and return it as unicode."
+    scaled = value * int(self.scale) / 100
+    return unicode(int(scaled)) + 'px'
+
+  def removepercentwidth(self):
+    "Remove percent width if present, to set it at the figure level."
+    if not self.width:
+      return None
+    if not '%' in self.width:
+      return None
+    width = self.width
+    self.width = None
+    if self.height == 'auto':
+      self.height = None
+    return width
+
+  def addstyle(self, container):
+    "Add the proper style attribute to the output tag."
+    if not isinstance(container.output, TaggedOutput):
+      Trace.error('No tag to add style, in ' + unicode(container))
+    if not self.width and not self.height and not self.maxwidth and not self.maxheight:
+      # nothing to see here; move along
+      return
+    tag = ' style="'
+    tag += self.styleparameter('width')
+    tag += self.styleparameter('maxwidth')
+    tag += self.styleparameter('height')
+    tag += self.styleparameter('maxheight')
+    if tag[-1] == ' ':
+      tag = tag[:-1]
+    tag += '"'
+    container.output.tag += tag
+
+  def styleparameter(self, name):
+    "Get the style for a single parameter."
+    value = getattr(self, name)
+    if value:
+      return name.replace('max', 'max-') + ': ' + value + '; '
+    return ''
 
 
 
@@ -2168,7 +2785,6 @@ class Hfill(TaggedText):
   "Horizontall fill"
 
   def process(self):
-    Trace.debug('hfill')
     self.output.tag = 'span class="hfill"'
 
 class BarredText(TaggedText):
@@ -2183,15 +2799,17 @@ class BarredText(TaggedText):
       return
     self.output.tag = TagConfig.barred[self.type]
 
-class LangLine(Container):
+class LangLine(BlackBox):
   "A line with language information"
-
-  def __init__(self):
-    self.parser = LoneCommand()
-    self.output = EmptyOutput()
 
   def process(self):
     self.lang = self.header[1]
+
+class InsetLength(BlackBox):
+  "A length measure inside an inset."
+
+  def process(self):
+    self.length = self.header[1]
 
 class Space(Container):
   "A space of several types"
@@ -2202,118 +2820,117 @@ class Space(Container):
   
   def process(self):
     self.type = self.header[2]
-    if self.type not in StyleConfig.spaces:
+    if self.type not in StyleConfig.hspaces:
       Trace.error('Unknown space type ' + self.type)
       self.html = [' ']
       return
-    self.html = [StyleConfig.spaces[self.type]]
+    self.html = [StyleConfig.hspaces[self.type]]
+    length = self.getlength()
+    if not length:
+      return
+    self.output = TaggedOutput().settag('span class="hspace"', False)
+    ContainerSize().set(length).addstyle(self)
 
+  def getlength(self):
+    "Get the space length from the contents or parameters."
+    if len(self.contents) == 0 or not isinstance(self.contents[0], InsetLength):
+      return None
+    return self.contents[0].length
 
-
-
-
-
-
-
-import gettext
-
-
-class Translator(object):
-  "Reads the configuration file and tries to find a translation."
-  "Otherwise falls back to the messages in the config file."
-
-  instance = None
-  language = None
-
-  def translate(cls, key):
-    "Get the translated message for a key."
-    return cls.instance.getmessage(key)
-
-  translate = classmethod(translate)
+class VerticalSpace(Container):
+  "An inset that contains a vertical space."
 
   def __init__(self):
-    self.translation = None
-    self.first = True
+    self.parser = InsetParser()
+    self.output = FixedOutput()
 
-  def findtranslation(self):
-    "Find the translation for the document language."
-    self.langcodes = None
-    if not self.language:
-      Trace.error('No language in document')
+  def process(self):
+    "Set the correct tag"
+    self.type = self.header[2]
+    if self.type not in StyleConfig.vspaces:
+      self.output = TaggedOutput().settag('div class="vspace" style="height: ' + self.type + ';"', True)
       return
-    if not self.language in TranslationConfig.languages:
-      Trace.error('Unknown language ' + self.language)
-      return
-    if TranslationConfig.languages[self.language] == 'en':
-      return
-    langcodes = [TranslationConfig.languages[self.language]]
-    try:
-      self.translation = gettext.translation('elyxer', None, langcodes)
-    except IOError:
-      Trace.error('No translation for ' + unicode(langcodes))
+    self.html = [StyleConfig.vspaces[self.type]]
 
-  def getmessage(self, key):
-    "Get the translated message for the given key."
-    if self.first:
-      self.findtranslation()
-      self.first = False
-    message = self.getuntranslated(key)
-    if not self.translation:
-      return message
-    try:
-      message = self.translation.ugettext(message)
-    except IOError:
-      pass
-    return message
+class Align(Container):
+  "Bit of aligned text"
 
-  def getuntranslated(self, key):
-    "Get the untranslated message."
-    return TranslationConfig.constants[key]
+  def __init__(self):
+    self.parser = ExcludingParser()
+    self.output = TaggedOutput().setbreaklines(True)
 
-Translator.instance = Translator()
+  def process(self):
+    self.output.tag = 'div class="' + self.header[1] + '"'
 
-class TranslationExport(object):
-  "Export the translation to a file."
+class Newline(Container):
+  "A newline"
 
-  def __init__(self, writer):
-    self.writer = writer
+  def __init__(self):
+    self.parser = LoneCommand()
+    self.output = FixedOutput()
 
-  def export(self, constants):
-    "Export the translation constants as a .po file."
-    self.writer.writeline('# SOME DESCRIPTIVE TITLE.')
-    self.writer.writeline('# eLyXer version ' + GeneralConfig.version['number'])
-    self.writer.writeline('# Released on ' + GeneralConfig.version['date'])
-    self.writer.writeline(u'# Contact: Alex Fernández <elyxer@gmail.com>')
-    self.writer.writeline('# This file is distributed under the same license as the eLyXer package.')
-    self.writer.writeline('# (C) YEAR FIRST AUTHOR <EMAIL@ADDRESS>.')
-    self.writer.writeline('#')
-    self.writer.writeline('#, fuzzy')
-    self.writer.writeline('msgid ""')
-    self.writer.writeline('msgstr ""')
-    self.writer.writeline('')
-    for key, message in constants.iteritems():
-      self.writer.writeline('')
-      self.writer.writeline('#: ' + key)
-      self.writer.writeline('msgid  "' + message + '"')
-      self.writer.writeline('msgstr "' + message + '"')
-    self.writer.close()
+  def process(self):
+    "Process contents"
+    self.html = ['<br/>\n']
+
+class NewPage(Newline):
+  "A new page"
+
+  def process(self):
+    "Process contents"
+    self.html = ['<p><br/>\n</p>\n']
+
+class Separator(Container):
+  "A separator string which is not extracted by extracttext()."
+
+  def __init__(self, constant):
+    self.output = FixedOutput()
+    self.contents = []
+    self.html = [constant]
+
+class StrikeOut(TaggedText):
+  "Striken out text."
+
+  def process(self):
+    "Set the output tag to strike."
+    self.output.tag = 'strike'
+
+class StartAppendix(BlackBox):
+  "Mark to start an appendix here."
+  "From this point on, all chapters become appendices."
+
+  def process(self):
+    "Activate the special numbering scheme for appendices, using letters."
+    NumberGenerator.generator.startappendix()
+
+class ERT(Container):
+  "Evil Red Text"
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = EmptyOutput()
+
+
+
 
 
 
 class Link(Container):
   "A link to another part of the document"
 
+  anchor = None
+  url = None
+  type = None
+  page = None
+  target = None
+  destination = None
+  title = None
+
   def __init__(self):
-    Container.__init__(self)
+    "Initialize the link, add target if configured."
+    self.contents = []
     self.parser = InsetParser()
     self.output = LinkOutput()
-    self.anchor = None
-    self.url = None
-    self.type = None
-    self.page = None
-    self.target = None
-    self.destination = None
-    self.title = None
     if Options.target:
       self.target = Options.target
 
@@ -2345,136 +2962,28 @@ class Link(Container):
     self.destination = destination
     destination.destination = self
 
-class ListInset(Container):
-  "An inset with a list, normally made of links."
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = ContentsOutput()
-
-  def sortdictionary(self, dictionary):
-    "Sort all entries in the dictionary"
-    keys = dictionary.keys()
-    # sort by name
-    keys.sort()
-    return keys
-
-class ListOf(ListInset):
-  "A list of entities (figures, tables, algorithms)"
-
-  def process(self):
-    "Parse the header and get the type"
-    self.type = self.header[2]
-    text = Translator.translate('list-' + self.type)
-    self.contents = [TaggedText().constant(text, 'div class="tocheader"', True)]
-
-class TableOfContents(ListInset):
-  "Table of contents"
-
-  def process(self):
-    "Parse the header and get the type"
-    text = Translator.translate('toc')
-    self.contents = [TaggedText().constant(text, 'div class="tocheader"', True)]
-
-class IndexEntry(Link):
-  "An entry in the alphabetical index"
-
-  entries = dict()
-  arrows = dict()
-
-  namescapes = {'!':'', '|':', ', '  ':' '}
-  keyescapes = {' ':'-', '--':'-', ',':''}
-
-  def process(self):
-    "Put entry in index"
-    if 'name' in self.parameters:
-      name = self.parameters['name'].strip()
-    else:
-      name = self.extracttext()
-    self.name = self.escape(name, IndexEntry.namescapes)
-    key = self.escape(self.name, IndexEntry.keyescapes)
-    if not key in IndexEntry.entries:
-      # no entry yet; create
-      entry = Link().complete(name, 'index-' + key, None, 'printindex')
-      entry.name = name
-      IndexEntry.entries[key] = entry
-    if not key in IndexEntry.arrows:
-      # no arrows yet; create list
-      IndexEntry.arrows[key] = []
-    self.index = len(IndexEntry.arrows[key])
-    self.complete(u'↓', 'entry-' + key + '-' + unicode(self.index))
-    self.destination = IndexEntry.entries[key]
-    arrow = Link().complete(u'↑', 'index-' + key)
-    arrow.destination = self
-    IndexEntry.arrows[key].append(arrow)
-
-class PrintIndex(ListInset):
-  "Command to print an index"
-
-  def process(self):
-    "Create the alphabetic index"
-    index = Translator.translate('index')
-    self.contents = [TaggedText().constant(index, 'h1 class="index"'),
-        Constant('\n')]
-    for key in self.sortdictionary(IndexEntry.entries):
-      entry = IndexEntry.entries[key]
-      entrytext = [IndexEntry.entries[key], Constant(': ')]
-      contents = [TaggedText().complete(entrytext, 'i')]
-      contents += self.extractarrows(key)
-      self.contents.append(TaggedText().complete(contents, 'p class="printindex"',
-          True))
-
-  def extractarrows(self, key):
-    "Extract all arrows (links to the original reference) for a key."
-    arrows = []
-    for arrow in IndexEntry.arrows[key]:
-      arrows += [arrow, Constant(u', \n')]
-    return arrows[:-1]
-
-class NomenclatureEntry(Link):
-  "An entry of LyX nomenclature"
-
-  entries = dict()
-
-  def process(self):
-    "Put entry in index"
-    symbol = self.parameters['symbol']
-    description = self.parameters['description']
-    key = symbol.replace(' ', '-').lower()
-    if key in NomenclatureEntry.entries:
-      Trace.error('Duplicated nomenclature entry ' + key)
-    self.complete(u'↓', 'noment-' + key)
-    entry = Link().complete(u'↑', 'nom-' + key)
-    entry.symbol = symbol
-    entry.description = description
-    self.setmutualdestination(entry)
-    NomenclatureEntry.entries[key] = entry
-
-class PrintNomenclature(ListInset):
-  "Print all nomenclature entries"
-
-  def process(self):
-    nomenclature = Translator.translate('nomenclature')
-    self.contents = [TaggedText().constant(nomenclature,
-      'h1 class="nomenclature"')]
-    for key in self.sortdictionary(NomenclatureEntry.entries):
-      entry = NomenclatureEntry.entries[key]
-      contents = [entry, Constant(entry.symbol + u' ' + entry.description)]
-      text = TaggedText().complete(contents, 'div class="Nomenclated"', True)
-      self.contents.append(text)
+  def __unicode__(self):
+    "Return a printable representation."
+    result = 'Link'
+    if self.anchor:
+      result += ' #' + self.anchor
+    if self.url:
+      result += ' to ' + self.url
+    return result
 
 class URL(Link):
   "A clickable URL"
 
   def process(self):
     "Read URL from parameters"
-    name = self.escape(self.parameters['target'])
-    if 'type' in self.parameters:
-      self.url = self.escape(self.parameters['type']) + name
-    else:
-      self.url = name
-    if 'name' in self.parameters:
-      name = self.parameters['name']
+    target = self.escape(self.getparameter('target'))
+    self.url = target
+    type = self.getparameter('type')
+    if type:
+      self.url = self.escape(type) + target
+    name = self.getparameter('name')
+    if not name:
+      name = target
     self.contents = [Constant(name)]
 
 class FlexURL(URL):
@@ -2484,7 +2993,7 @@ class FlexURL(URL):
     "Read URL from contents"
     self.url = self.extracttext()
 
-class LinkOutput(object):
+class LinkOutput(ContainerOutput):
   "A link pointing to some destination"
   "Or an anchor (destination)"
 
@@ -2504,183 +3013,9 @@ class LinkOutput(object):
       tag += ' target="' + link.target + '"'
     if link.title:
       tag += ' title="' + link.title + '"'
-    text = TaggedText().complete(link.contents, tag)
-    return text.gethtml()
+    return TaggedOutput().settag(tag).gethtml(link)
 
 
-
-
-
-
-
-
-
-class NumberGenerator(object):
-  "A number generator for unique sequences and hierarchical structures"
-
-  letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-  instance = None
-  startinglevel = 0
-  maxdepth = 10
-
-  unique = NumberingConfig.layouts['unique']
-  ordered = NumberingConfig.layouts['ordered']
-
-  def __init__(self):
-    self.number = []
-    self.uniques = dict()
-    self.chaptered = dict()
-
-  def generateunique(self, type):
-    "Generate unique numbering: a number to place in the title but not to "
-    "append to others. Examples: Part 1, Book 3."
-    if not type in self.uniques:
-      self.uniques[type] = 0
-    self.uniques[type] = self.increase(self.uniques[type])
-    return unicode(self.uniques[type])
-
-  def generateordered(self, type):
-    "Generate ordered numbering: a number to use and possibly concatenate "
-    "with others. Example: Chapter 1, Section 1.5."
-    level = self.getlevel(type)
-    if level == 0:
-      Trace.error('Impossible level 0 for ' + type)
-      return '.'
-    if len(self.number) >= level:
-      self.number = self.number[:level]
-    else:
-      while len(self.number) < level:
-        self.number.append(0)
-    self.number[level - 1] = self.increase(self.number[level - 1])
-    return self.dotseparated(self.number)
-
-  def generatechaptered(self, type, chapter = None):
-    "Generate a number which goes with first-level numbers (chapters). "
-    "For the article classes a unique number is generated."
-    if NumberGenerator.startinglevel > 0:
-      return self.generateunique(type)
-    if not chapter:
-      chapter = self.getchapter()
-    if not type in self.chaptered or self.chaptered[type][0] != chapter:
-      self.chaptered[type] = [chapter, 0]
-    chaptered = self.chaptered[type]
-    chaptered[1] = self.increase(chaptered[1])
-    self.chaptered[type] = chaptered
-    return self.dotseparated(chaptered)
-
-  def getchapter(self):
-    "Get the current chapter number."
-    if len(self.number) == 0:
-      return 0
-    else:
-      return self.number[0]
-
-  def getlevel(self, type):
-    "Get the level that corresponds to a type."
-    type = self.deasterisk(type)
-    if type in NumberGenerator.unique:
-      return 0
-    level = NumberGenerator.ordered.index(type) + 1
-    return level - NumberGenerator.startinglevel
-
-  def isunique(self, container):
-    "Find out if a container requires unique numbering."
-    return self.deasterisk(container.type) in NumberGenerator.unique
-
-  def isinordered(self, container):
-    "Find out if a container is ordered or unordered."
-    return self.deasterisk(container.type) in NumberGenerator.ordered
-
-  def isnumbered(self, container):
-    "Find out if a container is numbered."
-    if '*' in container.type:
-      return False
-    if self.getlevel(container.type) > NumberGenerator.maxdepth:
-      return False
-    return True
-
-  def increase(self, number):
-    "Increase the number (or letter)"
-    if not isinstance(number, str):
-      return number + 1
-    if number == '-':
-      index = 0
-    elif not number in NumberGenerator.letters:
-      Trace.error('Unknown letter numeration ' + number)
-      return 0
-    else:
-      index = NumberGenerator.letters.index(number) + 1
-    return self.letter(index)
-
-  def letter(self, index):
-    "Get the letter that corresponds to the given index."
-    return NumberGenerator.letters[index % len(NumberGenerator.letters)]
-
-  def dotseparated(self, number):
-    "Get the number separated by dots: 1.1.3"
-    dotsep = ''
-    if len(number) == 0:
-      Trace.error('Empty number')
-      return '.'
-    for piece in number:
-      dotsep += '.' + unicode(piece)
-    return dotsep[1:]
-
-  def deasterisk(self, type):
-    "Get the type without the asterisk for unordered types."
-    return type.replace('*', '')
-
-NumberGenerator.instance = NumberGenerator()
-
-class LayoutNumberer(object):
-  "Number a layout with the relevant attributes."
-
-  instance = None
-
-  def __init__(self):
-    self.generator = NumberGenerator.instance
-    self.lastnumbered = None
-
-  def isnumbered(self, container):
-    "Find out if a container requires numbering at all."
-    return self.generator.isinordered(container) or self.generator.isunique(container)
-
-  def numberlayout(self, layout):
-    "Set all attributes: number, entry, level..."
-    if self.generator.isunique(layout):
-      number = self.generator.generateunique(layout.type)
-      self.setcommonattrs(layout, number)
-      layout.anchortext = ''
-      if layout.number != '':
-        layout.anchortext = layout.entry + '.'
-      return
-    if not self.generator.isinordered(layout):
-      Trace.error('Trying to number wrong ' + unicode(layout))
-      return
-    # ordered or unordered
-    if self.generator.isnumbered(layout):
-      number = self.generator.generateordered(layout.type)
-    else:
-      number = self.generator.generateunique(layout.type)
-    self.setcommonattrs(layout, number)
-    layout.anchortext = layout.number
-    layout.output.tag = layout.output.tag.replace('?', unicode(layout.level))
-
-  def setcommonattrs(self, layout, number):
-    "Set the common attributes for a layout."
-    layout.level = self.generator.getlevel(layout.type)
-    type = self.generator.deasterisk(layout.type)
-    layout.number = ''
-    if self.generator.isnumbered(layout):
-      layout.number = number
-    layout.partkey = 'toc-' + layout.type + '-' + number
-    layout.entry = Translator.translate(type)
-    if layout.number != '':
-      self.lastnumbered = layout
-      layout.entry += ' ' + layout.number
-
-LayoutNumberer.instance = LayoutNumberer()
 
 
 
@@ -2698,7 +3033,7 @@ class Postprocessor(object):
     self.last = None
 
   def postprocess(self, next):
-    "Postprocess the root container and its contents"
+    "Postprocess a container and its contents."
     self.postrecursive(self.current)
     result = self.postcurrent(next)
     self.last = self.current
@@ -2762,11 +3097,17 @@ class Label(Link):
   "A label to be referenced"
 
   names = dict()
+  lastlayout = None
+
+  def __init__(self):
+    Link.__init__(self)
+    self.lastnumbered = None
 
   def process(self):
     "Process a label container."
-    key = self.parameters['name']
+    key = self.getparameter('name')
     self.create(' ', key)
+    self.lastnumbered = Label.lastlayout
 
   def create(self, text, key, type = 'Label'):
     "Create the label for a given key."
@@ -2781,16 +3122,16 @@ class Label(Link):
   def labelnumber(self):
     "Get the number for the latest numbered container seen."
     numbered = self.numbered(self)
-    if numbered and numbered.number:
-      return numbered.number
+    if numbered and numbered.partkey and numbered.partkey.number:
+      return numbered.partkey.number
     return ''
 
   def numbered(self, container):
     "Get the numbered container for the label."
-    if hasattr(container, 'number'):
+    if container.partkey:
       return container
-    if not hasattr(container, 'parent'):
-      if hasattr(self, 'lastnumbered'):
+    if not container.parent:
+      if self.lastnumbered:
         return self.lastnumbered
       return None
     return self.numbered(container.parent)
@@ -2805,14 +3146,11 @@ class Reference(Link):
   "A reference to a label."
 
   references = dict()
-  formats = {
-      'ref':u'@↕', 'eqref':u'(@↕)', 'pageref':u'#↕',
-      'vref':u'@on-page#↕'
-      }
+  key = 'none'
 
   def process(self):
     "Read the reference and set the arrow."
-    self.key = self.parameters['reference']
+    self.key = self.getparameter('reference')
     if self.key in Label.names:
       self.direction = u'↑'
       label = Label.names[self.key]
@@ -2827,36 +3165,27 @@ class Reference(Link):
 
   def format(self):
     "Format the reference contents."
-    if 'LatexCommand' in self.parameters:
-      formatkey = self.parameters['LatexCommand']
-    else:
+    formats = StyleConfig.referenceformats
+    formatkey = self.getparameter('LatexCommand')
+    if not formatkey:
       formatkey = 'ref'
-    if not formatkey in self.formats:
+    if not formatkey in formats:
       Trace.error('Unknown reference format ' + formatkey)
       formatstring = u'↕'
     else:
-      formatstring = self.formats[formatkey]
+      formatstring = formats[formatkey]
     formatstring = formatstring.replace(u'↕', self.direction)
-    formatstring = formatstring.replace('@', self.destination.labelnumber())
+    if '@' in formatstring:
+      formatstring = formatstring.replace('@', self.destination.labelnumber())
     formatstring = formatstring.replace('#', '1')
-    formatstring = formatstring.replace('on-page', Translator.translate('on-page'))
+    if 'on-page' in formatstring:
+      formatstring = formatstring.replace('on-page', Translator.translate('on-page'))
     self.contents = [Constant(formatstring)]
 
   def __unicode__(self):
     "Return a printable representation."
     return 'Reference ' + self.key
 
-class PostLabel(object):
-  "Postprocessing of a label: assign number of the referenced part."
-
-  processedclass = Label
-
-  def postprocess(self, last, label, next):
-    "Remember the last numbered container seen."
-    label.lastnumbered = LayoutNumberer.instance.lastnumbered
-    return label
-
-Postprocessor.stages += [PostLabel]
 
 
 
@@ -2869,21 +3198,20 @@ Postprocessor.stages += [PostLabel]
 
 
 
-
-import codecs
 
 
 class HeaderParser(Parser):
   "Parses the LyX header"
 
   def parse(self, reader):
-    "Parse header parameters into a dictionary"
-    self.parseending(reader, lambda: self.parseline(reader))
+    "Parse header parameters into a dictionary, return the preamble."
+    contents = []
+    self.parseending(reader, lambda: self.parseline(reader, contents))
     # skip last line
     reader.nextline()
-    return []
+    return contents
 
-  def parseline(self, reader):
+  def parseline(self, reader, contents):
     "Parse a single line as a parameter or as a start"
     line = reader.currentline()
     if line.startswith(HeaderConfig.parameters['branch']):
@@ -2893,7 +3221,7 @@ class HeaderParser(Parser):
       LstParser().parselstset(reader)
       return
     elif line.startswith(HeaderConfig.parameters['beginpreamble']):
-      PreambleParser().parsepreamble(reader)
+      contents.append(self.factory.createcontainer(reader))
       return
     # no match
     self.parseparameter(reader)
@@ -2918,15 +3246,12 @@ class PreambleParser(Parser):
   "A parser for the LyX preamble."
 
   preamble = []
-  parsed = False
 
-  def __init__(self):
-    self.ending = HeaderConfig.parameters['endpreamble']
-
-  def parsepreamble(self, reader):
+  def parse(self, reader):
     "Parse the full preamble with all statements."
-    reader.nextline()
+    self.ending = HeaderConfig.parameters['endpreamble']
     self.parseending(reader, lambda: self.parsepreambleline(reader))
+    return []
 
   def parsepreambleline(self, reader):
     "Parse a single preamble line."
@@ -2961,15 +3286,12 @@ class LstParser(object):
   def parsecontainer(self, container):
     "Parse some lstparams from a container."
     container.lstparams = LstParser.globalparams.copy()
-    if not 'lstparams' in container.parameters:
-      return
-    paramtext = container.parameters['lstparams']
-    container.lstparams.update(self.parselstparams(paramtext))
+    paramlist = container.getparameterlist('lstparams')
+    container.lstparams.update(self.parselstparams(paramlist))
 
-  def parselstparams(self, text):
-    "Parse a number of lstparams from a text."
+  def parselstparams(self, paramlist):
+    "Process a number of lstparams from a list."
     paramdict = dict()
-    paramlist = text.split(',')
     for param in paramlist:
       if not '=' in param:
         if len(param.strip()) > 0:
@@ -2982,473 +3304,513 @@ class LstParser(object):
 
 
 
-class LyXHeader(Container):
-  "Reads the header, outputs the HTML header"
 
-  indentstandard = False
-  tocdepth = 10
-
-  def __init__(self):
-    self.contents = []
-    self.parser = HeaderParser()
-    self.output = HeaderOutput()
-
-  def process(self):
-    "Find pdf title"
-    TitleOutput.pdftitle = self.getparameter('pdftitle')
-    if self.getparameter('documentclass') in HeaderConfig.styles['article']:
-      NumberGenerator.startinglevel = 1
-    if self.getparameter('paragraphseparation') == 'indent':
-      LyXHeader.indentstandard = True
-    LyXHeader.tocdepth = self.getlevel('tocdepth')
-    NumberGenerator.maxdepth = self.getlevel('secnumdepth')
-    Translator.language = self.getparameter('language')
-
-  def getparameter(self, configparam):
-    "Get a parameter configured in HeaderConfig."
-    key = HeaderConfig.parameters[configparam]
-    if not key in self.parameters:
-      return None
-    return self.parameters[key]
-
-  def getlevel(self, configparam):
-    "Get a level read as a parameter from HeaderConfig."
-    value = int(self.getparameter(configparam))
-    if NumberGenerator.startinglevel == 1:
-      return value
-    return value + 1
-
-class LyXFooter(Container):
-  "Reads the footer, outputs the HTML footer"
-
-  def __init__(self):
-    self.contents = []
-    self.parser = BoundedDummy()
-    self.output = FooterOutput()
-
-class Align(Container):
-  "Bit of aligned text"
-
-  def __init__(self):
-    self.parser = ExcludingParser()
-    self.output = TaggedOutput().setbreaklines(True)
-
-  def process(self):
-    self.output.tag = 'div class="' + self.header[1] + '"'
-
-class Newline(Container):
-  "A newline"
-
-  def __init__(self):
-    self.parser = LoneCommand()
-    self.output = FixedOutput()
-
-  def process(self):
-    "Process contents"
-    self.html = ['<br/>\n']
-
-class NewPage(Newline):
-  "A new page"
-
-  def process(self):
-    "Process contents"
-    self.html = ['<p><br/>\n</p>\n']
-
-class Appendix(Container):
-  "An appendix to the main document"
-
-  def __init__(self):
-    self.parser = LoneCommand()
-    self.output = EmptyOutput()
-
-class ERT(Container):
-  "Evil Red Text"
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = EmptyOutput()
+import datetime
 
 
 
-class Layout(Container):
-  "A layout (block of text) inside a lyx file"
+import os
+import codecs
 
-  def __init__(self):
-    self.contents = list()
-    self.parser = BoundedParser()
-    self.output = TaggedOutput().setbreaklines(True)
 
-  def process(self):
-    self.type = self.header[1]
-    if self.type in TagConfig.layouts:
-      self.output.tag = TagConfig.layouts[self.type] + ' class="' + self.type + '"'
-    elif self.type.replace('*', '') in TagConfig.layouts:
-      self.output.tag = TagConfig.layouts[self.type.replace('*', '')] + ' class="' +  self.type.replace('*', '-') + '"'
-    else:
-      self.output.tag = 'div class="' + self.type + '"'
-    self.numerate()
+class BulkFile(object):
+  "A file to treat in bulk"
 
-  def numerate(self):
-    "Numerate if necessary."
-    if not LayoutNumberer.instance.isnumbered(self):
-      return
-    if self.containsappendix():
-      self.activateappendix()
-    LayoutNumberer.instance.numberlayout(self)
+  encodings = ['utf-8','Cp1252']
 
-  def containsappendix(self):
-    "Find out if there is an appendix somewhere in the layout"
-    for element in self.contents:
-      if isinstance(element, Appendix):
-        return True
-    return False
-    
-  def activateappendix(self):
-    "Change first number to letter, and chapter to appendix"
-    NumberGenerator.instance.number = ['-']
+  def __init__(self, filename):
+    self.filename = filename
+    self.temp = self.filename + '.temp'
+
+  def readall(self):
+    "Read the whole file"
+    for encoding in BulkFile.encodings:
+      try:
+        return self.readcodec(encoding)
+      except UnicodeDecodeError:
+        pass
+    Trace.error('No suitable encoding for ' + self.filename)
+    return []
+
+  def readcodec(self, encoding):
+    "Read the whole file with the given encoding"
+    filein = codecs.open(self.filename, 'rU', encoding)
+    lines = filein.readlines()
+    result = []
+    for line in lines:
+      result.append(line.strip('\r\n') + '\n')
+    filein.close()
+    return result
+
+  def getfiles(self):
+    "Get reader and writer for a file name"
+    reader = LineReader(self.filename)
+    writer = LineWriter(self.temp)
+    return reader, writer
+
+  def swaptemp(self):
+    "Swap the temp file for the original"
+    os.chmod(self.temp, os.stat(self.filename).st_mode)
+    os.rename(self.temp, self.filename)
 
   def __unicode__(self):
-    return 'Layout of type ' + self.type
+    "Get the unicode representation"
+    return 'file ' + self.filename
 
-class StandardLayout(Layout):
-  "A standard layout -- can be a true div or nothing at all"
 
-  indentation = False
 
-  def process(self):
-    self.type = 'standard'
-    self.output = ContentsOutput()
+class HTMLTemplate(object):
+  "A template for HTML generation."
 
-  def complete(self, contents):
-    "Set the contents and return it."
-    self.process()
-    self.contents = contents
+  current = None
+
+  def getheader(self):
+    "Get the header (before content) of the template."
+    return []
+
+  def convertheader(self):
+    "Convert the header and all variables."
+    return self.convert(self.getheader())
+
+  def convertfooter(self):
+    "Convert the footer and all variables."
+    return self.convert(self.getfooter())
+
+  def convert(self, html):
+    "Convert a bit of HTML replacing all variables."
+    varmap = VariableMap()
+    for index, line in enumerate(html):
+      if '<!--$' in line:
+        html[index] = varmap.replace(line)
+    return html
+
+  def getfooter(self):
+    "Get the footer (after content) of the template."
+    return []
+
+  def get(cls):
+    "Choose the right HTML template."
+    if not cls.current:
+      if Options.raw:
+        cls.current = RawTemplate()
+      elif Options.template:
+        cls.current = FileTemplate().read()
+      else:
+        cls.current = DefaultTemplate()
+    return cls.current
+
+  get = classmethod(get)
+
+class RawTemplate(HTMLTemplate):
+  "The template for raw output."
+
+  def getheader(self):
+    "Get the raw header."
+    return ['<!--starthtml-->\n']
+
+  def getfooter(self):
+    "Get the raw footer."
+    return ['\n\n<!--endhtml-->']
+
+class FileTemplate(HTMLTemplate):
+  "A template read from a file."
+
+  divider = '<!--$content-->'
+
+  def read(self):
+    "Read the file, separate header and footer."
+    self.header = []
+    lines = []
+    for line in self.templatelines():
+      if FileTemplate.divider == line:
+        self.header = lines
+        lines = []
+      else:
+        lines.append(line)
+    if self.header == []:
+      Trace.error('No ' + FileTemplate.divider + ' in template')
+      self.header = lines
+      lines = []
+    self.footer = lines
     return self
 
-class Title(Layout):
-  "The title of the whole document"
-
-  def process(self):
-    self.type = 'title'
-    self.output.tag = 'h1 class="title"'
-    self.title = self.extracttext()
-    TitleOutput.title = self.title
-    Trace.message('Title: ' + self.title)
-
-class Author(Layout):
-  "The document author"
-
-  def process(self):
-    self.type = 'author'
-    self.output.tag = 'h2 class="author"'
-    strings = self.searchall(StringContainer)
-    if len(strings) > 0:
-      FooterOutput.author = strings[0].string
-      Trace.debug('Author: ' + FooterOutput.author)
-
-class Abstract(Layout):
-  "A paper abstract"
-
-  def process(self):
-    self.type = 'abstract'
-    self.output.tag = 'div class="abstract"'
-    message = Translator.translate('abstract')
-    tagged = TaggedText().constant(message, 'p class="abstract-message"', True)
-    self.contents.insert(0, tagged)
-
-class FirstWorder(Layout):
-  "A layout where the first word is extracted"
-
-  def extractfirstword(self, contents):
-    "Extract the first word as a list"
-    first, found = self.extractfirsttuple(contents)
-    return first
-
-  def extractfirsttuple(self, contents):
-    "Extract the first word as a tuple"
-    firstcontents = []
-    index = 0
-    while index < len(contents):
-      first, found = self.extractfirstcontainer(contents[index])
-      if first:
-        firstcontents += first
-      if found:
-        return firstcontents, True
+  def templatelines(self):
+    "Read all lines in the template, separate content into its own line."
+    template = BulkFile(Options.template).readall()
+    for line in template:
+      if not FileTemplate.divider in line:
+        yield line
       else:
-        del contents[index]
-    return firstcontents, False
+        split = line.split(FileTemplate.divider)
+        for part in split[:-1]:
+          yield part
+          yield FileTemplate.divider
+        yield split[-1]
 
-  def extractfirstcontainer(self, container):
-    "Extract the first word from a string container"
-    if isinstance(container, StringContainer):
-      return self.extractfirststring(container)
-    if isinstance(container, ERT):
-      return [container], False
-    if len(container.contents) == 0:
-      # empty container
-      return [container], False
-    first, found = self.extractfirsttuple(container.contents)
-    if isinstance(container, TaggedText) and hasattr(container, 'tag'):
-      newtag = TaggedText().complete(first, container.tag)
-      return [newtag], found
-    return first, found
+  def getheader(self):
+    "Return the header (before content)."
+    return self.header
 
-  def extractfirststring(self, container):
-    "Extract the first word from a string container"
-    string = container.string
-    if not ' ' in string:
-      return [container], False
-    split = string.split(' ', 1)
-    container.string = split[1]
-    return [Constant(split[0])], True
+  def getfooter(self):
+    "Return the footer (after the content)."
+    return self.footer
 
-class Description(FirstWorder):
-  "A description layout"
+class DefaultTemplate(HTMLTemplate):
+  "The default HTML template when not configured."
 
-  def process(self):
-    "Set the first word to bold"
-    self.type = 'Description'
-    self.output.tag = 'div class="Description"'
-    firstword = self.extractfirstword(self.contents)
-    if not firstword:
-      return
-    firstword.append(Constant(u' '))
-    tag = 'span class="Description-entry"'
-    self.contents.insert(0, TaggedText().complete(firstword, tag))
-
-class List(FirstWorder):
-  "A list layout"
-
-  def process(self):
-    "Set the first word to bold"
-    self.type = 'List'
-    self.output.tag = 'div class="List"'
-    firstword = self.extractfirstword(self.contents)
-    if not firstword:
-      return
-    first = TaggedText().complete(firstword, 'span class="List-entry"')
-    second = TaggedText().complete(self.contents, 'span class="List-contents"')
-    self.contents = [first, second]
-
-class PlainLayout(Layout):
-  "A plain layout"
-
-  def process(self):
-    "Output just as contents."
-    self.output = ContentsOutput()
-    self.type = 'Plain'
-
-  def makevisible(self):
-    "Make the layout visible, output as tagged text."
-    self.output = TaggedOutput().settag('div class="PlainVisible"', True)
-
-class LyXCode(Layout):
-  "A bit of LyX-Code."
-
-  def process(self):
-    "Output as pre."
-    self.output.tag = 'pre class="LyX-Code"'
-    for newline in self.searchall(Newline):
-      index = newline.parent.contents.index(newline)
-      newline.parent.contents[index] = Constant('\n')
-
-class PostLayout(object):
-  "Numerate an indexed layout"
-
-  processedclass = Layout
-
-  def postprocess(self, last, layout, next):
-    "Generate a number and place it before the text"
-    if not hasattr(layout, 'number'):
-      return layout
-    label = Label().create(layout.anchortext, layout.partkey, type='toc')
-    layout.contents.insert(0, label)
-    if layout.anchortext != '':
-      layout.contents.insert(1, Constant(u' '))
-    return layout
-
-  def modifylayout(self, layout, type):
-    "Modify a layout according to the given type."
-    layout.level = NumberGenerator.instance.getlevel(type)
-    layout.output.tag = layout.output.tag.replace('?', unicode(layout.level))
-
-  def containsappendix(self, layout):
-    "Find out if there is an appendix somewhere in the layout"
-    for element in layout.contents:
-      if isinstance(element, Appendix):
-        return True
-    return False
-
-  def activateappendix(self):
-    "Change first number to letter, and chapter to appendix"
-    NumberGenerator.instance.number = ['-']
-
-class PostStandard(object):
-  "Convert any standard spans in root to divs"
-
-  processedclass = StandardLayout
-
-  def postprocess(self, last, standard, next):
-    "Switch to div"
-    type = 'Standard'
-    if LyXHeader.indentstandard:
-      if isinstance(last, StandardLayout):
-        type = 'Indented'
-      else:
-        type = 'Unindented'
-    standard.output = TaggedOutput().settag('div class="' + type + '"', True)
-    return standard
-
-class PostLyXCode(object):
-  "Coalesce contiguous LyX-Code layouts."
-
-  processedclass = LyXCode
-
-  def postprocess(self, last, lyxcode, next):
-    "Coalesce if last was also LyXCode"
-    if not isinstance(last, LyXCode):
-      return lyxcode
-    if hasattr(last, 'first'):
-      lyxcode.first = last.first
+  def getheader(self):
+    "Get the default header (before content)."
+    html = []
+    if not Options.html:
+      html.append(u'<?xml version="1.0" encoding="<!--$encoding-->"?>\n')
+      html.append(u'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n')
+      html.append(u'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">\n')
     else:
-      lyxcode.first = last
-    toappend = lyxcode.first.contents
-    toappend.append(Constant('\n'))
-    toappend += lyxcode.contents
-    lyxcode.output = EmptyOutput()
-    return lyxcode
+      html.append(u'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n')
+      html.append(u'<html lang="en">\n')
+    html.append(u'<head>\n')
+    html.append(u'<meta http-equiv="Content-Type" content="text/html; charset=<!--$encoding-->"/>\n')
+    html.append(u'<meta name="generator" content="http://www.nongnu.org/elyxer/"/>\n')
+    html.append(u'<meta name="create-date" content="<!--$date-->"/>\n')
+    html += self.getcss()
+    html.append(u'<title><!--$title--></title>\n')
+    if Options.jsmath:
+      html.append(u'<script type="text/javascript" src="<!--$jsmath-->/plugins/noImageFonts.js"></script>\n')
+      html.append(u'<script type="text/javascript" src="<!--$jsmath-->/easy/load.js"></script>\n')
+    if Options.mathjax:
+      html.append(u'<script type="text/javascript" src="<!--$mathjax-->/MathJax.js">\n')
+      html.append(u'  //  Load MathJax and get it running\n')
+      html.append(u'  MathJax.Hub.Config({ jax: ["input/TeX"],\n') # output/HTML-CSS
+      html.append(u'  config: ["MMLorHTML.js"],\n')
+      html.append(u'  extensions: ["TeX/AMSmath.js","TeX/AMSsymbols.js"],\n')
+      html.append(u'  "HTML-CSS": { imageFont: null }\n')
+      html.append(u'  });\n')
+      html.append(u'</script>\n')
+    html.append('</head>\n')
+    html.append('<body>\n')
+    html.append('<div id="globalWrapper">\n')
+    if Options.jsmath or Options.mathjax:
+      if Options.mathjax:
+        html.append(u'<script type="math/tex">\n')
+        html.append(u'\\newcommand{\\lyxlock}{}\n')
+        html.append(u'</script>\n')
+      html.append(u'<noscript>\n')
+      html.append(u'<div class="warning">\n')
+      html.append(Translator.translate('jsmath-warning'))
+      if Options.jsmath:
+        html.append(u'<a href="http://www.math.union.edu/locate/jsMath">jsMath</a>')
+      if Options.mathjax:
+        html.append(u'<a href="http://www.mathjax.org/">MathJax</a>')
+      html.append(Translator.translate('jsmath-requires'))
+      html.append(Translator.translate('jsmath-enable') + '\n')
+      html.append(u'</div><hr/>\n')
+      html.append(u'</noscript>\n')
+    return html
 
-Postprocessor.stages += [PostLayout, PostStandard, PostLyXCode]
+  def getcss(self):
+    "Get the CSS headers, both linked and embedded."
+    html = []
+    for cssdoc in Options.css:
+      if cssdoc != '':
+        html.append(u'<link rel="stylesheet" href="' + cssdoc + '" type="text/css" media="all"/>\n')
+    for cssfile in Options.embedcss:
+      html.append(u'<style type="text/css">\n')
+      html += BulkFile(cssfile).readall()
+      html.append(u'</style>\n')
+    return html
 
+  def getfooter(self):
+    "Get the default footer (after content)."
+    html = []
+    html.append('\n')
+    footer = self.createfooter()
+    if len(footer) > 0:
+      html.append('<hr class="footer"/>\n')
+      html += footer
+    html.append('</div>\n')
+    html.append('</body>\n')
+    html.append('</html>\n')
+    return html
 
+  def createfooter(self):
+    "Create the footer proper."
+    html = []
+    if Options.copyright:
+      html.append('<div class="footer">\nCopyright (C) <!--$year--> <!--$author-->\n</div>\n')
+    if Options.nofooter:
+      return html
+    html.append('<div class="footer" id="generated-by">\n')
+    html.append(Translator.translate('generated-by'))
+    html.append('<a href="http://elyxer.nongnu.org/">eLyXer <!--$version--></a>')
+    html.append(Translator.translate('generated-on'))
+    html.append('<span class="create-date"><!--$datetime--></span>\n')
+    html.append('</div>\n')
+    return html
 
-class BiblioCitation(Container):
-  "A complete bibliography citation (possibly with many cites)."
-
-  citations = dict()
+class VariableMap(object):
+  "A map with all replacement variables."
 
   def __init__(self):
-    self.parser = InsetParser()
-    self.output = TaggedOutput().settag('sup')
-    self.contents = []
+    self.variables = dict()
+    self.variables['title'] = DocumentTitle().getvalue()
+    self.variables['author'] = DocumentAuthor().getvalue()
+    self.variables['version'] = GeneralConfig.version['number'] + ' (' \
+        + GeneralConfig.version['date'] + ')'
+    self.variables['year'] = unicode(datetime.date.today().year)
+    self.variables['date'] = datetime.date.today().isoformat()
+    self.variables['datetime'] = datetime.datetime.now().isoformat()
+    self.variables['css'] = Options.css[0]
+    if Options.iso885915:
+      self.variables['encoding'] = 'ISO-8859-1'
+    else:
+      self.variables['encoding'] = 'UTF-8'
+    if Options.jsmath:
+      self.variables['jsmath'] = Options.jsmath
+    if Options.mathjax:
+      self.variables['mathjax'] = Options.mathjax
 
-  def process(self):
-    "Process the complete citation and all cites within."
-    keys = self.parameters['key'].split(',')
-    for key in keys:
-      self.contents += [BiblioCite().create(key), Constant(',')]
-    if len(keys) > 0:
-      # remove trailing ,
-      self.contents.pop()
+  def replace(self, line):
+    "Replace all variables in a line."
+    result = ''
+    pos = TextPosition(line)
+    while not pos.finished():
+      if pos.checkskip('<!--$'):
+        result += self.getvalue(pos)
+      else:
+        result += pos.skipcurrent()
+    return result
 
-class BiblioCite(Link):
-  "Cite of a bibliography entry"
+  def getvalue(self, pos):
+    "Get the value of the variable at the given position."
+    value = ''
+    key = pos.globalpha()
+    if not key in self.variables:
+      Trace.error('Template variable ' + key + ' not found')
+    else:
+      value = self.variables[key]
+    if not pos.checkskip('-->'):
+      Trace.error('Weird template format in ' + line)
+    return value
 
-  cites = dict()
+class DocumentTitle(object):
+  "The title of the whole document."
 
-  def create(self, key):
-    "Create the cite to the given key."
-    self.key = key
-    number = NumberGenerator.instance.generateunique('bibliocite')
-    ref = BiblioReference().create(key, number)
-    self.complete(number, 'cite-' + number, type='bibliocite')
-    self.setmutualdestination(ref)
-    if not key in BiblioCite.cites:
-      BiblioCite.cites[key] = []
-    BiblioCite.cites[key].append(self)
+  title = None
+
+  def getvalue(self):
+    "Return the correct title from the option or the PDF title."
+    if Options.title:
+      return Options.title
+    if DocumentTitle.title:
+      return DocumentTitle.title
+    if DocumentParameters.pdftitle:
+      return DocumentParameters.pdftitle
+    return 'Converted document'
+
+class DocumentAuthor(object):
+  "The author of the document."
+
+  author = ''
+
+  def appendauthor(cls, authorline):
+    "Append a line with author information."
+    cls.author += authorline
+
+  appendauthor = classmethod(appendauthor)
+
+  def getvalue(self):
+    "Get the document author."
+    return DocumentAuthor.author
+
+class HeaderOutput(ContainerOutput):
+  "Returns the HTML headers"
+
+  def gethtml(self, container):
+    "Return a constant header"
+    return HTMLTemplate.get().convertheader()
+
+class FooterOutput(ContentsOutput):
+  "Return the HTML code for the footer"
+
+  def gethtml(self, container):
+    "Footer HTML"
+    contents = ContentsOutput.gethtml(self, container)
+    return contents + HTMLTemplate.get().convertfooter()
+
+
+
+
+
+
+class PartKey(object):
+  "A key to identify a given document part (chapter, section...)."
+
+  partkey = None
+  tocentry = None
+  anchortext = None
+  number = None
+  filename = None
+  showtitle = False
+  header = False
+
+  def __init__(self):
+    self.level = 0
+
+  def createindex(self, partkey):
+    "Create a part key for an index page."
+    self.partkey = partkey
+    self.tocentry = partkey
+    self.filename = partkey
     return self
 
-class Bibliography(Container):
-  "A bibliography layout containing an entry"
-
-  def __init__(self):
-    self.parser = BoundedParser()
-    self.output = TaggedOutput().settag('p class="biblio"', True)
-
-class PostBiblio(object):
-  "Insert a Bibliography legend before the first item"
-
-  processedclass = Bibliography
-
-  def postprocess(self, last, element, next):
-    "If we have the first bibliography insert a tag"
-    if isinstance(last, Bibliography) or Options.nobib:
-      return element
-    bibliography = Translator.translate('bibliography')
-    header = TaggedText().constant(bibliography, 'h1 class="biblio"')
-    layout = StandardLayout().complete([header, element])
-    return layout
-
-Postprocessor.stages += [PostBiblio]
-
-class BiblioReference(Link):
-  "A reference to a bibliographical entry."
-
-  references = dict()
-
-  def create(self, key, number):
-    "Create the reference with the given key and number."
-    self.key = key
-    self.complete(number, 'biblio-' + number, type='biblioentry')
-    if not key in BiblioReference.references:
-      BiblioReference.references[key] = []
-    BiblioReference.references[key].append(self)
+  def createfloat(self, partkey, number):
+    "Create a part key for a float."
+    self.partkey = partkey
+    self.number = number
+    self.tocentry = partkey
+    self.showtitle = True
     return self
 
-class BiblioEntry(Container):
-  "A bibliography entry"
+  def createformula(self, number):
+    "Create the part key for a formula."
+    self.number = number
+    self.partkey = 'formula-' + number
+    self.tocentry = '(' + number + ')'
+    return self
 
-  entries = dict()
+  def createheader(self, headorfooter):
+    "Create the part key for a header or footer."
+    self.partkey = headorfooter
+    self.tocentry = None
+    self.header = True
+    return self
 
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = TaggedOutput().settag('span class="entry"')
+  def createanchor(self, partkey):
+    "Create an anchor for the page."
+    self.partkey = partkey
+    self.tocentry = partkey
+    self.header = True
+    return self
 
-  def process(self):
-    "Process the cites for the entry's key"
-    self.processcites(self.parameters['key'])
+  def addtoclabel(self, container):
+    "Create the label for the TOC, and add it to the container."
+    labeltext = ''
+    if self.anchortext:
+      labeltext = self.anchortext
+      container.contents.insert(0, Separator(u' '))
+    label = Label().create(labeltext, self.partkey, type='toc')
+    container.contents.insert(0, label)
 
-  def processcites(self, key):
-    "Get all the cites of the entry"
-    self.key = key
-    if not key in BiblioReference.references:
-      self.contents.append(Constant('[-] '))
-      return
-    self.contents = [Constant('[')]
-    for ref in BiblioReference.references[key]:
-      self.contents.append(ref)
-      self.contents.append(Constant(','))
-    self.contents.pop(-1)
-    self.contents.append(Constant('] '))
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Part key for ' + self.partkey
+
+class LayoutPartKey(PartKey):
+  "The part key for a layout."
+
+  generator = NumberGenerator()
+
+  def create(self, layout):
+    "Set the layout for which we are creating the part key."
+    self.processtype(layout.type)
+    return self
+
+  def processtype(self, type):
+    "Process the layout type."
+    self.level = self.generator.getlevel(type)
+    self.number = self.generator.generate(type)
+    anchortype = self.getanchortype(type)
+    self.partkey = 'toc-' + anchortype + '-' + self.number
+    self.tocentry = self.gettocentry(type)
+    self.showtitle = True
+    self.filename = self.getfilename(type)
+    if self.generator.isnumbered(type):
+      if not self.tocentry:
+        self.tocentry = ''
+      else:
+        self.tocentry += ' '
+      self.tocentry += self.number
+      self.anchortext = self.getanchortext(type)
+
+  def getanchortype(self, type):
+    "Get the type for the anchor."
+    parttype = self.generator.getparttype(type)
+    if self.generator.isunordered(type):
+      parttype += '-'
+    return parttype
+
+  def gettocentry(self, type):
+    "Get the entry for the TOC: Chapter, Section..."
+    if Options.notoclabels:
+      return ''
+    return Translator.translate(self.generator.getparttype(type))
+
+  def addtotocentry(self, text):
+    "Add some text to the tocentry; create if None."
+    if not self.tocentry:
+      self.tocentry = ''
+    self.tocentry += text
+
+  def getanchortext(self, type):
+    "Get the text for the anchor given to a layout type."
+    if self.generator.isunique(type):
+      return self.tocentry + '.'
+    return self.number
+
+  def getfilename(self, type):
+    "Get the filename to be used if splitpart is active."
+    if self.level == Options.splitpart and self.generator.isnumbered(type):
+      return self.number
+    if self.level <= Options.splitpart:
+      return self.partkey.replace('toc-', '')
+    return None
+
+  def needspartkey(self, layout):
+    "Find out if a layout needs a part key."
+    if self.generator.isunique(layout.type):
+      return True
+    return self.generator.isinordered(layout.type)
+
+  def __unicode__(self):
+    "Get a printable representation."
+    return 'Part key for layout ' + self.tocentry
+
+class PartKeyGenerator(object):
+  "Number a layout with the relevant attributes."
+
+  partkeyed = []
+  layoutpartkey = LayoutPartKey()
+
+  def forlayout(cls, layout):
+    "Get the part key for a layout."
+    if layout.hasemptyoutput():
+      return None
+    if not cls.layoutpartkey.needspartkey(layout):
+      return None
+    Label.lastlayout = layout
+    cls.partkeyed.append(layout)
+    return LayoutPartKey().create(layout)
+
+  def forindex(cls, index):
+    "Get the part key for an index or nomenclature."
+    if index.hasemptyoutput():
+      return None
+    cls.partkeyed.append(index)
+    return PartKey().createindex(index.name)
+
+  forlayout = classmethod(forlayout)
+  forindex = classmethod(forindex)
 
 
 
 
-import sys
+import unicodedata
 
 
 
 
 
-class Cloner(object):
-  "An object used to clone other objects."
 
-  clonelist = ['contents']
-
-  def clone(cls, original):
-    "Return an exact copy of an object."
-    "The original object must have an empty constructor."
-    type = original.__class__
-    clone = type.__new__(type)
-    clone.__init__()
-    return clone
-
-  clone = classmethod(clone)
-
-
-
-
-import sys
 
 
 class FormulaParser(Parser):
@@ -3474,7 +3836,7 @@ class FormulaParser(Parser):
         Trace.error('Unparsed formula line ' + stripped)
       reader.nextline()
     reader.nextline()
-    return [formula]
+    return formula
 
   def parseformula(self, reader):
     "Parse the formula contents"
@@ -3535,7 +3897,7 @@ class FormulaParser(Parser):
     index = line.index(start)
     line = line[index + len(start):].strip()
     while not line.endswith(ending):
-      formula += line
+      formula += line + '\n'
       reader.nextline()
       line = reader.currentline()
     formula += line[:-len(ending)]
@@ -3554,63 +3916,31 @@ class MacroParser(FormulaParser):
     "Parse the formula until the end"
     formula = self.parsemultiliner(reader, self.parent.start, self.ending)
     reader.nextline()
-    return [formula]
+    return formula
   
 
 
-class Formula(Container):
-  "A LaTeX formula"
 
-  initializations = []
 
-  def __init__(self):
-    self.parser = FormulaParser()
-    self.output = TaggedOutput().settag('span class="formula"')
-    self.initialize()
 
-  def process(self):
-    "Convert the formula to tags"
-    if self.header[0] != 'inline':
-      self.output.settag('div class="formula"', True)
-    if Options.jsmath:
-      if self.header[0] != 'inline':
-        self.output = TaggedOutput().settag('div class="math"')
-      else:
-        self.output = TaggedOutput().settag('span class="math"')
-      self.contents = [Constant(self.contents[0])]
-      return
-    if Options.mathjax:
-      self.output.tag = 'span class="MathJax_Preview"'
-      tag = 'script type="math/tex'
-      if self.header[0] != 'inline':
-        tag += ';mode=display'
-      self.contents = [TaggedText().constant(self.contents[0], tag + '"', True)]
-      return
-    whole = WholeFormula.parse(self.contents[0])
-    self.contents = [whole]
-    whole.parent = self
 
-  def initialize(self):
-    "Perform any necessary initializations."
-    "Introduced to process any macros in the preamble."
-    for init in Formula.initializations:
-      init()
 
-  def __unicode__(self):
-    "Return a printable representation."
-    if hasattr(self, 'number'):
-      return 'Formula (' + self.number + ')'
-    return 'Unnumbered formula'
 
 class FormulaBit(Container):
   "A bit of a formula"
 
+  type = None
+  original = ''
+
   def __init__(self):
-    # type can be 'alpha', 'number', 'font'
-    self.type = None
-    self.original = ''
+    "The formula bit type can be 'alpha', 'number', 'font'."
     self.contents = []
     self.output = ContentsOutput()
+
+  def setfactory(self, factory):
+    "Set the internal formula factory."
+    self.factory = factory
+    return self
 
   def add(self, bit):
     "Add any kind of formula bit already processed"
@@ -3626,7 +3956,7 @@ class FormulaBit(Container):
 
   def clone(self):
     "Return a copy of itself."
-    return WholeFormula.parse(self.original)
+    return self.factory.parseformula(self.original)
 
   def __unicode__(self):
     "Get a string representation"
@@ -3656,90 +3986,13 @@ class FormulaConstant(Constant):
     self.original = string
     self.type = None
 
-class WholeFormula(FormulaBit):
-  "Parse a whole formula"
+  def clone(self):
+    "Return a copy of itself."
+    return FormulaConstant(self.original)
 
-  def __init__(self):
-    FormulaBit.__init__(self)
-    self.factory = FormulaFactory()
-
-  def detect(self, pos):
-    "Check in the factory"
-    return self.factory.detectbit(pos)
-
-  def parsebit(self, pos):
-    "Parse with any formula bit"
-    while self.factory.detectbit(pos):
-      bit = self.factory.parsebit(pos)
-      #Trace.debug(bit.original + ' -> ' + unicode(bit.gethtml()))
-      self.add(bit)
-
-  def process(self):
-    "Process the whole formula"
-    for index, bit in enumerate(self.contents):
-      bit.process()
-      # no units processing
-      continue
-      if bit.type == 'alpha':
-        # make variable
-        self.contents[index] = TaggedBit().complete([bit], 'i')
-      elif bit.type == 'font' and index > 0:
-        last = self.contents[index - 1]
-        if last.type == 'number':
-          #separate
-          last.contents.append(FormulaConstant(u' '))
-
-  def parse(cls, formula):
-    "Parse a whole formula and return it."
-    pos = TextPosition(formula)
-    whole = WholeFormula()
-    if not whole.detect(pos):
-      Trace.error('Unknown formula at: ' + pos.identifier())
-      return TaggedBit().constant(pos.identifier(), 'span class="unknown"')
-    whole.parsebit(pos)
-    whole.process()
-    return whole
-
-  parse = classmethod(parse)
-
-class FormulaFactory(object):
-  "Construct bits of formula"
-
-  # bits will be appended later
-  bits = []
-
-  def detectbit(self, pos):
-    "Detect if there is a next bit"
-    if pos.finished():
-      return False
-    for bit in FormulaFactory.bits:
-      if bit.detect(pos):
-        return True
-    return False
-
-  def parsebit(self, pos):
-    "Parse just one formula bit."
-    for bit in FormulaFactory.bits:
-      if bit.detect(pos):
-        # get a fresh bit and parse it
-        newbit = Cloner.clone(bit)
-        newbit.factory = self
-        returnedbit = newbit.parsebit(pos)
-        if returnedbit:
-          return returnedbit
-        return newbit
-    Trace.error('Unrecognized formula at ' + pos.identifier())
-    return FormulaConstant(pos.currentskip())
-
-
-
-
-import sys
-
-
-
-import sys
-
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Formula constant: ' + self.string
 
 class RawText(FormulaBit):
   "A bit of text inside a formula"
@@ -3783,7 +4036,7 @@ class FormulaSymbol(FormulaBit):
     self.skiporiginal(pos.current(), pos)
     self.contents.append(FormulaConstant(symbol))
 
-class Number(FormulaBit):
+class FormulaNumber(FormulaBit):
   "A string of digits in a formula"
 
   def detect(self, pos):
@@ -3799,14 +4052,30 @@ class Number(FormulaBit):
 class Comment(FormulaBit):
   "A LaTeX comment: % to the end of the line."
 
+  start = FormulaConfig.starts['comment']
+
   def detect(self, pos):
     "Detect the %."
-    return pos.current() == '%'
+    return pos.current() == self.start
 
   def parsebit(self, pos):
     "Parse to the end of the line."
-    comment = pos.globincluding('\n')
-    self.original += comment
+    self.original += pos.globincluding('\n')
+
+class WhiteSpace(FormulaBit):
+  "Some white space inside a formula."
+
+  def detect(self, pos):
+    "Detect the white space."
+    return pos.current().isspace()
+
+  def parsebit(self, pos):
+    "Parse all whitespace."
+    self.original += pos.skipspace()
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Whitespace: *' + self.original + '*'
 
 class Bracket(FormulaBit):
   "A {} bracket inside a formula"
@@ -3850,11 +4119,10 @@ class Bracket(FormulaBit):
 
   def innerformula(self, pos):
     "Parse a whole formula inside the bracket"
-    self.inner = WholeFormula()
-    if self.inner.detect(pos):
-      self.inner.parsebit(pos)
-      self.add(self.inner)
-      return
+    while self.factory.detectany(pos):
+      self.add(self.factory.parseany(pos))
+      for ignored in self.factory.clearignored(pos):
+        self.add(ignored)
     if pos.finished():
       return
     if pos.current() != self.ending:
@@ -3863,30 +4131,28 @@ class Bracket(FormulaBit):
 
   def innertext(self, pos):
     "Parse some text inside the bracket, following textual rules."
-    factory = FormulaFactory()
+    specialchars = FormulaConfig.symbolfunctions.keys()
+    specialchars.append(FormulaConfig.starts['command'])
+    specialchars.append(FormulaConfig.starts['bracket'])
+    specialchars.append(Comment.start)
     while not pos.finished():
-      if pos.current() == FormulaConfig.starts['command'] or \
-          pos.current() in FormulaConfig.symbolfunctions:
-        bit = factory.parsebit(pos)
-        pos.checkskip(' ')
+      if pos.current() in specialchars:
+        if self.factory.detectany(pos):
+          self.add(self.factory.parseany(pos))
+          if pos.checkskip(' '):
+            self.original += ' '
       else:
-        bit = FormulaConstant(pos.currentskip())
-      self.add(bit)
+        self.add(FormulaConstant(pos.skipcurrent()))
 
   def innerliteral(self, pos):
-    "Parse a literal inside the bracket, which cannot generate html"
+    "Parse a literal inside the bracket, which does not generate HTML."
     self.literal = ''
     while not pos.current() == self.ending:
       if pos.current() == self.start:
         self.parseliteral(pos)
       else:
-        self.literal += pos.currentskip()
+        self.literal += pos.skipcurrent()
     self.original += self.literal
-
-  def process(self):
-    "Process the bracket"
-    if self.inner:
-      self.inner.process()
 
 class SquareBracket(Bracket):
   "A [] bracket inside a formula"
@@ -3894,62 +4160,343 @@ class SquareBracket(Bracket):
   start = FormulaConfig.starts['squarebracket']
   ending = FormulaConfig.endings['squarebracket']
 
-FormulaFactory.bits += [
-    FormulaSymbol(), RawText(), Number(), Comment(), Bracket()
-    ]
+  def clone(self):
+    "Return a new square bracket with the same contents."
+    bracket = SquareBracket()
+    bracket.contents = self.contents
+    return bracket
+
+
+
+class MathsProcessor(object):
+  "A processor for a maths construction inside the FormulaProcessor."
+
+  def process(self, contents, index):
+    "Process an element inside a formula."
+    Trace.error('Unimplemented process() in ' + unicode(self))
+
+  def __unicode__(self):
+    "Return a printable description."
+    return 'Maths processor ' + self.__class__.__name__
+
+class FormulaProcessor(object):
+  "A processor specifically for formulas."
+
+  processors = []
+
+  def process(self, bit):
+    "Process the contents of every formula bit, recursively."
+    self.processcontents(bit)
+    self.processinsides(bit)
+    self.traversewhole(bit)
+
+  def processcontents(self, bit):
+    "Process the contents of a formula bit."
+    if not isinstance(bit, FormulaBit):
+      return
+    bit.process()
+    for element in bit.contents:
+      self.processcontents(element)
+
+  def processinsides(self, bit):
+    "Process the insides (limits, brackets) in a formula bit."
+    if not isinstance(bit, FormulaBit):
+      return
+    for index, element in enumerate(bit.contents):
+      for processor in self.processors:
+        processor.process(bit.contents, index)
+      # continue with recursive processing
+      self.processinsides(element)
+
+  def traversewhole(self, formula):
+    "Traverse over the contents to alter variables and space units."
+    last = None
+    for bit, contents in self.traverse(formula):
+      if bit.type == 'alpha':
+        self.italicize(bit, contents)
+      elif bit.type == 'font' and last and last.type == 'number':
+        bit.contents.insert(0, FormulaConstant(u' '))
+      last = bit
+
+  def traverse(self, bit):
+    "Traverse a formula and yield a flattened structure of (bit, list) pairs."
+    for element in bit.contents:
+      if hasattr(element, 'type') and element.type:
+        yield (element, bit.contents)
+      elif isinstance(element, FormulaBit):
+        for pair in self.traverse(element):
+          yield pair
+
+  def italicize(self, bit, contents):
+    "Italicize the given bit of text."
+    index = contents.index(bit)
+    contents[index] = TaggedBit().complete([bit], 'i')
+
+
+
+
+class Formula(Container):
+  "A LaTeX formula"
+
+  def __init__(self):
+    self.parser = FormulaParser()
+    self.output = TaggedOutput().settag('span class="formula"')
+
+  def process(self):
+    "Convert the formula to tags"
+    if self.header[0] == 'inline':
+      DocumentParameters.displaymode = False
+    else:
+      DocumentParameters.displaymode = True
+      self.output.settag('div class="formula"', True)
+    if Options.jsmath:
+      if self.header[0] != 'inline':
+        self.output = TaggedOutput().settag('div class="math"')
+      else:
+        self.output = TaggedOutput().settag('span class="math"')
+      self.contents = [Constant(self.parsed)]
+      return
+    if Options.mathjax:
+      self.output.tag = 'span class="MathJax_Preview"'
+      tag = 'script type="math/tex'
+      if self.header[0] != 'inline':
+        tag += ';mode=display'
+      self.contents = [TaggedText().constant(self.parsed, tag + '"', True)]
+      return
+    whole = FormulaFactory().parseformula(self.parsed)
+    FormulaProcessor().process(whole)
+    whole.parent = self
+    self.contents = [whole]
+
+  def parse(self, pos):
+    "Parse using a parse position instead of self.parser."
+    if pos.checkskip('$$'):
+      self.parsedollarblock(pos)
+    elif pos.checkskip('$'):
+      self.parsedollarinline(pos)
+    elif pos.checkskip('\\('):
+      self.parseinlineto(pos, '\\)')
+    elif pos.checkskip('\\['):
+      self.parseblockto(pos, '\\]')
+    else:
+      pos.error('Unparseable formula')
+    self.process()
+    return self
+
+  def parsedollarinline(self, pos):
+    "Parse a $...$ formula."
+    self.header = ['inline']
+    self.parsedollar(pos)
+
+  def parsedollarblock(self, pos):
+    "Parse a $$...$$ formula."
+    self.header = ['block']
+    self.parsedollar(pos)
+    if not pos.checkskip('$'):
+      pos.error('Formula should be $$...$$, but last $ is missing.')
+
+  def parsedollar(self, pos):
+    "Parse to the next $."
+    pos.pushending('$')
+    self.parsed = pos.globexcluding('$')
+    pos.popending('$')
+
+  def parseinlineto(self, pos, limit):
+    "Parse a \\(...\\) formula."
+    self.header = ['inline']
+    self.parseupto(pos, limit)
+
+  def parseblockto(self, pos, limit):
+    "Parse a \\[...\\] formula."
+    self.header = ['block']
+    self.parseupto(pos, limit)
+
+  def parseupto(self, pos, limit):
+    "Parse a formula that ends with the given command."
+    pos.pushending(limit)
+    self.parsed = pos.glob(lambda current: True)
+    pos.popending(limit)
+
+  def __unicode__(self):
+    "Return a printable representation."
+    if self.partkey and self.partkey.number:
+      return 'Formula (' + self.partkey.number + ')'
+    return 'Unnumbered formula'
+
+class WholeFormula(FormulaBit):
+  "Parse a whole formula"
+
+  def detect(self, pos):
+    "Check in the factory"
+    return self.factory.detectany(pos)
+
+  def parsebit(self, pos):
+    "Parse with any formula bit"
+    while self.factory.detectany(pos):
+      bit = self.factory.parseany(pos)
+      self.add(bit)
+      for ignored in self.factory.clearignored(pos):
+        self.add(ignored)
+
+class FormulaFactory(object):
+  "Construct bits of formula"
+
+  # bit types will be appended later
+  types = [FormulaSymbol, RawText, FormulaNumber, Bracket]
+  ignoredtypes = [Comment, WhiteSpace]
+  defining = False
+
+  def __init__(self):
+    "Initialize the map of instances."
+    self.instances = dict()
+
+  def detectany(self, pos):
+    "Detect if there is a next bit"
+    if pos.finished():
+      return False
+    for type in FormulaFactory.types:
+      if self.detecttype(type, pos):
+        return True
+    return False
+
+  def detecttype(self, type, pos):
+    "Detect a bit of a given type."
+    self.clearignored(pos)
+    if pos.finished():
+      return False
+    return self.instance(type).detect(pos)
+
+  def instance(self, type):
+    "Get an instance of the given type."
+    if not type in self.instances or not self.instances[type]:
+      self.instances[type] = self.create(type)
+    return self.instances[type]
+
+  def create(self, type):
+    "Create a new formula bit of the given type."
+    return Cloner.create(type).setfactory(self)
+
+  def clearignored(self, pos):
+    "Clear all ignored types."
+    ignored = []
+    while not pos.finished():
+      cleared = self.clearany(pos)
+      if not cleared:
+        return ignored
+      ignored.append(cleared)
+    return ignored
+
+  def clearany(self, pos):
+    "Cleary any ignored type."
+    for type in self.ignoredtypes:
+      if self.instance(type).detect(pos):
+        return self.parsetype(type, pos)
+    return None
+
+  def parseany(self, pos):
+    "Parse any formula bit at the current location."
+    for type in FormulaFactory.types:
+      if self.detecttype(type, pos):
+        return self.parsetype(type, pos)
+    Trace.error('Unrecognized formula at ' + pos.identifier())
+    return FormulaConstant(pos.skipcurrent())
+
+  def parsetype(self, type, pos):
+    "Parse the given type and return it."
+    bit = self.instance(type)
+    self.instances[type] = None
+    returnedbit = bit.parsebit(pos)
+    if returnedbit:
+      return returnedbit.setfactory(self)
+    return bit
+
+  def parseformula(self, formula):
+    "Parse a string of text that contains a whole formula."
+    pos = TextPosition(formula)
+    whole = self.create(WholeFormula)
+    if whole.detect(pos):
+      whole.parsebit(pos)
+      return whole
+    # no formula found
+    if not pos.finished():
+      Trace.error('Unknown formula at: ' + pos.identifier())
+      whole.add(TaggedBit().constant(formula, 'span class="unknown"'))
+    return whole
 
 
 
 class FormulaCommand(FormulaBit):
   "A LaTeX command inside a formula"
 
-  commandbits = []
+  types = []
   start = FormulaConfig.starts['command']
-  preambling = False
 
   def detect(self, pos):
-    "Find the current command"
+    "Find the current command."
     return pos.checkfor(FormulaCommand.start)
 
   def parsebit(self, pos):
-    "Parse the command"
+    "Parse the command."
     command = self.extractcommand(pos)
-    for bit in FormulaCommand.commandbits:
-      if bit.recognize(command):
-        newbit = Cloner.clone(bit)
-        newbit.factory = self.factory
-        newbit.setcommand(command)
-        newbit.parsebit(pos)
-        self.add(newbit)
-        return newbit
-    if not self.preambling:
+    bit = self.parsewithcommand(command, pos)
+    if bit:
+      return bit
+    if command.startswith('\\up') or command.startswith('\\Up'):
+      upgreek = self.parseupgreek(command, pos)
+      if upgreek:
+        return upgreek
+    if not self.factory.defining:
       Trace.error('Unknown command ' + command)
     self.output = TaggedOutput().settag('span class="unknown"')
     self.add(FormulaConstant(command))
     return None
 
+  def parsewithcommand(self, command, pos):
+    "Parse the command type once we have the command."
+    for type in FormulaCommand.types:
+      if command in type.commandmap:
+        return self.parsecommandtype(command, type, pos)
+    return None
+
+  def parsecommandtype(self, command, type, pos):
+    "Parse a given command type."
+    bit = self.factory.create(type)
+    bit.setcommand(command)
+    bit.parsebit(pos)
+    return bit
+
   def extractcommand(self, pos):
-    "Extract the command from the current position"
+    "Extract the command from the current position."
     if not pos.checkskip(FormulaCommand.start):
       Trace.error('Missing command start ' + start)
       return
     if pos.current().isalpha():
       # alpha command
-      return FormulaCommand.start + pos.globalpha()
+      command = FormulaCommand.start + pos.globalpha()
+      # skip mark of short command
+      pos.checkskip('*')
+      return command
     # symbol command
-    return FormulaCommand.start + pos.currentskip()
+    return FormulaCommand.start + pos.skipcurrent()
 
-  def process(self):
-    "Process the internals"
-    for bit in self.contents:
-      bit.process()
+  def parseupgreek(self, command, pos):
+    "Parse the Greek \\up command.."
+    if len(command) < 4:
+      return None
+    if command.startswith('\\up'):
+      upcommand = '\\' + command[3:]
+    elif pos.checkskip('\\Up'):
+      upcommand = '\\' + command[3:4].upper() + command[4:]
+    else:
+      Trace.error('Impossible upgreek command: ' + command)
+      return
+    upgreek = self.parsewithcommand(upcommand, pos)
+    if upgreek:
+      upgreek.type = 'font'
+    return upgreek
 
 class CommandBit(FormulaCommand):
   "A formula bit that includes a command"
-
-  def recognize(self, command):
-    "Recognize the command as own"
-    return command in self.commandmap
 
   def setcommand(self, command):
     "Set the command in the bit"
@@ -3959,36 +4506,35 @@ class CommandBit(FormulaCommand):
  
   def parseparameter(self, pos):
     "Parse a parameter at the current position"
-    if not self.factory.detectbit(pos):
+    if not self.factory.detectany(pos):
       Trace.error('No parameter found at: ' + pos.identifier())
       return None
-    parameter = self.factory.parsebit(pos)
+    parameter = self.factory.parseany(pos)
     self.add(parameter)
     return parameter
 
   def parsesquare(self, pos):
     "Parse a square bracket"
-    bracket = SquareBracket()
-    if not bracket.detect(pos):
+    if not self.factory.detecttype(SquareBracket, pos):
       return None
-    bracket.parsebit(pos)
+    bracket = self.factory.parsetype(SquareBracket, pos)
     self.add(bracket)
     return bracket
 
   def parseliteral(self, pos):
     "Parse a literal bracket."
-    bracket = Bracket()
-    if not bracket.detect(pos):
+    if not self.factory.detecttype(Bracket, pos):
       Trace.error('No literal parameter found at: ' + pos.identifier())
       return None
+    bracket = Bracket().setfactory(self.factory)
     self.add(bracket.parseliteral(pos))
     return bracket.literal
 
   def parsesquareliteral(self, pos):
     "Parse a square bracket literally."
-    bracket = SquareBracket()
-    if not bracket.detect(pos):
+    if not self.factory.detecttype(SquareBracket, pos):
       return None
+    bracket = SquareBracket().setfactory(self.factory)
     self.add(bracket.parseliteral(pos))
     return bracket.literal
 
@@ -4000,6 +4546,15 @@ class EmptyCommand(CommandBit):
   def parsebit(self, pos):
     "Parse a command without parameters"
     self.contents = [FormulaConstant(self.translated)]
+
+class SpacedCommand(CommandBit):
+  "An empty command which should have math spacing in formulas."
+
+  commandmap = FormulaConfig.spacedcommands
+
+  def parsebit(self, pos):
+    "Place as contents the command translated and spaced."
+    self.contents = [FormulaConstant(u' ' + self.translated + u' ')]
 
 class AlphaCommand(EmptyCommand):
   "A command without paramters whose result is alphabetical"
@@ -4015,6 +4570,7 @@ class OneParamFunction(CommandBit):
   "A function of one parameter"
 
   commandmap = FormulaConfig.onefunctions
+  simplified = False
 
   def parsebit(self, pos):
     "Parse a function with one parameter"
@@ -4027,6 +4583,7 @@ class OneParamFunction(CommandBit):
     if self.original in self.commandmap:
       self.output = FixedOutput()
       self.html = [self.commandmap[self.original]]
+      self.simplified = True
 
 class SymbolFunction(CommandBit):
   "Find a function which is represented by a symbol (like _ or ^)"
@@ -4052,7 +4609,9 @@ class TextFunction(CommandBit):
   def parsebit(self, pos):
     "Parse a text parameter"
     self.output = TaggedOutput().settag(self.translated)
-    bracket = Bracket().parsetext(pos)
+    if not self.factory.detecttype(Bracket, pos):
+      Trace.error('No parameter for ' + unicode(self))
+    bracket = Bracket().setfactory(self.factory).parsetext(pos)
     self.add(bracket)
 
   def process(self):
@@ -4086,43 +4645,18 @@ class FontFunction(OneParamFunction):
     self.type = 'font'
     self.simplifyifpossible()
 
-class DecoratingFunction(OneParamFunction):
-  "A function that decorates some bit of text"
-
-  commandmap = FormulaConfig.decoratingfunctions
-
-  def parsebit(self, pos):
-    "Parse a decorating function"
-    self.output = TaggedOutput().settag('span class="withsymbol"')
-    self.type = 'alpha'
-    symbol = self.translated
-    self.symbol = TaggedBit().constant(symbol, 'span class="symbolover"')
-    self.contents.append(self.symbol)
-    self.parameter = self.parseparameter(pos)
-    self.parameter.output = TaggedOutput().settag('span class="undersymbol"')
-    self.simplifyifpossible()
-
-class UnderDecoratingFunction(DecoratingFunction):
-  "A function that decorates some bit of text from below."
-
-  commandmap = FormulaConfig.underdecoratingfunctions
-
-  def parsebit(self, pos):
-    "Parse an under-decorating function."
-    DecoratingFunction.parsebit(self, pos)
-    self.symbol.output.settag('span class="symbolunder"')
-    self.parameter.output.settag('span class="oversymbol"')
-
-FormulaFactory.bits += [FormulaCommand(), SymbolFunction()]
-FormulaCommand.commandbits = [
-    EmptyCommand(), AlphaCommand(), OneParamFunction(), DecoratingFunction(),
-    FontFunction(), LabelFunction(), TextFunction(), UnderDecoratingFunction(),
+FormulaFactory.types += [FormulaCommand, SymbolFunction]
+FormulaCommand.types = [
+    AlphaCommand, EmptyCommand, OneParamFunction, FontFunction, LabelFunction,
+    TextFunction, SpacedCommand,
     ]
 
 
 
 
-import sys
+
+
+
 
 
 class ParameterDefinition(object):
@@ -4130,6 +4664,7 @@ class ParameterDefinition(object):
   "[] parameters are optional, {} parameters are mandatory."
   "Each parameter has a one-character name, like {$1} or {$p}."
   "A parameter that ends in ! like {$p!} is a literal."
+  "Example: [$1]{$p!} reads an optional parameter $1 and a literal mandatory parameter p."
 
   parambrackets = [('[', ']'), ('{', '}')]
 
@@ -4149,14 +4684,14 @@ class ParameterDefinition(object):
         if not pos.checkskip('$'):
           Trace.error('Wrong parameter name ' + pos.current())
           return None
-        self.name = pos.currentskip()
+        self.name = pos.skipcurrent()
         if pos.checkskip('!'):
           self.literal = True
         if not pos.checkskip(closing):
-          Trace.error('Wrong parameter closing ' + pos.currentskip())
+          Trace.error('Wrong parameter closing ' + pos.skipcurrent())
           return None
         return self
-    Trace.error('Wrong character in parameter template' + pos.currentskip())
+    Trace.error('Wrong character in parameter template: ' + pos.skipcurrent())
     return None
 
   def read(self, pos, function):
@@ -4182,17 +4717,9 @@ class ParameterDefinition(object):
       result += ' (empty)'
     return result
 
-class HybridFunction(CommandBit):
-  "Read a function with a variable number of parameters, defined in a template."
-
-  commandmap = FormulaConfig.hybridfunctions
-
-  def parsebit(self, pos):
-    "Parse a function with [] and {} parameters"
-    readtemplate = self.translated[0]
-    writetemplate = self.translated[1]
-    self.readparams(readtemplate, pos)
-    self.contents = self.writeparams(writetemplate)
+class ParameterFunction(CommandBit):
+  "A function with a variable number of parameters defined in a template."
+  "The parameters are defined as a parameter definition."
 
   def readparams(self, readtemplate, pos):
     "Read the params according to the template."
@@ -4208,6 +4735,49 @@ class HybridFunction(CommandBit):
       paramdef = ParameterDefinition().parse(pos)
       if paramdef:
         yield paramdef
+
+  def getparam(self, name):
+    "Get a parameter as parsed."
+    if not name in self.params:
+      return None
+    return self.params[name]
+
+  def getvalue(self, name):
+    "Get the value of a parameter."
+    return self.getparam(name).value
+
+  def getliteralvalue(self, name):
+    "Get the literal value of a parameter."
+    param = self.getparam(name)
+    if not param or not param.literalvalue:
+      return None
+    return param.literalvalue
+
+  def getintvalue(self, name):
+    "Get the value of a literal parameter as an int."
+    value = self.getliteralvalue(name)
+    if not value:
+      return 0
+    return int(value)
+
+class HybridFunction(ParameterFunction):
+  """
+  A parameter function where the output is also defined using a template.
+  The template can use a number of functions; each function has an associated tag.
+  Example: [f0{$1},span class="fbox"] defines a function f0 which corresponds to
+  a span of class fbox, yielding <span class="fbox">$1</span>.
+  Literal parameters can be used in tags definitions: [f0{$1},span style="color: $p;"]
+  yields <span style="color: $p;">$1</span>, where $p is a literal parameter.
+  """
+
+  commandmap = FormulaConfig.hybridfunctions
+
+  def parsebit(self, pos):
+    "Parse a function with [] and {} parameters"
+    readtemplate = self.translated[0]
+    writetemplate = self.translated[1]
+    self.readparams(readtemplate, pos)
+    self.contents = self.writeparams(writetemplate)
 
   def writeparams(self, writetemplate):
     "Write all params according to the template"
@@ -4226,12 +4796,12 @@ class HybridFunction(CommandBit):
         if function:
           result.append(function)
       else:
-        result.append(FormulaConstant(pos.currentskip()))
+        result.append(FormulaConstant(pos.skipcurrent()))
     return result
 
   def writeparam(self, pos):
     "Write a single param of the form $0, $x..."
-    name = '$' + pos.currentskip()
+    name = '$' + pos.skipcurrent()
     if not name in self.params:
       Trace.error('Unknown parameter ' + name)
       return None
@@ -4263,7 +4833,7 @@ class HybridFunction(CommandBit):
     if not pos.current().isdigit():
       Trace.error('Function should be f0,...,f9: f' + pos.current())
       return None
-    index = int(pos.currentskip())
+    index = int(pos.skipcurrent())
     if 2 + index > len(self.translated):
       Trace.error('Function f' + unicode(index) + ' is not defined')
       return None
@@ -4283,9 +4853,1129 @@ class HybridFunction(CommandBit):
         tag = tag.replace(variable, value)
     return tag
 
-FormulaCommand.commandbits += [
-    HybridFunction(),
+FormulaCommand.types += [HybridFunction]
+
+
+
+class MathMacro(object):
+  "A math macro: command, parameters, default values, definition."
+
+  macros = dict()
+
+  def __init__(self):
+    self.newcommand = None
+    self.parameternumber = 0
+    self.defaults = []
+    self.definition = None
+
+  def instantiate(self):
+    "Return an instance of the macro."
+    return self.definition.clone()
+
+class MacroParameter(FormulaBit):
+  "A parameter from a macro."
+
+  def detect(self, pos):
+    "Find a macro parameter: #n."
+    return pos.checkfor('#')
+
+  def parsebit(self, pos):
+    "Parse the parameter: #n."
+    if not pos.checkskip('#'):
+      Trace.error('Missing parameter start #.')
+      return
+    self.number = int(pos.skipcurrent())
+    self.original = '#' + unicode(self.number)
+    self.contents = [TaggedBit().constant('#' + unicode(self.number), 'span class="unknown"')]
+
+class DefiningFunction(ParameterFunction):
+  "Read a function that defines a new command (a macro)."
+
+  commandmap = FormulaConfig.definingfunctions
+
+  def parsebit(self, pos):
+    "Parse a function with [] and {} parameters."
+    if self.factory.detecttype(Bracket, pos):
+      newcommand = self.parseliteral(pos)
+    elif self.factory.detecttype(FormulaCommand, pos):
+      newcommand = self.factory.create(FormulaCommand).extractcommand(pos)
+    else:
+      Trace.error('Unknown formula bit in defining function at ' + pos.identifier())
+      return
+    template = self.translated
+    self.factory.defining = True
+    self.readparams(template, pos)
+    self.factory.defining = False
+    self.contents = []
+    macro = MathMacro()
+    macro.newcommand = newcommand
+    macro.parameternumber = self.getintvalue('$n')
+    Trace.debug('New command ' + newcommand + ' (' + \
+        unicode(macro.parameternumber) + ' parameters)')
+    macro.definition = self.getvalue('$d')
+    self.extractdefaults(macro)
+    MathMacro.macros[newcommand] = macro
+
+  def extractdefaults(self, macro):
+    "Extract the default values for existing parameters."
+    for index in range(9):
+      value = self.extractdefault(index + 1)
+      if not value:
+        return
+      macro.defaults.append(value)
+
+  def extractdefault(self, index):
+    "Extract the default value for parameter index."
+    value = self.getvalue('$' + unicode(index))
+    if not value:
+      return None
+    if len(value.contents) == 0:
+      return FormulaConstant('')
+    return value
+
+class MacroFunction(CommandBit):
+  "A function that was defined using a macro."
+
+  commandmap = MathMacro.macros
+
+  def parsebit(self, pos):
+    "Parse a number of input parameters."
+    self.output = FilteredOutput()
+    self.values = []
+    macro = self.translated
+    self.parseparameters(pos, macro)
+    self.completemacro(macro)
+
+  def parseparameters(self, pos, macro):
+    "Parse as many parameters as are needed."
+    self.parseoptional(pos, list(macro.defaults))
+    self.parsemandatory(pos, macro.parameternumber - len(macro.defaults))
+    while self.factory.detecttype(Bracket, pos):
+      self.values.append(self.parseparameter(pos))
+    remaining = macro.parameternumber - len(self.values)
+    if remaining > 0:
+      self.parsenumbers(remaining, pos)
+    if len(self.values) < macro.parameternumber:
+      Trace.error('Missing parameters in macro ' + unicode(self))
+
+  def parseoptional(self, pos, defaults):
+    "Parse optional parameters."
+    optional = []
+    while self.factory.detecttype(SquareBracket, pos):
+      optional.append(self.parsesquare(pos))
+      if len(optional) > len(defaults):
+        break
+    for value in optional:
+      default = defaults.pop()
+      if len(value.contents) > 0:
+        self.values.append(value)
+      else:
+        self.values.append(default)
+    self.values += defaults
+
+  def parsemandatory(self, pos, number):
+    "Parse a number of mandatory parameters."
+    for index in range(number):
+      parameter = self.parsemacroparameter(pos, number - index)
+      if not parameter:
+        return
+      self.values.append(parameter)
+
+  def parsemacroparameter(self, pos, remaining):
+    "Parse a macro parameter. Could be a bracket or a single letter."
+    "If there are just two values remaining and there is a running number,"
+    "parse as two separater numbers."
+    if pos.finished():
+      return None
+    if self.factory.detecttype(FormulaNumber, pos):
+      return self.parsenumbers(pos, remaining)
+    return self.parseparameter(pos)
+
+  def parsenumbers(self, pos, remaining):
+    "Parse the remaining parameters as a running number."
+    "For example, 12 would be {1}{2}."
+    number = self.factory.parsetype(FormulaNumber, pos)
+    if not len(number.original) == remaining:
+      return number
+    for digit in number.original:
+      value = self.factory.create(FormulaNumber)
+      value.add(FormulaConstant(digit))
+      value.type = number
+      self.values.append(value)
+    return None
+
+  def completemacro(self, macro):
+    "Complete the macro with the parameters read."
+    self.contents = [macro.instantiate()]
+    replaced = [False] * len(self.values)
+    for parameter in self.searchall(MacroParameter):
+      index = parameter.number - 1
+      if index >= len(self.values):
+        Trace.error('Macro parameter index out of bounds: ' + unicode(index))
+        return
+      replaced[index] = True
+      parameter.contents = [self.values[index].clone()]
+    for index in range(len(self.values)):
+      if not replaced[index]:
+        self.addfilter(index, self.values[index])
+
+  def addfilter(self, index, value):
+    "Add a filter for the given parameter number and parameter value."
+    original = '#' + unicode(index + 1)
+    value = ''.join(self.values[0].gethtml())
+    self.output.addfilter(original, value)
+
+class FormulaMacro(Formula):
+  "A math macro defined in an inset."
+
+  def __init__(self):
+    self.parser = MacroParser()
+    self.output = EmptyOutput()
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Math macro'
+
+FormulaFactory.types += [ MacroParameter ]
+
+FormulaCommand.types += [
+    DefiningFunction, MacroFunction,
     ]
+
+
+
+
+
+
+class SideNote(Container):
+  "A side note that appears at the right."
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput()
+
+  def process(self):
+    "Enclose everything in a marginal span."
+    self.output.settag('span class="Marginal"', True)
+
+class FootnoteMarker(Container):
+  "A marker for a footnote."
+
+  def __init__(self):
+    "Set the correct span class."
+    self.contents = []
+    span = 'span class="SupFootMarker"'
+    if Options.alignfoot:
+      span = 'span class="AlignFootMarker"'
+    self.output = TaggedOutput().settag(span, False)
+    mode = 'A'
+    if Options.numberfoot:
+      mode = '1'
+    if Options.symbolfoot:
+      mode = '*'
+    NumberGenerator.generator.getcounter('Footnote').setmode(mode)
+
+  def create(self):
+    "Create the marker for a footnote."
+    self.order = NumberGenerator.generator.generate('Footnote')
+    if Options.endfoot:
+      self.link = Link().complete(self.getmark(), 'footmarker-' + self.order)
+    self.createcontents()
+    return self
+
+  def createanchor(self, marker):
+    "Create the anchor for a footnote. Adds a link for end footnotes."
+    self.order = marker.order
+    if Options.endfoot:
+      self.link = Link().complete(self.getmark(), 'footnote-' + self.order)
+      self.link.setmutualdestination(marker.link)
+    self.createcontents()
+    return self
+
+  def createcontents(self):
+    "Create the contents of the marker."
+    if Options.endfoot:
+      self.contents = [self.link]
+    else:
+      self.contents = [Constant(self.getmark())]
+    space = Constant(u' ')
+    self.contents = [space] + self.contents + [space]
+
+  def getmark(self):
+    "Get the mark to be displayed in the marker based on the order."
+    if Options.symbolfoot:
+      return self.order
+    else:
+      return '[' + self.order + ']'
+
+class Footnote(Container):
+  "A footnote to the main text."
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput().settag('span class="FootOuter"', False)
+
+  def process(self):
+    "Add a counter for the footnote."
+    "Can be numeric or a letter depending on runtime options."
+    marker = FootnoteMarker().create()
+    anchor = FootnoteMarker().createanchor(marker)
+    notecontents = [anchor] + list(self.contents)
+    self.contents = [marker]
+    if Options.hoverfoot:
+      self.contents.append(self.createnote(notecontents, 'span class="HoverFoot"'))
+    if Options.marginfoot:
+      self.contents.append(self.createnote(notecontents, 'span class="MarginFoot"'))
+    if Options.endfoot:
+      EndFootnotes.footnotes.append(self.createnote(notecontents, 'div class="EndFoot"'))
+
+  def createnote(self, contents, tag):
+    "Create a note with the given contents and HTML tag."
+    return TaggedText().complete(contents, tag, False)
+
+class EndFootnotes(Container):
+  "The collection of footnotes at the document end."
+
+  footnotes = []
+
+  def __init__(self):
+    "Generate all footnotes and a proper header for them all."
+    self.output = ContentsOutput()
+    header = TaggedText().constant(Translator.translate('footnotes'), 'h1 class="index"')
+    self.contents = [header] + self.footnotes
+
+class Note(Container):
+  "A LyX note of several types"
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = EmptyOutput()
+
+  def process(self):
+    "Hide note and comment, dim greyed out"
+    self.type = self.header[2]
+    if TagConfig.notes[self.type] == '':
+      return
+    self.output = TaggedOutput().settag(TagConfig.notes[self.type], True)
+
+
+
+class LyXHeader(Container):
+  "Reads the header, outputs the HTML header"
+
+  def __init__(self):
+    self.contents = []
+    self.parser = HeaderParser()
+    self.output = HeaderOutput()
+    self.parameters = dict()
+    self.partkey = PartKey().createheader('header')
+
+  def process(self):
+    "Find pdf title"
+    DocumentParameters.pdftitle = self.getheaderparameter('pdftitle')
+    documentclass = self.getheaderparameter('documentclass')
+    if documentclass in HeaderConfig.styles['article']:
+      DocumentParameters.startinglevel = 1
+    if documentclass in HeaderConfig.styles['book']:
+      DocumentParameters.bibliography = 'bibliography'
+    else:
+      DocumentParameters.bibliography = 'references'
+    if self.getheaderparameter('paragraphseparation') == 'indent':
+      DocumentParameters.indentstandard = True
+    DocumentParameters.tocdepth = self.getlevel('tocdepth')
+    DocumentParameters.maxdepth = self.getlevel('secnumdepth')
+    DocumentParameters.language = self.getheaderparameter('language')
+    if self.getheaderparameter('outputchanges') == 'true':
+      DocumentParameters.outputchanges = True
+    return self
+
+  def getheaderparameter(self, configparam):
+    "Get a parameter configured in HeaderConfig."
+    key = HeaderConfig.parameters[configparam]
+    if not key in self.parameters:
+      return None
+    return self.parameters[key]
+
+  def getlevel(self, configparam):
+    "Get a level read as a parameter from HeaderConfig."
+    paramvalue = self.getheaderparameter(configparam)
+    if not paramvalue:
+      return 0
+    value = int(paramvalue)
+    if DocumentParameters.startinglevel == 1:
+      return value
+    return value + 1
+
+class LyXPreamble(Container):
+  "The preamble at the beginning of a LyX file. Parsed for macros."
+
+  def __init__(self):
+    self.parser = PreambleParser()
+    self.output = EmptyOutput()
+
+  def process(self):
+    "Parse the LyX preamble, if needed."
+    if len(PreambleParser.preamble) == 0:
+      return
+    pos = TextPosition('\n'.join(PreambleParser.preamble))
+    while not pos.finished():
+      if self.detectfunction(pos):
+        self.parsefunction(pos)
+      else:
+        pos.globincluding('\n')
+    PreambleParser.preamble = []
+
+  def detectfunction(self, pos):
+    "Detect a macro definition or a preamble function."
+    for function in FormulaConfig.definingfunctions:
+      if pos.checkfor(function):
+        return True
+    for function in FormulaConfig.preamblefunctions:
+      if pos.checkfor(function):
+        return True
+    return False
+
+  def parsefunction(self, pos):
+    "Parse a macro definition or a preamble function."
+    command = FormulaFactory().parsetype(FormulaCommand, pos)
+    if not isinstance(command, DefiningFunction) and not isinstance(command, PreambleFunction):
+      Trace.error('Did not define a macro with ' + unicode(command))
+
+class LyXFooter(Container):
+  "Reads the footer, outputs the HTML footer"
+
+  def __init__(self):
+    self.contents = []
+    self.parser = BoundedDummy()
+    self.output = FooterOutput()
+    self.partkey = PartKey().createheader('footer')
+
+  def process(self):
+    "Include any footnotes at the end."
+    if EndFootnotes.footnotes:
+      endnotes = EndFootnotes()
+      self.contents = [endnotes]
+
+class PreambleFunction(ParameterFunction):
+  "A function which is used in the preamble to perform some operation."
+
+  commandmap = FormulaConfig.preamblefunctions
+
+  def parsebit(self, pos):
+    "Parse a function with [] and {} parameters."
+    template = self.translated[0]
+    self.readparams(template, pos)
+    operation = self.translated[1]
+    operate = getattr(self, operation)
+    operate()
+
+  def setcounter(self):
+    "Set a global counter."
+    counter = self.getliteralvalue('$p')
+    value = self.getintvalue('$n')
+    Trace.debug('Setting counter ' + unicode(counter) + ' to ' + unicode(value))
+    NumberGenerator.generator.getcounter(counter).init(value)
+
+FormulaCommand.types += [PreambleFunction]
+
+
+
+class Layout(Container):
+  "A layout (block of text) inside a lyx file"
+
+  type = 'none'
+
+  def __init__(self):
+    "Initialize the layout."
+    self.contents = []
+    self.parser = BoundedParser()
+    self.output = TaggedOutput().setbreaklines(True)
+
+  def process(self):
+    "Get the type and numerate if necessary."
+    self.type = self.header[1]
+    if self.type in TagConfig.layouts:
+      self.output.tag = TagConfig.layouts[self.type] + ' class="' + self.type + '"'
+    elif self.type.replace('*', '') in TagConfig.layouts:
+      self.output.tag = TagConfig.layouts[self.type.replace('*', '')]
+      self.output.tag += ' class="' +  self.type.replace('*', '-') + '"'
+    else:
+      self.output.tag = 'div class="' + self.type + '"'
+    self.numerate()
+
+  def numerate(self):
+    "Numerate if necessary."
+    partkey = PartKeyGenerator.forlayout(self)
+    if partkey:
+      self.partkey = partkey
+      self.output.tag = self.output.tag.replace('?', unicode(partkey.level))
+
+  def __unicode__(self):
+    "Return a printable representation."
+    if self.partkey:
+      return 'Layout ' + self.type + ' #' + unicode(self.partkey.number)
+    return 'Layout of type ' + self.type
+
+class StandardLayout(Layout):
+  "A standard layout -- can be a true div or nothing at all"
+
+  indentation = False
+
+  def process(self):
+    self.type = 'standard'
+    self.output = ContentsOutput()
+
+  def complete(self, contents):
+    "Set the contents and return it."
+    self.process()
+    self.contents = contents
+    return self
+
+class Title(Layout):
+  "The title of the whole document"
+
+  def process(self):
+    self.type = 'title'
+    self.output.tag = 'h1 class="title"'
+    title = self.extracttext()
+    DocumentTitle.title = title
+    Trace.message('Title: ' + title)
+
+class Author(Layout):
+  "The document author"
+
+  def process(self):
+    self.type = 'author'
+    self.output.tag = 'h2 class="author"'
+    author = self.extracttext()
+    Trace.debug('Author: ' + author)
+    DocumentAuthor.appendauthor(author)
+
+class Abstract(Layout):
+  "A paper abstract"
+
+  done = False
+
+  def process(self):
+    self.type = 'abstract'
+    self.output.tag = 'div class="abstract"'
+    if Abstract.done:
+      return
+    message = Translator.translate('abstract')
+    tagged = TaggedText().constant(message, 'p class="abstract-message"', True)
+    self.contents.insert(0, tagged)
+    Abstract.done = True
+
+class FirstWorder(Layout):
+  "A layout where the first word is extracted"
+
+  def extractfirstword(self):
+    "Extract the first word as a list"
+    return self.clonecontents(self.contents)
+
+  def clonecontents(self, contents):
+    "Extract the first word in contents."
+    firstcontents = []
+    while len(contents) > 0:
+      if self.spaceincontainer(contents[0]):
+        cloned = self.clonecontainer(contents[0])
+        firstcontents.append(cloned)
+        return firstcontents
+      firstcontents.append(contents[0])
+      del contents[0]
+    return firstcontents
+
+  def clonecontainer(self, container):
+    "Clone a container including the output."
+    if isinstance(container, StringContainer):
+      return self.clonestring(container)
+    result = Cloner.clone(container)
+    result.output = container.output
+    result.contents = self.clonecontents(container.contents)
+    return result
+
+  def clonestring(self, container):
+    "Extract the first word from a string container."
+    if not ' ' in container.string:
+      Trace.error('No space in string ' + container.string)
+      return container
+    split = container.string.split(' ', 1)
+    container.string = split[1]
+    return Constant(split[0])
+
+  def spaceincontainer(self, container):
+    "Find out if the container contains a space somewhere."
+    return ' ' in container.extracttext()
+
+class Description(FirstWorder):
+  "A description layout"
+
+  def process(self):
+    "Set the first word to bold"
+    self.type = 'Description'
+    self.output.tag = 'div class="Description"'
+    firstword = self.extractfirstword()
+    if not firstword:
+      return
+    tag = 'span class="Description-entry"'
+    self.contents.insert(0, TaggedText().complete(firstword, tag))
+    self.contents.insert(1, Constant(u' '))
+
+class List(FirstWorder):
+  "A list layout"
+
+  def process(self):
+    "Set the first word to bold"
+    self.type = 'List'
+    self.output.tag = 'div class="List"'
+    firstword = self.extractfirstword()
+    if not firstword:
+      return
+    first = TaggedText().complete(firstword, 'span class="List-entry"')
+    second = TaggedText().complete(self.contents, 'span class="List-contents"')
+    self.contents = [first, second]
+
+class PlainLayout(Layout):
+  "A plain layout"
+
+  def process(self):
+    "Output just as contents."
+    self.output = ContentsOutput()
+    self.type = 'Plain'
+
+  def makevisible(self):
+    "Make the layout visible, output as tagged text."
+    self.output = TaggedOutput().settag('div class="PlainVisible"', True)
+
+class LyXCode(Layout):
+  "A bit of LyX-Code."
+
+  def process(self):
+    "Output as pre."
+    self.output.tag = 'pre class="LyX-Code"'
+    for newline in self.searchall(Newline):
+      index = newline.parent.contents.index(newline)
+      newline.parent.contents[index] = Constant('\n')
+
+class PostLayout(object):
+  "Numerate an indexed layout"
+
+  processedclass = Layout
+
+  def postprocess(self, last, layout, next):
+    "Group layouts and/or number them."
+    if layout.type in TagConfig.group['layouts']:
+      return self.group(last, layout)
+    if layout.partkey:
+      self.number(layout)
+    return layout
+
+  def group(self, last, layout):
+    "Group two layouts if they are the same type."
+    if not self.isgroupable(layout) or not self.isgroupable(last) or last.type != layout.type:
+      return layout
+    layout.contents = last.contents + [Constant('<br/>\n')] + layout.contents
+    last.contents = []
+    last.output = EmptyOutput()
+    return layout
+
+  def isgroupable(self, container):
+    "Check that the container can be grouped."
+    if not isinstance(container, Layout):
+      return False
+    for element in container.contents:
+      if not element.__class__.__name__ in LayoutConfig.groupable['allowed']:
+        return False
+    return True
+
+  def number(self, layout):
+    "Generate a number and place it before the text"
+    layout.partkey.addtoclabel(layout)
+
+class PostStandard(object):
+  "Convert any standard spans in root to divs"
+
+  processedclass = StandardLayout
+
+  def postprocess(self, last, standard, next):
+    "Switch to div, and clear if empty."
+    type = 'Standard'
+    if self.isempty(standard):
+      standard.output = EmptyOutput()
+      return standard
+    if DocumentParameters.indentstandard:
+      if isinstance(last, StandardLayout):
+        type = 'Indented'
+      else:
+        type = 'Unindented'
+    standard.output = TaggedOutput().settag('div class="' + type + '"', True)
+    return standard
+
+  def isempty(self, standard):
+    "Find out if the standard layout is empty."
+    for element in standard.contents:
+      if not element.output.isempty():
+        return False
+    return True
+
+class PostPlainLayout(PostLayout):
+  "Numerate a plain layout"
+
+  processedclass = PlainLayout
+
+  def postprocess(self, last, plain, next):
+    "Group plain layouts."
+    if not self.istext(last) or not self.istext(plain):
+      return plain
+    plain.makevisible()
+    return self.group(last, plain)
+
+  def istext(self, container):
+    "Find out if the container is only text."
+    if not isinstance(container, PlainLayout):
+      return False
+    extractor = ContainerExtractor(TOCConfig.extractplain)
+    text = extractor.extract(container)
+    return (len(text) > 0)
+
+class PostLyXCode(object):
+  "Coalesce contiguous LyX-Code layouts."
+
+  processedclass = LyXCode
+
+  def postprocess(self, last, lyxcode, next):
+    "Coalesce if last was also LyXCode"
+    if not isinstance(last, LyXCode):
+      return lyxcode
+    if hasattr(last, 'first'):
+      lyxcode.first = last.first
+    else:
+      lyxcode.first = last
+    toappend = lyxcode.first.contents
+    toappend.append(Constant('\n'))
+    toappend += lyxcode.contents
+    lyxcode.output = EmptyOutput()
+    return lyxcode
+
+Postprocessor.stages += [
+    PostLayout, PostStandard, PostLyXCode, PostPlainLayout
+    ]
+
+
+
+class BiblioCitation(Container):
+  "A complete bibliography citation (possibly with many cites)."
+
+  citations = dict()
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput().settag('span class="bibcites"')
+    self.contents = []
+
+  def process(self):
+    "Process the complete citation and all cites within."
+    self.contents = [Constant('[')]
+    keys = self.getparameterlist('key')
+    for key in keys:
+      self.contents += [BiblioCite().create(key), Constant(', ')]
+    if len(keys) > 0:
+      # remove trailing ,
+      self.contents.pop()
+    self.contents.append(Constant(']'))
+
+class BiblioCite(Link):
+  "Cite of a bibliography entry"
+
+  cites = dict()
+
+  def create(self, key):
+    "Create the cite to the given key."
+    self.key = key
+    number = NumberGenerator.generator.generate('bibliocite')
+    ref = BiblioReference().create(key, number)
+    self.complete(number, 'cite-' + number, type='bibliocite')
+    self.setmutualdestination(ref)
+    if not key in BiblioCite.cites:
+      BiblioCite.cites[key] = []
+    BiblioCite.cites[key].append(self)
+    return self
+
+class Bibliography(Container):
+  "A bibliography layout containing an entry"
+
+  def __init__(self):
+    self.parser = BoundedParser()
+    self.output = TaggedOutput().settag('p class="biblio"', True)
+
+class BiblioHeader(Container):
+  "The header of the bibliography."
+
+  def __init__(self):
+    "Create the header for the bibliography section."
+    self.type = 'biblio'
+    self.output = ContentsOutput()
+    self.name = Translator.translate(DocumentParameters.bibliography)
+    self.contents = [TaggedText().constant(self.name, 'h1 class="biblio"', True)]
+
+  def addtotoc(self, parent):
+    "Add the bibliography header to the TOC."
+    self.parent = parent
+    self.partkey = PartKeyGenerator.forindex(self)
+    if not self.partkey:
+      return
+    self.partkey.addtoclabel(self)
+    while parent:
+      parent.partkey = self.partkey
+      parent = parent.parent
+
+class PostBiblio(object):
+  "Insert a Bibliography legend before the first item"
+
+  processedclass = Bibliography
+
+  def postprocess(self, last, element, next):
+    "If we have the first bibliography insert a tag"
+    if isinstance(last, Bibliography) or Options.nobib:
+      return element
+    layout = StandardLayout()
+    header = BiblioHeader()
+    header.addtotoc(layout)
+    layout.complete([header, element])
+    return layout
+
+Postprocessor.stages += [PostBiblio]
+
+class BiblioReference(Link):
+  "A reference to a bibliographical entry."
+
+  references = dict()
+
+  def create(self, key, number):
+    "Create the reference with the given key and number."
+    self.key = key
+    self.complete(number, 'biblio-' + number, type='biblioentry')
+    if not key in BiblioReference.references:
+      BiblioReference.references[key] = []
+    BiblioReference.references[key].append(self)
+    return self
+
+class BiblioEntry(Container):
+  "A bibliography entry"
+
+  entries = dict()
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput().settag('span class="entry"')
+    self.contents = []
+
+  def process(self):
+    "Process the cites for the entry's key"
+    self.citeref = [Constant(NumberGenerator.generator.generate('biblioentry'))]
+    self.processcites(self.getparameter('key'))
+
+  def processcites(self, key):
+    "Get all the cites of the entry"
+    self.key = key
+    if not key in BiblioReference.references:
+      self.contents.append(Constant('[-] '))
+      return
+    self.contents = [Constant('[')]
+    for ref in BiblioReference.references[key]:
+      self.contents.append(ref)
+      self.contents.append(Constant(','))
+    self.contents.pop(-1)
+    self.contents.append(Constant('] '))
+
+
+
+
+
+
+
+
+
+
+class Processor(object):
+  "Process a container and its contents."
+
+  prestages = []
+  skipfiltered = ['LyXHeader', 'LyXFooter', 'Title', 'Author', 'TableOfContents']
+
+  def __init__(self, filtering):
+    "Set filtering mode (to skip postprocessing)."
+    "With filtering on, the classes in skipfiltered are not processed at all."
+    self.filtering = filtering
+    self.postprocessor = Postprocessor()
+
+  def process(self, container):
+    "Do the whole processing on a container."
+    if self.filtering and container.__class__.__name__ in self.skipfiltered:
+      return None
+    container = self.preprocess(container)
+    self.processcontainer(container)
+    if not container:
+      # do not postprocess empty containers from here
+      return container
+    return self.postprocess(container)
+
+  def preprocess(self, root):
+    "Preprocess a root container with all prestages."
+    if not root:
+      return None
+    for stage in self.prestages:
+      root = stage.preprocess(root)
+      if not root:
+        return None
+    return root
+
+  def processcontainer(self, container):
+    "Process a container and its contents, recursively."
+    if not container:
+      return
+    for element in container.contents:
+      self.processcontainer(element)
+    container.process()
+
+  def postprocess(self, container):
+    "Postprocess a container, unless filtering is on."
+    if self.filtering:
+      return container
+    return self.postprocessor.postprocess(container)
+
+
+
+class ListInset(Container):
+  "An inset with a list, normally made of links."
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = ContentsOutput()
+
+  def sortdictionary(self, dictionary):
+    "Sort all entries in the dictionary"
+    keys = dictionary.keys()
+    # sort by name
+    keys.sort()
+    return keys
+
+  sortdictionary = classmethod(sortdictionary)
+
+class ListOf(ListInset):
+  "A list of entities (figures, tables, algorithms)"
+
+  def process(self):
+    "Parse the header and get the type"
+    self.type = self.header[2]
+    text = Translator.translate('list-' + self.type)
+    self.contents = [TaggedText().constant(text, 'div class="tocheader"', True)]
+
+class TableOfContents(ListInset):
+  "Table of contents"
+
+  def process(self):
+    "Parse the header and get the type"
+    self.create(Translator.translate('toc'))
+
+  def create(self, heading):
+    "Create a table of contents with the given heading text."
+    self.output = TaggedOutput().settag('div class="fulltoc"', True)
+    self.contents = [TaggedText().constant(heading, 'div class="tocheader"', True)]
+    return self
+
+  def add(self, entry):
+    "Add a new entry to the TOC."
+    self.contents.append(entry)
+
+class IndexReference(Link):
+  "A reference to an entry in the alphabetical index."
+
+  name = 'none'
+
+  def process(self):
+    "Put entry in index"
+    name = self.getparameter('name')
+    if name:
+      self.name = name.strip()
+    else:
+      self.name = self.extracttext()
+    IndexEntry.get(self.name).addref(self)
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Reference to ' + self.name
+
+class IndexHeader(Link):
+  "The header line for an index entry. Keeps all arrows."
+
+  keyescapes = {'!':'', '|':'-', ' ':'-', '--':'-', ',':'', '\\':'', '@':'_', u'°':''}
+
+  def create(self, names):
+    "Create the header for the given index entry."
+    self.output = TaggedOutput().settag('p class="printindex"', True)
+    self.name = names[-1]
+    keys = [self.escape(part, self.keyescapes) for part in names]
+    self.key = '-'.join(keys)
+    self.anchor = Link().complete('', 'index-' + self.key, None, 'printindex')
+    self.contents = [self.anchor, Constant(self.name + ': ')]
+    self.arrows = []
+    return self
+
+  def addref(self, reference):
+    "Create an arrow pointing to a reference."
+    reference.index = unicode(len(self.arrows))
+    reference.destination = self.anchor
+    reference.complete(u'↓', 'entry-' + self.key + '-' + reference.index)
+    arrow = Link().complete(u'↑', type = 'IndexArrow')
+    arrow.destination = reference
+    if len(self.arrows) > 0:
+      self.contents.append(Constant(u', '))
+    self.arrows.append(arrow)
+    self.contents.append(arrow)
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Index header for ' + self.name
+
+class IndexGroup(Container):
+  "A group of entries in the alphabetical index, for an entry."
+
+  root = None
+
+  def create(self):
+    "Create an index group."
+    self.entries = dict()
+    self.output = EmptyOutput()
+    return self
+
+  def findentry(self, names):
+    "Find the entry with the given names."
+    if self == IndexGroup.root:
+      self.output = ContentsOutput()
+    else:
+      self.output = TaggedOutput().settag('div class="indexgroup"', True)
+    lastname = names[-1]
+    if not lastname in self.entries:
+      self.entries[lastname] = IndexEntry().create(names)
+    return self.entries[lastname]
+
+  def sort(self):
+    "Sort all entries in the group."
+    for key in ListInset.sortdictionary(self.entries):
+      entry = self.entries[key]
+      entry.group.sort()
+      self.contents.append(entry)
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Index group'
+
+IndexGroup.root = IndexGroup().create()
+
+class IndexEntry(Container):
+  "An entry in the alphabetical index."
+  "When an index entry is of the form 'part1 ! part2 ...', "
+  "a hierarchical structure in the form of an IndexGroup is constructed."
+  "An index entry contains a mandatory header, and an optional group."
+
+  def create(self, names):
+    "Create an index entry with the given name."
+    self.output = ContentsOutput()
+    self.header = IndexHeader().create(names)
+    self.group = IndexGroup().create()
+    self.contents = [self.header, self.group]
+    return self
+
+  def addref(self, reference):
+    "Add a reference to the entry."
+    self.header.addref(reference)
+
+  def get(cls, name):
+    "Get the index entry for the given name."
+    group = IndexGroup.root
+    parts = IndexEntry.splitname(name)
+    readparts = []
+    for part in parts:
+      readparts.append(part)
+      entry = group.findentry(readparts)
+      group = entry.group
+    return entry
+
+  def splitname(cls, name):
+    "Split a name in parts divided by !."
+    return [part.strip() for part in name.split('!')]
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'Index entry for ' + self.header.name
+
+  get = classmethod(get)
+  splitname = classmethod(splitname)
+
+class PrintIndex(ListInset):
+  "Command to print an index"
+
+  def process(self):
+    "Create the alphabetic index"
+    self.name = Translator.translate('index')
+    self.partkey = PartKeyGenerator.forindex(self)
+    if not self.partkey:
+      return
+    self.contents = [TaggedText().constant(self.name, 'h1 class="index"')]
+    self.partkey.addtoclabel(self)
+    IndexGroup.root.sort()
+    self.contents.append(IndexGroup.root)
+
+class NomenclatureEntry(Link):
+  "An entry of LyX nomenclature"
+
+  entries = dict()
+
+  def process(self):
+    "Put entry in index"
+    symbol = self.getparameter('symbol')
+    description = self.getparameter('description')
+    key = symbol.replace(' ', '-').lower()
+    if key in NomenclatureEntry.entries:
+      Trace.error('Duplicated nomenclature entry ' + key)
+    self.complete(u'↓', 'noment-' + key)
+    entry = Link().complete(u'↑', 'nom-' + key)
+    entry.symbol = symbol
+    entry.description = description
+    self.setmutualdestination(entry)
+    NomenclatureEntry.entries[key] = entry
+
+class PrintNomenclature(ListInset):
+  "Print all nomenclature entries"
+
+  def process(self):
+    "Create the nomenclature."
+    self.name = Translator.translate('nomenclature')
+    self.partkey = PartKeyGenerator.forindex(self)
+    if not self.partkey:
+      return
+    self.contents = [TaggedText().constant(self.name, 'h1 class="nomenclature"')]
+    self.partkey.addtoclabel(self)
+    for key in self.sortdictionary(NomenclatureEntry.entries):
+      entry = NomenclatureEntry.entries[key]
+      contents = [entry, Constant(entry.symbol + u' ' + entry.description)]
+      text = TaggedText().complete(contents, 'div class="Nomenclated"', True)
+      self.contents.append(text)
+
+class PreListInset(object):
+  "Preprocess any container that contains a list inset."
+
+  def preprocess(self, container):
+    "Preprocess a container, extract any list inset and return it."
+    listinsets = container.searchall(ListInset)
+    if len(listinsets) == 0:
+      return container
+    if len(container.contents) > 1:
+      return container
+    return listinsets[0]
+
+Processor.prestages += [PreListInset()]
 
 
 
@@ -4387,14 +6077,19 @@ class Column(Container):
     self.parser = ColumnParser()
     self.output = EmptyOutput()
 
+  def process(self):
+    "Read size parameters if present."
+    self.size = ContainerSize().readparameters(self)
+
   def set(self, cell):
     "Set alignments in the corresponding cell"
-    alignment = self.parameters['alignment']
+    alignment = self.getparameter('alignment')
     if alignment == 'block':
       alignment = 'justify'
     cell.setattribute('align', alignment)
-    valignment = self.parameters['valignment']
+    valignment = self.getparameter('valignment')
     cell.setattribute('valign', valignment)
+    self.size.addstyle(cell)
 
 class Cell(Container):
   "A cell in a table"
@@ -4411,12 +6106,93 @@ class Cell(Container):
     "Set a cell attribute in the tag"
     self.output.tag += ' ' + attribute + '="' + unicode(value) + '"'
 
+class PostTable(object):
+  "Postprocess a table"
+
+  processedclass = Table
+
+  def postprocess(self, last, table, next):
+    "Postprocess a table: long table, multicolumn rows"
+    self.longtable(table)
+    for row in table.contents:
+      index = 0
+      while index < len(row.contents):
+        self.checkforplain(row, index)
+        self.checkmulticolumn(row, index)
+        index += 1
+    return table
+
+  def longtable(self, table):
+    "Postprocess a long table, removing unwanted rows"
+    features = table.getparameter('features')
+    if not features:
+      return
+    if not 'islongtable' in features:
+      return
+    if features['islongtable'] != 'true':
+      return
+    if self.hasrow(table, 'endfirsthead'):
+      self.removerows(table, 'endhead')
+    if self.hasrow(table, 'endlastfoot'):
+      self.removerows(table, 'endfoot')
+
+  def hasrow(self, table, attrname):
+    "Find out if the table has a row of first heads"
+    for row in table.contents:
+      if row.getparameter(attrname):
+        return True
+    return False
+
+  def removerows(self, table, attrname):
+    "Remove the head rows, since the table has first head rows."
+    for row in table.contents:
+      if row.getparameter(attrname):
+        row.output = EmptyOutput()
+
+  def checkforplain(self, row, index):
+    "Make plain layouts visible if necessary."
+    cell = row.contents[index]
+    plainlayouts = cell.searchall(PlainLayout)
+    if len(plainlayouts) <= 1:
+      return
+    for plain in plainlayouts:
+      plain.makevisible()
+
+  def checkmulticolumn(self, row, index):
+    "Process a multicolumn attribute"
+    cell = row.contents[index]
+    mc = cell.getparameter('multicolumn')
+    if not mc:
+      return
+    if mc != '1':
+      Trace.error('Unprocessed multicolumn=' + unicode(multicolumn) +
+          ' cell ' + unicode(cell))
+      return
+    total = 1
+    index += 1
+    while self.checkbounds(row, index):
+      del row.contents[index]
+      total += 1
+    cell.setmulticolumn(total)
+
+  def checkbounds(self, row, index):
+    "Check if the index is within bounds for the row"
+    if index >= len(row.contents):
+      return False
+    mc = row.contents[index].getparameter('multicolumn')
+    if mc != '2':
+      return False
+    return True
+
+Postprocessor.stages.append(PostTable)
+
 
 
 
 import struct
 import sys
 import os
+import shutil
 
 
 
@@ -4449,8 +6225,12 @@ class Path(object):
 
   def hasext(self, ext):
     "Check if the file has the given extension"
-    base, oldext = os.path.splitext(self.path)
-    return oldext == ext
+    return self.getext() == ext
+
+  def getext(self):
+    "Get the current extension of the file."
+    base, ext = os.path.splitext(self.path)
+    return ext
 
   def __unicode__(self):
     "Return a unicode string representation"
@@ -4515,89 +6295,88 @@ class OutputPath(Path):
 class Image(Container):
   "An embedded image"
 
-  ignoredtexts = ImageConfig.size['ignoredtexts']
-  vectorformats = ImageConfig.formats['vector']
-  rasterformats = ImageConfig.formats['raster']
   defaultformat = ImageConfig.formats['default']
+  size = None
+  copy = None
 
   def __init__(self):
     self.parser = InsetParser()
-    self.output = ImageOutput()
+    self.output = TaggedOutput()
     self.type = 'embedded'
-    self.width = None
-    self.height = None
-    self.maxwidth = None
-    self.maxheight = None
-    self.scale = None
 
   def process(self):
     "Place the url, convert the image if necessary."
-    self.origin = InputPath(self.parameters['filename'])
-    if not self.origin.exists():
-      Trace.error('Image ' + unicode(self.origin) + ' not found')
-      return
+    self.origin = InputPath(self.getparameter('filename'))
     self.destination = self.getdestination(self.origin)
-    self.setscale()
-    ImageConverter.instance.convert(self)
+    self.size = ContainerSize().readparameters(self)
+    if self.origin.exists():
+      ImageConverter.instance.convert(self)
+    else:
+      Trace.error('Image ' + unicode(self.origin) + ' not found')
     self.setsize()
+    self.settag()
 
   def getdestination(self, origin):
     "Convert origin path to destination path."
     "Changes extension of destination to output image format."
     destination = OutputPath(origin)
-    forceformat = '.jpg'
-    forcedest = Image.defaultformat
-    if Options.forceformat:
-      forceformat = Options.forceformat
-      forcedest = Options.forceformat
-    if not destination.hasext(forceformat):
-      destination.changeext(forcedest)
+    if Options.noconvert:
+      return destination
+    self.convertformat(destination)
     destination.removebackdirs()
     return destination
 
-  def setscale(self):
-    "Set the scale attribute if present."
-    self.setifparam('scale')
+  def convertformat(self, destination):
+    "Convert the format of the destination image."
+    if Options.copyimages:
+      return
+    imageformat = '.jpg'
+    forcedest = Image.defaultformat
+    if Options.imageformat:
+      imageformat = Options.imageformat
+      forcedest = Options.imageformat
+    if not destination.hasext(imageformat):
+      destination.changeext(forcedest)
 
   def setsize(self):
     "Set the size attributes width and height."
-    imagefile = ImageFile(self.destination)
-    width, height = imagefile.getdimensions()
-    if width:
-      self.maxwidth = unicode(width) + 'px'
-      if self.scale:
-        self.width = self.scalevalue(width)
-    if height:
-      self.maxheight = unicode(height) + 'px'
-      if self.scale:
-        self.height = self.scalevalue(height)
-    self.setifparam('width')
-    self.setifparam('height')
-
-  def setifparam(self, name):
-    "Set the value in the container if it exists as a param."
-    if not name in self.parameters:
-      return
-    value = unicode(self.parameters[name])
-    for ignored in Image.ignoredtexts:
-      if ignored in value:
-        value = value.replace(ignored, '')
-    setattr(self, name, value)
+    width, height = ImageFile(self.destination).getdimensions()
+    self.size.checkimage(width, height)
 
   def scalevalue(self, value):
     "Scale the value according to the image scale and return it as unicode."
-    scaled = value * int(self.scale) / 100
+    scaled = value * int(self.size.scale) / 100
     return unicode(int(scaled)) + 'px'
+
+  def settag(self):
+    "Set the output tag for the image."
+    tag = 'img class="' + self.type + '"'
+    if self.origin.exists():
+      url = self.destination.url
+    else:
+      url = self.origin.url
+    alt = Translator.translate('figure') + ' ' + url
+    tag += ' src="' + url + '" alt="' + alt + '"'
+    emptytag = True
+    if self.destination.hasext('.svg'):
+      self.contents = [Constant(alt)]
+      tag = 'object class="' + self.type + '" data="' + url + '"'
+      emptytag = False
+    self.output.settag(tag, True, empty=emptytag)
+    self.size.addstyle(self)
 
 class ImageConverter(object):
   "A converter from one image file to another."
+
+  vectorformats = ImageConfig.formats['vector']
+  cropboxformats = ImageConfig.cropboxformats
 
   active = True
   instance = None
 
   def convert(self, image):
     "Convert an image to PNG"
-    if not ImageConverter.active:
+    if not ImageConverter.active or Options.noconvert:
       return
     if image.origin.path == image.destination.path:
       return
@@ -4606,6 +6385,10 @@ class ImageConverter(object):
         # file has not changed; do not convert
         return
     image.destination.createdirs()
+    if Options.copyimages:
+      Trace.debug('Copying ' + image.origin.path + ' to ' + image.destination.path)
+      shutil.copy2(image.origin.path, image.destination.path)
+      return
     converter, command = self.buildcommand(image)
     try:
       Trace.debug(converter + ' command: "' + command + '"')
@@ -4652,15 +6435,15 @@ class ImageConverter(object):
     params = dict()
     params['input'] = image.origin
     params['output'] = image.destination
-    if image.origin.hasexts(Image.vectorformats):
+    if image.origin.hasexts(self.vectorformats):
       scale = 100
-      if image.scale:
-        scale = image.scale
+      if image.size.scale:
+        scale = image.size.scale
         # descale
-        image.scale = None
+        image.size.scale = None
       params['scale'] = scale
-    # elif image.origin.hasext('.pdf'):
-      # params['define'] = 'pdf:use-cropbox=true'
+    if image.origin.getext() in self.cropboxformats:
+      params['format'] = self.cropboxformats[image.origin.getext()]
     return params
 
 ImageConverter.instance = ImageConverter()
@@ -4685,6 +6468,8 @@ class ImageFile(object):
       dimensions = self.getpngdimensions()
     elif self.path.hasext('.jpg'):
       dimensions = self.getjpgdimensions()
+    elif self.path.hasext('.svg'):
+      dimensions = self.getsvgdimensions()
     ImageFile.dimensions[unicode(self.path)] = dimensions
     return dimensions
 
@@ -4710,6 +6495,10 @@ class ImageFile(object):
     width = self.readword(jpgfile)
     jpgfile.close()
     return (width, height)
+
+  def getsvgdimensions(self):
+    "Get the dimensions of a SVG image."
+    return (None, None)
 
   def skipheaders(self, file, hexvalues):
     "Skip JPEG headers until one of the parameter headers is found"
@@ -4746,41 +6535,6 @@ class ImageFile(object):
     "Seek forward, just by reading the given number of bytes"
     file.read(bytes)
 
-class ImageOutput(object):
-  "Returns an image in the output"
-
-  def gethtml(self, container):
-    "Get the HTML output of the image as a list"
-    html = ['<img class="' + container.type + '"']
-    if container.origin.exists():
-      html += self.getimagehtml(container)
-    else:
-      html.append(' src="' + container.origin.url + '"')
-    html.append('/>\n')
-    return html
-
-  def getimagehtml(self, container):
-    "Get the HTML corresponding to the image."
-    if container.width and not container.height:
-      container.height = 'auto'
-    if container.height and not container.width:
-      container.width = 'auto'
-    html = []
-    figure = Translator.translate('figure')
-    html.append(' src="' + container.destination.url +
-        '" alt="' + figure + ' ' + container.destination.url + '"')
-    html.append(' style="')
-    if container.width:
-      html.append('width: ' + container.width + '; ')
-    if container.maxwidth:
-      html.append('max-width: ' + container.maxwidth + '; ')
-    if container.height:
-      html.append('height: ' + container.height + '; ')
-    if container.maxheight:
-      html.append('max-height: ' + container.maxheight + '; ')
-    html.append('"')
-    return html
-
 
 
 
@@ -4789,11 +6543,12 @@ class ImageOutput(object):
 class ListItem(Container):
   "An element in a list"
 
+  type = 'none'
+
   def __init__(self):
-    "Output should be empty until the postprocessor can group items"
-    self.contents = list()
+    "Create a list item."
     self.parser = BoundedParser()
-    self.output = EmptyOutput()
+    self.output = ContentsOutput()
 
   def process(self):
     "Set the correct type and contents."
@@ -4808,9 +6563,10 @@ class DeeperList(Container):
   "A nested list"
 
   def __init__(self):
-    "Output should be empty until the postprocessor can group items"
+    "Create a nested list element."
     self.parser = BoundedParser()
-    self.output = EmptyOutput()
+    self.output = ContentsOutput()
+    self.contents = []
 
   def process(self):
     "Create the deeper list"
@@ -4841,7 +6597,6 @@ class PendingList(object):
     "Add a deeper list item"
     if self.empty():
       self.insertfake()
-    item = self.contents[-1]
     self.contents[-1].contents += deeper.contents
 
   def generate(self):
@@ -4925,49 +6680,264 @@ Postprocessor.stages += [PostListItem, PostDeeperList]
 
 
 
-import os
-import sys
-import codecs
 
 
-class BulkFile(object):
-  "A file to treat in bulk"
+class Float(Container):
+  "A floating inset"
 
-  def __init__(self, filename):
-    self.filename = filename
-    self.temp = self.filename + '.temp'
+  type = 'none'
 
-  def readall(self):
-    "Read the whole file"
-    for encoding in FileConfig.parsing['encodings']:
-      try:
-        return self.readcodec(encoding)
-      except UnicodeDecodeError:
-        pass
-    Trace.error('No suitable encoding for ' + self.filename)
-    return []
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput().settag('div class="float"', True)
 
-  def readcodec(self, encoding):
-    "Read the whole file with the given encoding"
-    filein = codecs.open(self.filename, 'rU', encoding)
-    lines = filein.readlines()
-    filein.close()
-    return lines
+  def process(self):
+    "Get the float type."
+    self.type = self.header[2]
+    self.processnumber()
+    self.processfloats()
+    self.processtags()
 
-  def getfiles(self):
-    "Get reader and writer for a file name"
-    reader = LineReader(self.filename)
-    writer = LineWriter(self.temp)
-    return reader, writer
+  def isparent(self):
+    "Find out whether the float is the parent float or is contained in another float."
+    current = self.parent
+    while current:
+      if isinstance(current, Float):
+        return False
+      current = current.parent
+    return True
 
-  def swaptemp(self):
-    "Swap the temp file for the original"
-    os.chmod(self.temp, os.stat(self.filename).st_mode)
-    os.rename(self.temp, self.filename)
+  def processnumber(self):
+    "Number a float if it isn't numbered."
+    if not self.isparent():
+      # do nothing; parent will take care of numbering
+      return
+    number = NumberGenerator.chaptered.generate(self.type)
+    entry = number
+    if not Options.notoclabels:
+      entry = Translator.translate('float-' + self.type) + entry
+    self.partkey = PartKey().createfloat(entry, number)
+
+  def processtags(self):
+    "Process the HTML tags."
+    tagged = self.embed()
+    self.applywideningtag(tagged)
+
+  def embed(self):
+    "Embed the whole contents in a div."
+    embeddedtag = self.getembeddedtag()
+    tagged = TaggedText().complete(self.contents, embeddedtag, True)
+    self.contents = [tagged]
+    return tagged
+
+  def processfloats(self):
+    "Process all floats contained inside."
+    floats = self.searchall(Float)
+    counter = NumberCounter('subfloat').setmode('a')
+    for subfloat in floats:
+      subfloat.output.tag = subfloat.output.tag.replace('div', 'span')
+      # number the float
+      counter.increase()
+      number = counter.getvalue()
+      entry = '(' + number + ')'
+      subfloat.partkey = PartKey().createfloat(entry, number)
+
+  def getembeddedtag(self):
+    "Get the tag for the embedded object."
+    floats = self.searchall(Float)
+    if len(floats) > 0:
+      return 'div class="multi' + self.type + '"'
+    return 'div class="' + self.type + '"'
+
+  def applywideningtag(self, container):
+    "Apply the tag to set float width, if present."
+    images = self.searchall(Image)
+    if len(images) != 1:
+      return ''
+    image = images[0]
+    if not image.size:
+      return
+    width = image.size.removepercentwidth()
+    if not width:
+      return
+    image.type = 'figure'
+    ContainerSize().setmax(width).addstyle(container)
+    image.settag()
+
+  def searchinside(self, type):
+    "Search for a given type in the contents"
+    return self.searchincontents(self.contents, type)
+
+  def searchincontents(self, contents, type):
+    "Search in the given contents for the required type."
+    list = []
+    for element in contents:
+      list += self.searchinelement(element, type)
+    return list
+
+  def searchinelement(self, element, type):
+    "Search for a given type outside floats"
+    if isinstance(element, Float):
+      return []
+    if isinstance(element, type):
+      return [element]
+    return self.searchincontents(element.contents, type)
 
   def __unicode__(self):
-    "Get the unicode representation"
-    return 'file ' + self.filename
+    "Return a printable representation"
+    return 'Floating inset of type ' + self.type
+
+class Wrap(Float):
+  "A wrapped (floating) float"
+
+  def processtags(self):
+    "Add the widening tag to the parent tag."
+    self.embed()
+    placement = self.getparameter('placement')
+    if not placement:
+      placement = 'o'
+    self.output.tag = 'div class="wrap-' + placement + '"'
+    self.applywideningtag(self)
+
+class Caption(Container):
+  "A caption for a figure or a table"
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput().settag('div class="caption"', True)
+
+  def create(self, message):
+    "Create a caption with a given message."
+    self.contents = [Constant(message)]
+    return self
+
+class Listing(Container):
+  "A code listing"
+
+  processor = None
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = TaggedOutput().settag('div class="listing"', True)
+    self.numbered = None
+    # DCB : Use the default brush
+    self.brush = Options.defaultbrush
+
+  def process(self):
+    "Remove all layouts"
+    self.counter = 0
+    self.type = 'listing'
+    self.processparams()
+    if Listing.processor:
+      Listing.processor.preprocess(self)
+    newcontents = []
+    captions = []
+    for container in self.contents:
+      # DCB : We don't want inset captions inside the <pre/>, so we filter
+      # them out and save them for later
+      if container.searchall(Caption) == []:
+        newcontents += self.extract(container)
+      else:
+        captions.insert(0, container)
+
+    # DCB: Add highlighting via brush
+    if self.brush:
+      tagged = TaggedText().complete(newcontents, 'pre class="listing brush: ' + self.brush + '"', False)
+    else:
+      tagged = TaggedText().complete(newcontents, 'pre class="listing', False)
+
+    self.contents = [tagged]
+    # DCB: If we found an inset caption, use the last one
+    if captions != []:
+      self.contents.insert(0, captions[0])
+    else:
+      # DCB: If we had no inset captions, use any in the listings params
+      if 'caption' in self.lstparams:
+        text = self.lstparams['caption'][1:-1]
+        self.contents.insert(0, Caption().create(text))
+    if Listing.processor:
+      Listing.processor.postprocess(self)
+
+  def processparams(self):
+    "Process listing parameteres."
+    LstParser().parsecontainer(self)
+    if 'numbers' in self.lstparams:
+      self.numbered = self.lstparams['numbers']
+    if 'language' in self.lstparams:
+      self.brush = self.lstparams['language'].lower()
+
+  def extract(self, container):
+    "Extract the container's contents and return them"
+    if isinstance(container, StringContainer):
+      return self.modifystring(container)
+    if isinstance(container, StandardLayout):
+      return self.modifylayout(container)
+    if isinstance(container, PlainLayout):
+      return self.modifylayout(container)
+    Trace.error('Unexpected container ' + container.__class__.__name__ +
+        ' in listing')
+    container.tree()
+    return []
+
+  def modifystring(self, string):
+    "Modify a listing string"
+    if string.string == '':
+      string.string = u'​'
+    return self.modifycontainer(string)
+
+  def modifylayout(self, layout):
+    "Modify a standard layout"
+    if len(layout.contents) == 0:
+      layout.contents = [Constant(u'​')]
+    return self.modifycontainer(layout)
+
+  def modifycontainer(self, container):
+    "Modify a listing container"
+    contents = [container, Constant('\n')]
+    if self.numbered:
+      self.counter += 1
+      tag = 'span class="number-' + self.numbered + '"'
+      contents.insert(0, TaggedText().constant(unicode(self.counter), tag))
+    return contents
+
+class FloatNumber(Container):
+  "Holds the number for a float in the caption."
+
+  def __init__(self):
+    self.output = ContentsOutput()
+
+  def create(self, float):
+    "Create the float number."
+    self.contents = [Constant(float.partkey.tocentry)]
+    return self
+
+class PostFloat(object):
+  "Postprocess a float: number it and move the label"
+
+  processedclass = Float
+
+  def postprocess(self, last, float, next):
+    "Move the label to the top and number the caption"
+    number = FloatNumber().create(float)
+    for caption in float.searchinside(Caption):
+      self.postlabels(float, caption)
+      caption.contents.insert(0, Separator(u' '))
+      caption.contents.insert(0, number)
+    return float
+
+  def postlabels(self, float, caption):
+    "Search for labels and move them to the top"
+    labels = caption.searchremove(Label)
+    if len(labels) == 0:
+      labels = [Label().create(' ', float.partkey.tocentry.replace(' ', '-'))]
+    float.contents = labels + float.contents
+
+class PostWrap(PostFloat):
+  "For a wrap: exactly like a float"
+
+  processedclass = Wrap
+
+Postprocessor.stages += [PostFloat, PostWrap]
 
 
 
@@ -5036,58 +7006,6 @@ class ShortTitle(Container):
     self.parser = InsetParser()
     self.output = EmptyOutput()
 
-class SideNote(Container):
-  "A side note that appears at the right."
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = TaggedOutput()
-
-  def process(self):
-    "Enclose everything in a marginal span."
-    self.output.settag('span class="Marginal"', True)
-
-class Footnote(Container):
-  "A footnote to the main text"
-
-  order = 0
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = ContentsOutput()
-
-  def process(self):
-    "Add a letter for the order, rotating"
-    if Options.numberfoot:
-      letter = NumberGenerator.instance.generateunique('Footnote')
-    else:
-      letter = NumberGenerator.instance.letter(Footnote.order)
-    span = 'span class="FootMarker"'
-    pre = FootnoteConfig.constants['prefrom']
-    post = FootnoteConfig.constants['postfrom']
-    fromfoot = TaggedText().constant(pre + letter + post, span)
-    self.contents.insert(0, fromfoot)
-    tag = TaggedText().complete(self.contents, 'span class="Foot"', True)
-    pre = FootnoteConfig.constants['preto']
-    post = FootnoteConfig.constants['postto']
-    tofoot = TaggedText().constant(pre + letter + post, span)
-    self.contents = [tofoot, tag]
-    Footnote.order += 1
-
-class Note(Container):
-  "A LyX note of several types"
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = EmptyOutput()
-
-  def process(self):
-    "Hide note and comment, dim greyed out"
-    self.type = self.header[2]
-    if TagConfig.notes[self.type] == '':
-      return
-    self.output = TaggedOutput().settag(TagConfig.notes[self.type], True)
-
 class FlexInset(Container):
   "A flexible inset, generic version."
 
@@ -5112,8 +7030,8 @@ class InfoInset(Container):
 
   def process(self):
     "Set the shortcut as text"
-    self.type = self.parameters['type']
-    self.contents = [Constant(self.parameters['arg'])]
+    self.type = self.getparameter('type')
+    self.contents = [Constant(self.getparameter('arg'))]
 
 class BoxInset(Container):
   "A box inset"
@@ -5126,310 +7044,177 @@ class BoxInset(Container):
     "Set the correct tag"
     self.type = self.header[2]
     self.output.settag('div class="' + self.type + '"', True)
+    ContainerSize().readparameters(self).addstyle(self)
 
-class VerticalSpace(Container):
-  "An inset that contains a vertical space."
+class PhantomText(Container):
+  "A line of invisible text (white over white)."
 
   def __init__(self):
     self.parser = InsetParser()
+    self.output = TaggedOutput().settag('span class="phantom"', False)
 
-  def process(self):
-    "Set the correct tag"
-    self.type = self.header[2]
-    self.output = TaggedOutput().settag('div class="' + self.type + '"', True)
+class LineInset(LyXLine):
+  "A LaTeX ruler, but parsed as an inset."
+
+  def __init__(self):
+    self.parser = InsetParser()
+    self.output = FixedOutput()
 
 class IncludeInset(Container):
   "A child document included within another."
 
   # the converter factory will be set in converter.py
   converterfactory = None
+  filename = None
 
   def __init__(self):
     self.parser = InsetParser()
     self.output = ContentsOutput()
-    self.postprocess = False
 
   def process(self):
     "Include the provided child document"
-    self.filename = os.path.join(Options.directory, self.parameters['filename'])
+    self.filename = os.path.join(Options.directory, self.getparameter('filename'))
     Trace.debug('Child document: ' + self.filename)
     LstParser().parsecontainer(self)
-    if 'LatexCommand' in self.parameters:
-      if self.parameters['LatexCommand'] == 'verbatiminput':
-        self.readverbatim()
-        return
-      if self.parameters['LatexCommand'] == 'lstinputlisting':
-        self.readlisting()
-        return
+    command = self.getparameter('LatexCommand')
+    if command == 'verbatiminput':
+      self.readverbatim()
+      return
+    elif command == 'lstinputlisting':
+      self.readlisting()
+      return
+    self.processinclude()
 
+  def processinclude(self):
+    "Process a regular include: standard child document."
+    self.contents = []
     olddir = Options.directory
-    newdir = os.path.dirname(self.parameters['filename'])
+    newdir = os.path.dirname(self.getparameter('filename'))
     if newdir != '':
       Trace.debug('Child dir: ' + newdir)
       Options.directory = os.path.join(Options.directory, newdir)
     try:
-      converter = IncludeInset.converterfactory.create(self)
-      converter.convert()
-      self.contents = converter.getcontents()
-    except:
-      Trace.error('Could not read ' + self.filename + ', please check that the file exists and has read permissions.')
-      self.contents = []
+      self.convertinclude()
     finally:
       Options.directory = olddir
 
+  def convertinclude(self):
+    "Convert an included document."
+    try:
+      converter = IncludeInset.converterfactory.create(self)
+    except:
+      Trace.error('Could not read ' + self.filename + ', please check that the file exists and has read permissions.')
+      return
+    if self.hasemptyoutput():
+      return
+    converter.convert()
+    self.contents = converter.getcontents()
+
   def readverbatim(self):
     "Read a verbatim document."
-    verbatim = list()
-    lines = BulkFile(self.filename).readall()
-    for line in lines:
-      verbatim.append(Constant(line))
-    self.contents = [TaggedText().complete(verbatim, 'pre', True)]
+    self.contents = [TaggedText().complete(self.readcontents(), 'pre', True)]
 
   def readlisting(self):
-    "Read a document and create a program listing"
+    "Read a document as a listing."
+    listing = Listing()
+    listing.contents = self.readcontents()
+    listing.parameters = self.parameters
+    listing.process()
+    self.contents = [listing]
+
+  def readcontents(self):
+    "Read the contents of a complete file."
+    contents = list()
     lines = BulkFile(self.filename).readall()
-    newcontents = []
     for line in lines:
-      newcontents.append(Constant(self.escape(line)))
-      
-    self.output = TaggedOutput().settag('div class="listing"', True)
-
-    lang = 'scala'
-    if 'language' in self.lstparams:
-      lang = self.lstparams['language']
-
-    tagged = TaggedText().complete(newcontents, 
-             'pre class="listing brush: '+lang+'"', False)
-    self.contents = [tagged]
-
-
-
-class Float(Container):
-  "A floating inset"
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = TaggedOutput().settag('div class="float"', True)
-    self.parentfloat = None
-    self.children = []
-    self.number = None
-
-  def process(self):
-    "Get the float type."
-    self.type = self.header[2]
-    self.processfloats()
-    self.processtags()
-    self.chapter = NumberGenerator.instance.getchapter()
-
-  def processtags(self):
-    "Process the HTML tags."
-    embeddedtag = self.getembeddedtag()
-    wideningtag = self.getwideningtag()
-    self.embed(embeddedtag + wideningtag)
-
-  def processfloats(self):
-    "Process all floats contained inside."
-    floats = self.searchall(Float)
-    for float in floats:
-      float.output.tag = float.output.tag.replace('div', 'span')
-      float.parentfloat = self
-      self.children.append(float)
-
-  def getembeddedtag(self):
-    "Get the tag for the embedded object."
-    floats = self.searchall(Float)
-    if len(floats) > 0:
-      return 'div class="multi' + self.type + '"'
-    return 'div class="' + self.type + '"'
-
-  def getwideningtag(self):
-    "Get the tag to set float width, if present."
-    images = self.searchall(Image)
-    if len(images) != 1:
-      return ''
-    image = images[0]
-    if not image.width:
-      return ''
-    if not '%' in image.width:
-      return ''
-    image.type = 'figure'
-    width = image.width
-    image.width = None
-    return ' style="max-width: ' + width + ';"'
-
-  def embed(self, tag):
-    "Embed the whole contents in a div"
-    tagged = TaggedText().complete(self.contents, tag, True)
-    self.contents = [tagged]
-
-  def searchinside(self, type):
-    "Search for a given type in the contents"
-    return self.searchincontents(self.contents, type)
-
-  def searchincontents(self, contents, type):
-    "Search in the given contents for the required type."
-    list = []
-    for element in contents:
-      list += self.searchinelement(element, type)
-    return list
-
-  def searchinelement(self, element, type):
-    "Search for a given type outside floats"
-    if isinstance(element, Float):
-      return []
-    if isinstance(element, type):
-      return [element]
-    return self.searchincontents(element.contents, type)
-
-  def __unicode__(self):
-    "Return a printable representation"
-    return 'Floating inset of type ' + self.type
-
-class Wrap(Float):
-  "A wrapped (floating) float"
-
-  def processtags(self):
-    "Add the widening tag to the parent tag."
-    embeddedtag = self.getembeddedtag()
-    self.embed(embeddedtag)
-    placement = self.parameters['placement']
-    wideningtag = self.getwideningtag()
-    self.output.tag = 'div class="wrap-' + placement + '"' + wideningtag
-
-class Caption(Container):
-  "A caption for a figure or a table"
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = TaggedOutput().settag('div class="caption"', True)
-
-class Listing(Container):
-  "A code listing"
-
-  processor = None
-
-  def __init__(self):
-    self.parser = InsetParser()
-    self.output = TaggedOutput().settag('div class="listing"', True)
-    self.numbered = None
-
-  def process(self):
-    "Remove all layouts"
-    self.counter = 0
-    self.type = 'listing'
-    self.processparams()
-    if Listing.processor:
-      Listing.processor.preprocess(self)
-    newcontents = []
-    for container in self.contents:
-      newcontents += self.extract(container)
-    lang = 'scala'
-    if 'language' in self.lstparams:
-      lang = self.lstparams['language']
-
-    tagged = TaggedText().complete(newcontents, 'pre class="listing brush: '+lang+'"', False)
-    self.contents = [tagged]
-    if Listing.processor:
-      Listing.processor.postprocess(self)
-
-  def processparams(self):
-    "Process listing parameteres."
-    LstParser().parsecontainer(self)
-    if not 'numbers' in self.lstparams:
-      return
-    self.numbered = self.lstparams['numbers']
-
-  def extract(self, container):
-    "Extract the container's contents and return them"
-    if isinstance(container, StringContainer):
-      return self.modifystring(container)
-    if isinstance(container, StandardLayout):
-      return self.modifylayout(container)
-    if isinstance(container, PlainLayout):
-      return self.modifylayout(container)
-    Trace.error('Unexpected container ' + container.__class__.__name__ +
-        ' in listing')
-    container.tree()
-    return []
-
-  def modifystring(self, string):
-    "Modify a listing string"
-    if string.string == '':
-      string.string = u'​'
-    return self.modifycontainer(string)
-
-  def modifylayout(self, layout):
-    "Modify a standard layout"
-    if len(layout.contents) == 0:
-      layout.contents = [Constant(u'​')]
-    return self.modifycontainer(layout)
-
-  def modifycontainer(self, container):
-    "Modify a listing container"
-    contents = [container, Constant('\n')]
-    if self.numbered:
-      self.counter += 1
-      tag = 'span class="number-' + self.numbered + '"'
-      contents.insert(0, TaggedText().constant(unicode(self.counter), tag))
+      contents.append(Constant(line))
     return contents
 
-class FloatNumber(Container):
-  "Holds the number for a float in the caption."
+  def __unicode__(self):
+    "Return a printable description."
+    if not self.filename:
+      return 'Included unnamed file'
+    return 'Included "' + self.filename + '"'
+
+
+
+
+
+
+class ChangeInserted(Container):
+  "A change which consists of an insertion."
 
   def __init__(self):
-    self.output = ContentsOutput()
-
-  def create(self, float):
-    "Create the float number."
-    self.contents = [Constant(float.entry)]
-    return self
-
-class PostFloat(object):
-  "Postprocess a float: number it and move the label"
-
-  processedclass = Float
-
-  def postprocess(self, last, float, next):
-    "Move the label to the top and number the caption"
-    self.postnumber(float)
-    number = FloatNumber().create(float)
-    for caption in float.searchinside(Caption):
-      self.postlabels(float, caption)
-      caption.contents.insert(0, Constant(u' '))
-      caption.contents.insert(0, number)
-    return float
-
-  def postlabels(self, float, caption):
-    "Search for labels and move them to the top"
-    labels = caption.searchremove(Label)
-    if len(labels) == 0:
-      labels = [Label().create(' ', float.entry.replace(' ', '-'))]
-    float.contents = labels + float.contents
-
-  def postnumber(self, float):
-    "Number a float if it isn't numbered."
-    if float.number:
-      return
-    if float.parentfloat:
-      self.postnumber(float.parentfloat)
-      index = float.parentfloat.children.index(float)
-      float.number = NumberGenerator.instance.letter(index).lower()
-      float.entry = '(' + float.number + ')'
+    self.parser = TextParser(self)
+    if DocumentParameters.outputchanges:
+      self.output = TaggedOutput().settag('span class="inserted"')
     else:
-      float.number = NumberGenerator.instance.generatechaptered(float.type, float.chapter)
-      float.entry = Translator.translate('float-' + float.type) + float.number
+      self.output = ContentsOutput()
 
-class PostWrap(PostFloat):
-  "For a wrap: exactly like a float"
+class ChangeDeleted(TaggedText):
+  "A change which consists of a deletion."
 
-  processedclass = Wrap
+  def __init__(self):
+    self.parser = TextParser(self)
+    if DocumentParameters.outputchanges:
+      self.output = TaggedOutput().settag('span class="deleted"')
+    else:
+      self.output = EmptyOutput()
 
-Postprocessor.stages += [PostFloat, PostWrap]
 
 
 
 
-import sys
+
+
+
+
+class BigSymbol(object):
+  "A big symbol generator."
+
+class BigBracket(BigSymbol):
+  "A big bracket generator."
+
+  def __init__(self, size, bracket):
+    "Set the size and symbol for the bracket."
+    self.size = size
+    if bracket in FormulaConfig.bigbrackets:
+      self.pieces = FormulaConfig.bigbrackets[bracket]
+    else:
+      self.pieces = [bracket, bracket]
+
+  def getpiece(self, index):
+    "Return the nth piece for the bracket."
+    if len(self.pieces) == 1:
+      return self.pieces[0]
+    if index == 0:
+      return self.pieces[0]
+    if index == self.size - 1:
+      return self.pieces[-1]
+    return self.pieces[1]
+
+  def getcell(self, index, align):
+    "Get the bracket piece as an array cell."
+    piece = self.getpiece(index)
+    return TaggedBit().constant(piece, 'span class="bracket align-' + align + '"')
+
+class CasesBrace(BigBracket):
+  "A big brace used for a case statement."
+
+  def __init__(self, size):
+    "Set the size for the brace."
+    self.size = size
+
+  def getpiece(self, index):
+    "Get the nth piece for the brace."
+    if index == 0:
+      return u'⎧'
+    if index == self.size - 1:
+      return u'⎩'
+    if index == (self.size - 1)/2:
+      return u'⎨'
+    return u'⎪'
+
 
 
 class FormulaEquation(CommandBit):
@@ -5440,88 +7225,91 @@ class FormulaEquation(CommandBit):
   def parsebit(self, pos):
     "Parse the array"
     self.output = ContentsOutput()
-    inner = WholeFormula()
-    inner.parsebit(pos)
-    self.add(inner)
+    self.add(self.factory.parsetype(WholeFormula, pos))
 
 class FormulaCell(FormulaCommand):
   "An array cell inside a row"
 
-  def __init__(self, alignment):
-    FormulaCommand.__init__(self)
+  def setalignment(self, alignment):
     self.alignment = alignment
-    self.output = TaggedOutput().settag('td class="formula-' + alignment +'"', True)
+    self.output = TaggedOutput().settag('span class="arraycell align-' + alignment +'"', True)
+    return self
 
   def parsebit(self, pos):
-    formula = WholeFormula()
-    if not formula.detect(pos):
+    self.factory.clearignored(pos)
+    if pos.finished():
+      return
+    if not self.factory.detecttype(WholeFormula, pos):
       Trace.error('Unexpected end of array cell at ' + pos.identifier())
       pos.skip(pos.current())
       return
-    formula.parsebit(pos)
-    self.add(formula)
+    self.add(self.factory.parsetype(WholeFormula, pos))
 
 class FormulaRow(FormulaCommand):
   "An array row inside an array"
 
   cellseparator = FormulaConfig.array['cellseparator']
 
-  def __init__(self, alignments):
-    FormulaCommand.__init__(self)
+  def setalignments(self, alignments):
     self.alignments = alignments
-    self.output = TaggedOutput().settag('tr', True)
+    self.output = TaggedOutput().settag('span class="arrayrow"', True)
+    return self
 
   def parsebit(self, pos):
     "Parse a whole row"
     index = 0
-    pos.pushending(FormulaRow.cellseparator, optional=True)
+    pos.pushending(self.cellseparator, optional=True)
     while not pos.finished():
       alignment = self.alignments[index % len(self.alignments)]
-      cell = FormulaCell(alignment)
+      cell = self.factory.create(FormulaCell).setalignment(alignment)
       cell.parsebit(pos)
       self.add(cell)
       index += 1
-      pos.checkskip(FormulaRow.cellseparator)
-    return
-    for cell in self.iteratecells(pos):
-      cell.parsebit(pos)
-      self.add(cell)
-
-  def iteratecells(self, pos):
-    "Iterate over all cells, finish when count ends"
-    for index, alignment in enumerate(self.alignments):
-      if self.anybutlast(index):
-        pos.pushending(cellseparator)
-      yield FormulaCell(alignment)
-      if self.anybutlast(index):
-        if not pos.checkfor(cellseparator):
-          Trace.error('No cell separator ' + cellseparator)
-        else:
-          self.original += pos.popending(cellseparator)
-
-  def anybutlast(self, index):
-    "Return true for all cells but the last"
-    return index < len(self.alignments) - 1
+      pos.checkskip(self.cellseparator)
+    if len(self.contents) == 0:
+      self.output = EmptyOutput()
 
 class MultiRowFormula(CommandBit):
   "A formula with multiple rows."
 
   def parserows(self, pos):
     "Parse all rows, finish when no more row ends"
+    self.rows = []
+    first = True
     for row in self.iteraterows(pos):
+      if first:
+        first = False
+      else:
+        # intersparse empty rows
+        self.addempty()
       row.parsebit(pos)
-      self.add(row)
+      self.addrow(row)
 
   def iteraterows(self, pos):
     "Iterate over all rows, end when no more row ends"
     rowseparator = FormulaConfig.array['rowseparator']
     while True:
       pos.pushending(rowseparator, True)
-      yield FormulaRow(self.alignments)
+      row = self.factory.create(FormulaRow)
+      yield row.setalignments(self.alignments)
       if pos.checkfor(rowseparator):
         self.original += pos.popending(rowseparator)
       else:
         return
+
+  def addempty(self):
+    "Add an empty row."
+    row = FormulaRow().setalignments(self.alignments)
+    for alignment in self.alignments:
+      cell = self.factory.create(FormulaCell).setalignment(alignment)
+      cell.add(FormulaConstant(u' '))
+      row.add(cell)
+    self.addrow(row)
+
+  def addrow(self, row):
+    "Add a row to the contents and to the list of rows."
+    self.rows.append(row)
+    self.add(row)
 
 class FormulaArray(MultiRowFormula):
   "An array within a formula"
@@ -5530,7 +7318,7 @@ class FormulaArray(MultiRowFormula):
 
   def parsebit(self, pos):
     "Parse the array"
-    self.output = TaggedOutput().settag('table class="formula"', True)
+    self.output = TaggedOutput().settag('span class="array"', True)
     self.parsealignments(pos)
     self.parserows(pos)
 
@@ -5547,6 +7335,18 @@ class FormulaArray(MultiRowFormula):
     for l in literal:
       self.alignments.append(l)
 
+class FormulaMatrix(MultiRowFormula):
+  "A matrix (array with center alignment)."
+
+  piece = 'matrix'
+
+  def parsebit(self, pos):
+    "Parse the matrix, set alignments to 'c'."
+    self.output = TaggedOutput().settag('span class="array"', True)
+    self.valign = 'c'
+    self.alignments = ['c']
+    self.parserows(pos)
+
 class FormulaCases(MultiRowFormula):
   "A cases statement"
 
@@ -5554,16 +7354,23 @@ class FormulaCases(MultiRowFormula):
 
   def parsebit(self, pos):
     "Parse the cases"
-    self.output = TaggedOutput().settag('table class="cases"', True)
+    self.output = TaggedOutput().settag('span class="bracketcases"', True)
     self.alignments = ['l', 'l']
     self.parserows(pos)
+    for row in self.contents:
+      for cell in row.contents:
+        cell.output.settag('span class="case align-l"', True)
+        cell.contents.append(FormulaConstant(u' '))
+    brace = CasesBrace(len(self.contents))
+    for index, row in enumerate(self.rows):
+      row.contents.insert(0, brace.getcell(index, 'l'))
 
 class EquationEnvironment(MultiRowFormula):
   "A \\begin{}...\\end equation environment with rows and cells."
 
   def parsebit(self, pos):
     "Parse the whole environment."
-    self.output = TaggedOutput().settag('table class="environment"', True)
+    self.output = TaggedOutput().settag('span class="environment"', True)
     environment = self.piece.replace('*', '')
     if environment in FormulaConfig.environments:
       self.alignments = FormulaConfig.environments[environment]
@@ -5577,32 +7384,386 @@ class BeginCommand(CommandBit):
 
   commandmap = {FormulaConfig.array['begin']:''}
 
-  innerbits = [FormulaEquation(), FormulaArray(), FormulaCases()]
+  types = [FormulaEquation, FormulaArray, FormulaCases, FormulaMatrix]
 
   def parsebit(self, pos):
     "Parse the begin command"
-    literal = self.parseliteral(pos)
-    bit = self.findbit(literal)
-    ending = FormulaConfig.array['end'] + '{' + literal + '}'
+    command = self.parseliteral(pos)
+    bit = self.findbit(command)
+    ending = FormulaConfig.array['end'] + '{' + command + '}'
     pos.pushending(ending)
     bit.parsebit(pos)
     self.add(bit)
+    self.array = bit
     self.original += pos.popending(ending)
 
   def findbit(self, piece):
     "Find the command bit corresponding to the \\begin{piece}"
-    for bit in BeginCommand.innerbits:
-      if bit.piece == piece:
-        newbit = Cloner.clone(bit)
-        return newbit
-    bit = EquationEnvironment()
+    for type in BeginCommand.types:
+      if piece.replace('*', '') == type.piece:
+        return self.factory.create(type)
+    bit = self.factory.create(EquationEnvironment)
     bit.piece = piece
     return bit
 
-FormulaCommand.commandbits += [BeginCommand()]
+FormulaCommand.types += [BeginCommand]
 
 
 
+
+
+
+
+
+
+class BibTagParser(object):
+  "A parser for BibTeX tags."
+
+  nameseparators = ['{', '=', '"', '#']
+
+  def __init__(self):
+    self.key = None
+    tags = BibStylesConfig.defaulttags
+    self.tags = dict((x, BibTag().constant(tags[x])) for x in tags)
+
+  def parse(self, pos):
+    "Parse the entry between {}."
+    self.type = BibTag.readexcluding(pos, self.nameseparators).strip()
+    if not pos.checkskip('{'):
+      pos.error('Entry should start with {')
+      return
+    pos.pushending('}')
+    self.parsetags(pos)
+    pos.popending('}')
+    pos.skipspace()
+
+  def parsetags(self, pos):
+    "Parse all tags in the entry."
+    pos.skipspace()
+    while not pos.finished():
+      if pos.checkskip('{'):
+        pos.error('Unmatched {')
+        return
+      pos.pushending(',', True)
+      self.parsetag(pos)
+      if pos.checkfor(','):
+        pos.popending(',')
+  
+  def parsetag(self, pos):
+    "Parse a single tag."
+    (key, value) = self.getkeyvalue(pos)
+    if not value:
+      self.key = key
+      return
+    name = key.lower()
+    self.tags[name] = value
+    if hasattr(self, 'dissect' + name):
+      dissector = getattr(self, 'dissect' + name)
+      dissector(value.extracttext())
+    if not pos.finished():
+      remainder = pos.globexcluding(',')
+      pos.error('Ignored ' + remainder + ' before comma')
+
+  def getkeyvalue(self, pos):
+    "Parse a string of the form key=value."
+    piece = BibTag.readexcluding(pos, self.nameseparators).strip()
+    if pos.finished():
+      return (piece, None)
+    if not pos.checkskip('='):
+      pos.error('Undesired character in tag name ' + piece)
+      pos.skipcurrent()
+      return (piece, None)
+    key = piece.lower()
+    pos.skipspace()
+    value = self.parsevalue(pos)
+    return (key, value)
+
+  def parsevalue(self, pos):
+    "Parse the value for a tag."
+    tag = BibTag()
+    pos.skipspace()
+    if pos.checkfor(','):
+      pos.error('Unexpected ,')
+      return tag.error()
+    tag.parse(pos)
+    return tag
+
+  def dissectauthor(self, authortag):
+    "Dissect the author tag into pieces."
+    authorsplit = authortag.split(' and ')
+    if len(authorsplit) == 0:
+      return
+    authorlist = []
+    for authorname in authorsplit:
+      author = BibAuthor().parse(authorname)
+      authorlist.append(author)
+    initials = ''
+    authors = ''
+    if len(authorlist) == 1:
+      initials = authorlist[0].surname[0:3]
+      authors = unicode(authorlist[0])
+    else:
+      for author in authorlist:
+        initials += author.surname[0:1]
+        authors += unicode(author) + ', '
+      authors = authors[:-2]
+    self.tags['surname'] = BibTag().constant(authorlist[0].surname)
+    self.tags['Sur'] = BibTag().constant(initials)
+    self.tags['authors'] = BibTag().constant(authors)
+
+  def dissectyear(self, yeartag):
+    "Dissect the year tag into pieces, looking for 4 digits in a row."
+    pos = TextPosition(yeartag)
+    while not pos.finished():
+      if pos.current().isdigit():
+        number = pos.globnumber()
+        if len(number) == 4:
+          self.tags['YY'] = BibTag().constant(number[2:])
+          return
+      else:
+        pos.skipcurrent()
+
+  def dissectfile(self, filetag):
+    "Extract the filename from the file tag as ':filename:FORMAT'."
+    if not filetag.startswith(':'):
+      return
+    bits = filetag.split(':')
+    if len(bits) != 3:
+      return
+    self.tags['filename'] = BibTag().constant(bits[1])
+    self.tags['format'] = BibTag().constant(bits[2])
+
+  def gettag(self, key):
+    "Get the tag for a given key."
+    if not key in self.tags:
+      return None
+    return self.tags[key]
+
+  def gettagtext(self, key):
+    "Get the tag for a key as raw text."
+    return self.gettag(key).extracttext()
+
+  def lineerror(self, message, pos):
+    "Show an error message for a line."
+    Trace.error(message + ': ' + pos.identifier())
+
+class BibTag(Container):
+  "A tag in a BibTeX file."
+
+  valueseparators = ['{', '"', '#', '\\', '}', '$']
+  stringdefs = dict()
+  replaced = BibTeXConfig.replaced
+  replacedinitials = [x[0] for x in BibTeXConfig.replaced]
+  factory = FormulaFactory()
+
+  def __init__(self):
+    self.contents = []
+    self.output = ContentsOutput()
+
+  def constant(self, text):
+    "Initialize for a single constant."
+    self.contents = [Constant(text)]
+    return self
+
+  def error(self):
+    "To use when parsing resulted in an error."
+    return self.constant('')
+
+  def add(self, piece):
+    "Add a new piece to the tag."
+    if isinstance(piece, basestring):
+      self.addtext(piece)
+    else:
+      self.contents.append(piece)
+
+  def addtext(self, piece):
+    "Add a text string to the tag."
+    last = self.findlaststring()
+    if last:
+      last.string += piece
+      return
+    self.contents.append(Constant(piece))
+
+  def findlaststring(self):
+    "Find the last string in the contents."
+    if len(self.contents) == 0:
+      return None
+    string = self.contents[-1]
+    if not isinstance(string, StringContainer):
+      return None
+    return string
+
+  def parse(self, pos):
+    "Parse a BibTeX tag."
+    self.parserecursive(pos, True)
+    # strip ending blank characters
+    last = self.findlaststring()
+    if last:
+      before = last.string
+      last.string = last.string.rstrip()
+
+  def parserecursive(self, pos, initial=False):
+    "Parse brackets or quotes recursively."
+    while not pos.finished():
+      self.parsetext(pos, initial)
+      if pos.finished():
+        return
+      elif pos.checkfor('{'):
+        self.parsebracket(pos, initial)
+      elif pos.checkfor('"'):
+        self.parsequoted(pos, initial)
+      elif pos.checkfor('\\'):
+        self.parseescaped(pos)
+      elif pos.checkfor('#'):
+        self.parsehash(pos, initial)
+      elif pos.checkfor('$'):
+        self.parseformula(pos)
+      else:
+        pos.error('Unexpected character ' + pos.current())
+        pos.skipcurrent()
+
+  def parsetext(self, pos, initial):
+    "Parse a bit of text."
+    "If on the initial level, try to substitute strings with string defs."
+    text = BibTag.readexcluding(pos, self.valueseparators)
+    if text == '':
+      return
+    key = text.strip()
+    if initial and key in self.stringdefs:
+      self.add(self.stringdefs[key])
+      return
+    self.add(text)
+
+  def parseescaped(self, pos):
+    "Parse an escaped string \\*."
+    if pos.checkfor('\\(') or pos.checkfor('\\['):
+      # start of formula commands
+      self.parseformula(pos)
+      return
+    if not self.factory.detecttype(FormulaCommand, pos):
+      pos.error('Not an escape sequence')
+      return
+    self.add(self.factory.parsetype(FormulaCommand, pos))
+
+  def parsebracket(self, pos, initial):
+    "Parse a {} bracket"
+    if not pos.checkskip('{'):
+      pos.error('Missing opening { in bracket')
+      return
+    pos.pushending('}')
+    self.parserecursive(pos, initial)
+    pos.popending('}')
+
+  def parsequoted(self, pos, initial):
+    "Parse a piece of quoted text"
+    if not pos.checkskip('"'):
+      pos.error('Missing opening " in quote')
+      return
+    if not initial:
+      self.add('"')
+      return
+    pos.pushending('"')
+    self.parserecursive(pos)
+    pos.popending('"')
+    pos.skipspace()
+
+  def parsehash(self, pos, initial):
+    "Parse a hash mark #."
+    if not pos.checkskip('#'):
+      pos.error('Missing # in hash')
+      return
+    if not initial:
+      self.add('#')
+
+  def parseformula(self, pos):
+    "Parse a whole formula."
+    formula = Formula().parse(pos)
+    self.add(formula)
+
+  def readexcluding(cls, pos, undesired):
+    "Parse a piece not structure (including spaces)."
+    result = ''
+    while not pos.finished():
+      if pos.current() in undesired:
+        return result
+      if pos.current().isspace():
+        result += ' '
+        pos.skipspace()
+      else:
+        replaced = cls.readreplaced(pos)
+        if replaced:
+          result += replaced
+        else:
+          result += pos.skipcurrent()
+    return result
+
+  def readreplaced(cls, pos):
+    "Check for one of the replaced strings."
+    if not pos.current() in BibTag.replacedinitials:
+      return None
+    for key in BibTag.replaced:
+      if pos.checkskip(key):
+        return BibTag.replaced[key]
+    return None
+
+  readexcluding = classmethod(readexcluding)
+  readreplaced = classmethod(readreplaced)
+
+  def __unicode__(self):
+    "Return a printable representation."
+    return 'BibTag: ' + self.extracttext()
+
+class BibAuthor(object):
+  "A BibTeX individual author."
+
+  def __init__(self):
+    self.surname = ''
+    self.firstnames = []
+
+  def parse(self, tag):
+    "Parse an individual author tag."
+    if ',' in tag:
+      self.parsecomma(tag)
+    else:
+      self.parsewithoutcomma(tag)
+    return self
+
+  def parsecomma(self, tag):
+    "Parse an author with a comma: Python, M."
+    bits = tag.split(',')
+    if len(bits) > 2:
+      Trace.error('Too many commas in ' + tag)
+    self.surname = bits[0].strip()
+    self.parsefirstnames(bits[1].strip())
+
+  def parsewithoutcomma(self, tag):
+    "Parse an author without a comma: M. Python."
+    bits = tag.rsplit(None, 1)
+    if len(bits) == 0:
+      Trace.error('Empty author')
+      return
+    self.surname = bits[-1].strip()
+    if len(bits) == 1:
+      return
+    self.parsefirstnames(bits[0].strip())
+
+  def parsefirstnames(self, firstnames):
+    "Parse the first name."
+    for firstname in firstnames.split():
+      self.firstnames.append(firstname)
+
+  def getinitial(self):
+    "Get the main initial for the author."
+    if len(self.surname) == 0:
+      return ''
+    return self.surname[0].toupper()
+
+  def __unicode__(self):
+    "Return a printable representation."
+    result = ''
+    for firstname in self.firstnames:
+      result += firstname + ' '
+    return result + self.surname
 
 
 
@@ -5614,25 +7775,35 @@ class BibTeX(Container):
     self.output = ContentsOutput()
 
   def process(self):
-    "Read all bibtex files and process them"
+    "Read all bibtex files and process them."
     self.entries = []
+    self.contents = [self.createheader()]
     bibliography = Translator.translate('bibliography')
-    tag = TaggedText().constant(bibliography, 'h1 class="biblio"', True)
-    self.contents.append(tag)
-    files = self.parameters['bibfiles'].split(',')
+    files = self.getparameterlist('bibfiles')
+    showall = False
+    if self.getparameter('btprint') == 'btPrintAll':
+      showall = True
     for file in files:
-      bibfile = BibFile(file)
+      bibfile = BibFile(file, showall)
       bibfile.parse()
       self.entries += bibfile.entries
       Trace.message('Parsed ' + unicode(bibfile))
     self.entries.sort(key = unicode)
     self.applystyle()
 
+  def createheader(self):
+    "Create the header for the bibliography."
+    header = BiblioHeader()
+    if 'bibtotoc' in self.getparameterlist('options'):
+      header.addtotoc(self)
+    return header
+
   def applystyle(self):
     "Read the style and apply it to all entries"
     style = self.readstyle()
     for entry in self.entries:
       entry.template = style['default']
+      entry.citetemplate = style['cite']
       type = entry.type.lower()
       if type in style:
         entry.template = style[type]
@@ -5641,8 +7812,7 @@ class BibTeX(Container):
 
   def readstyle(self):
     "Read the style from the bibliography options"
-    options = self.parameters['options'].split(',')
-    for option in options:
+    for option in self.getparameterlist('options'):
       if hasattr(BibStylesConfig, option):
         return getattr(BibStylesConfig, option)
     return BibStylesConfig.default
@@ -5650,9 +7820,10 @@ class BibTeX(Container):
 class BibFile(object):
   "A BibTeX file"
 
-  def __init__(self, filename):
+  def __init__(self, filename, showall):
     "Create the BibTeX file"
     self.filename = filename + '.bib'
+    self.showall = showall
     self.added = 0
     self.ignored = 0
     self.entries = []
@@ -5675,23 +7846,24 @@ class BibFile(object):
       pos = TextPosition(text)
     while not pos.finished():
       pos.skipspace()
+      if pos.checkskip(','):
+        pos.skipspace()
       self.parseentry(pos)
 
   def parseentry(self, pos):
     "Parse a single entry"
-    for entry in Entry.entries:
+    for entry in BibEntry.instances:
       if entry.detect(pos):
         newentry = Cloner.clone(entry)
         newentry.parse(pos)
-        if newentry.isreferenced():
+        if self.showall or newentry.isreferenced():
           self.entries.append(newentry)
           self.added += 1
         else:
           self.ignored += 1
         return
-    # Skip the whole line, and show it as an error
-    pos.checkskip('\n')
-    Entry.entries[0].lineerror('Unidentified entry', pos)
+    # Skip the whole line since it's a comment outside an entry
+    pos.globincluding('\n').strip()
 
   def __unicode__(self):
     "String representation"
@@ -5699,17 +7871,28 @@ class BibFile(object):
     string += unicode(self.ignored) + ' entries ignored'
     return string
 
-class Entry(Container):
+class BibEntry(Container):
   "An entry in a BibTeX file"
 
-  entries = []
+  instances = []
 
-  def lineerror(self, message, pos):
-    "Show an error message for a line."
-    Trace.error(message + ': ' + pos.identifier())
-    pos.globincluding('\n')
+  def detect(self, pos):
+    "Throw an error."
+    Trace.error('Tried to detect() in ' + unicode(self))
 
-class CommentEntry(Entry):
+  def parse(self, pos):
+    "Throw an error."
+    Trace.error('Tried to parse() in ' + unicode(self))
+
+  def isreferenced(self):
+    "Throw an error."
+    Trace.error('Function isreferenced() not implemented for ' + unicode(self))
+
+  def __unicode__(self):
+    "Return a string representation"
+    return 'BibTeX entry ' + self.__class__.__name__
+
+class CommentEntry(BibEntry):
   "A simple comment."
 
   def detect(self, pos):
@@ -5729,133 +7912,33 @@ class CommentEntry(Entry):
     "Return a string representation"
     return 'Comment'
 
-class ContentEntry(Entry):
-  "An entry holding some content."
-
-  nameseparators = ['{', '=', '"', '#']
-  valueseparators = ['{', '"', '#', '\\', '}']
-
-  def __init__(self):
-    self.key = None
-    self.tags = dict()
-    self.output = TaggedOutput().settag('p class="biblio"', True)
-
-  def parse(self, pos):
-    "Parse the entry between {}"
-    self.type = self.parsepiece(pos, self.nameseparators)
-    pos.skipspace()
-    if not pos.checkskip('{'):
-      self.lineerror('Entry should start with {', pos)
-      return
-    pos.pushending('}')
-    self.parsetags(pos)
-    pos.popending('}')
-    pos.skipspace()
-
-  def parsetags(self, pos):
-    "Parse all tags in the entry"
-    pos.skipspace()
-    while not pos.finished():
-      if pos.checkskip('{'):
-        self.lineerror('Unmatched {', pos)
-        return
-      pos.pushending(',', True)
-      self.parsetag(pos)
-      if pos.checkfor(','):
-        pos.popending(',')
-  
-  def parsetag(self, pos):
-    piece = self.parsepiece(pos, self.nameseparators)
-    if pos.finished():
-      self.key = piece
-      return
-    if not pos.checkskip('='):
-      self.lineerror('Undesired character in tag name ' + piece, pos)
-      return
-    name = piece.lower().strip()
-    pos.skipspace()
-    value = self.parsevalue(pos)
-    self.tags[name] = value
-    if not pos.finished():
-      remainder = pos.globexcluding(',')
-      self.lineerror('Ignored ' + remainder + ' before comma', pos)
-
-  def parsevalue(self, pos):
-    "Parse the value for a tag"
-    pos.skipspace()
-    if pos.checkfor(','):
-      self.lineerror('Unexpected ,', pos)
-      return ''
-    return self.parserecursive(pos)
-
-  def parserecursive(self, pos):
-    "Parse brackets or quotes recursively."
-    contents = ''
-    while not pos.finished():
-      contents += self.parsepiece(pos, self.valueseparators)
-      if pos.finished():
-        return contents
-      if pos.checkfor('{'):
-        contents += self.parsebracket(pos)
-      elif pos.checkfor('"'):
-        contents += self.parsequoted(pos)
-      elif pos.checkfor('\\'):
-        contents += self.parseescaped(pos)
-      elif pos.checkskip('#'):
-        pos.skipspace()
-      else:
-        self.lineerror('Unexpected character ' + pos.current(), pos)
-        pos.currentskip()
-    return contents
-
-  def parseescaped(self, pos):
-    "Parse an escaped character \\*."
-    if not pos.checkskip('\\'):
-      self.lineerror('Not an escaped character', pos)
-      return ''
-    if not pos.checkskip('{'):
-      return '\\' + pos.currentskip()
-    current = pos.currentskip()
-    if not pos.checkskip('}'):
-      self.lineerror('Weird escaped but unclosed brackets \\{*', pos)
-    return '\\' + current
-
-  def parsebracket(self, pos):
-    "Parse a {} bracket"
-    if not pos.checkskip('{'):
-      self.lineerror('Missing opening { in bracket', pos)
-      return ''
-    pos.pushending('}')
-    bracket = self.parserecursive(pos)
-    pos.popending('}')
-    return bracket
-
-  def parsequoted(self, pos):
-    "Parse a piece of quoted text"
-    if not pos.checkskip('"'):
-      self.lineerror('Missing opening " in quote', pos)
-      return ''
-    pos.pushending('"', True)
-    quoted = self.parserecursive(pos)
-    pos.popending('"')
-    pos.skipspace()
-    return quoted
-
-  def parsepiece(self, pos, undesired):
-    "Parse a piece not structure."
-    return pos.glob(lambda current: not current in undesired)
-
-class SpecialEntry(ContentEntry):
+class SpecialEntry(BibEntry):
   "A special entry"
 
-  types = ['@STRING', '@PREAMBLE', '@COMMENT']
+  types = ['@preamble', '@comment']
+
+  def __init__(self):
+    self.contents = []
+    self.output = EmptyOutput()
 
   def detect(self, pos):
     "Detect the special entry"
-    for type in SpecialEntry.types:
-      if pos.checkfor(type):
+    for type in self.types:
+      if pos.checkforlower(type):
         return True
     return False
+
+  def parse(self, pos):
+    "Parse and ignore."
+    self.type = 'special'
+    pos.globincluding('{')
+    pos.pushending('}')
+    while not pos.finished():
+      if pos.checkfor('{'):
+        self.parse(pos)
+      else:
+        pos.skipcurrent()
+    pos.popending()
 
   def isreferenced(self):
     "A special entry is never referenced"
@@ -5865,88 +7948,243 @@ class SpecialEntry(ContentEntry):
     "Return a string representation"
     return self.type
 
-class PubEntry(ContentEntry):
-  "A publication entry"
+class StringEntry(SpecialEntry):
+  "A string definition. The definition can later be used in other entries."
 
-  escaped = BibTeXConfig.escaped
+  parser = BibTagParser()
+  start = '@string'
+  key = None
 
   def detect(self, pos):
-    "Detect a publication entry"
-    return pos.checkfor('@')
+    "Detect the string definition."
+    return pos.checkforlower(self.start)
 
-  def isreferenced(self):
-    "Check if the entry is referenced"
-    if not self.key:
+  def parse(self, pos):
+    "Parse a single tag, which will define a string."
+    self.type = self.start
+    if not self.checkstart(pos):
+      return
+    pos.skipspace()
+    if not pos.checkskip('{'):
+      Trace.error('Missing opening { in ' + unicode(self))
+      pos.globincluding('\n')
+      return
+    pos.pushending('}')
+    (self.key, value) = self.parser.getkeyvalue(pos)
+    BibTag.stringdefs[self.key] = value
+    pos.popending('}')
+
+  def checkstart(self, pos):
+    "Check that the entry starts with @string."
+    if not pos.checkskip('@'):
+      Trace.error('Missing @ from string definition')
       return False
-    return self.key in BiblioReference.references
+    name = '@' + pos.globalpha()
+    if not name.lower() == self.start.lower():
+      Trace.error('Invalid start @' + name +', missing ' + self.start + ' from ' + unicode(self))
+      pos.globincluding('\n')
+      return False
+    return True
 
-  def process(self):
-    "Process the entry"
-    self.index = NumberGenerator.instance.generateunique('pubentry')
-    biblio = BiblioEntry()
-    biblio.processcites(self.key)
-    self.contents = [biblio, Constant(' ')]
-    self.contents.append(self.getcontents())
-
-  def getcontents(self):
-    "Get the contents as a constant"
-    contents = self.template
-    while contents.find('$') >= 0:
-      contents = self.replacetag(contents)
-    return Constant(self.escapeentry(contents))
-
-  def replacetag(self, string):
-    "Replace a tag with its value."
-    tag = self.extracttag(string)
-    value = self.gettag(tag)
-    dollar = string.find('$' + tag)
-    begin = string.rfind('{', 0, dollar)
-    end = string.find('}', dollar)
-    if begin != -1 and end != -1 and begin < end:
-      bracket = string[begin + 1:end]
-      if not value:
-        result = ''
-      else:
-        result = bracket.replace('$' + tag, value)
-      return string[0:begin] + result + string[end + 1:]
-    if not value:
-      value = ''
-    return string.replace('$' + tag, value)
-
-  def extracttag(self, string):
-    "Extract the first tag in the form $tag"
-    result = ''
-    index = string.index('$') + 1
-    while string[index].isalpha():
-      result += string[index]
-      index += 1
+  def __unicode__(self):
+    "Return a printable representation."
+    result = 'string definition'
+    if self.key:
+      result += ' for ' + self.key
     return result
 
-  def gettag(self, key):
-    "Get a tag with the given key"
-    if not key in self.tags:
-      return None
-    return self.tags[key]
 
-  def escapeentry(self, string):
-    "Escape a string."
-    for escape in self.escaped:
-      if escape in string:
-        string = string.replace(escape, self.escaped[escape])
-    return string
+BibEntry.instances += [CommentEntry(), SpecialEntry(), StringEntry()]
+
+
+
+
+
+
+class PubEntry(BibEntry):
+  "A publication entry"
+
+  def __init__(self):
+    self.output = TaggedOutput().settag('p class="biblio"', True)
+
+  def detect(self, pos):
+    "Detect a publication entry."
+    return pos.checkfor('@')
+
+  def parse(self, pos):
+    "Parse the publication entry."
+    self.parser = BibTagParser()
+    self.parser.parse(pos)
+    self.type = self.parser.type
+
+  def isreferenced(self):
+    "Check if the entry is referenced."
+    if not self.parser.key:
+      return False
+    return self.parser.key in BiblioReference.references
+
+  def process(self):
+    "Process the entry."
+    self.index = NumberGenerator.generator.generate('pubentry')
+    self.parser.tags['index'] = Constant(self.index)
+    biblio = BiblioEntry()
+    biblio.citeref = self.createref()
+    biblio.processcites(self.parser.key)
+    self.contents = [biblio, Constant(' ')]
+    self.contents += self.entrycontents()
+
+  def entrycontents(self):
+    "Get the contents of the entry."
+    return self.translatetemplate(self.template)
+
+  def createref(self):
+    "Create the reference to cite."
+    return self.translatetemplate(self.citetemplate)
+
+  def translatetemplate(self, template):
+    "Translate a complete template into a list of contents."
+    pos = TextPosition(template)
+    part = BibPart(self.parser.tags).parse(pos)
+    for variable in part.searchall(BibVariable):
+      if variable.empty():
+        Trace.error('Error parsing BibTeX template for ' + unicode(self) + ': '
+            + unicode(variable) + ' is empty')
+    return [part]
 
   def __unicode__(self):
     "Return a string representation"
     string = ''
-    author = self.gettag('author')
-    if author:
-      string += author + ': '
-    title = self.gettag('title')
-    if title:
-      string += '"' + title + '"'
+    if 'author' in self.parser.tags:
+      string += self.parser.gettagtext('author') + ': '
+    if 'title' in self.parser.tags:
+      string += '"' + self.parser.gettagtext('title') + '"'
     return string
 
-Entry.entries += [CommentEntry(), SpecialEntry(), PubEntry()]
+class BibPart(Container):
+  "A part of a BibTeX template."
+
+  def __init__(self, tags):
+    self.output = ContentsOutput()
+    self.contents = []
+    self.tags = tags
+    self.quotes = 0
+
+  def parse(self, pos):
+    "Parse a part of a template, return a list of contents."
+    while not pos.finished():
+      self.add(self.parsepiece(pos))
+    return self
+
+  def parsepiece(self, pos):
+    "Get the next piece of the template, return if it was empty."
+    if pos.checkfor('{'):
+      return self.parsebraces(pos)
+    elif pos.checkfor('$'):
+      return self.parsevariable(pos)
+    result = ''
+    while not pos.finished() and not pos.current() in '{$':
+      if pos.current() == '"':
+        self.quotes += 1
+      result += pos.skipcurrent()
+    return Constant(result)
+
+  def parsebraces(self, pos):
+    "Parse a pair of curly braces {}."
+    if not pos.checkskip('{'):
+      Trace.error('Missing { in braces.')
+      return None
+    pos.pushending('}')
+    part = BibPart(self.tags).parse(pos)
+    pos.popending('}')
+    empty = part.emptyvariables()
+    if empty:
+      return None
+    return part
+
+  def parsevariable(self, pos):
+    "Parse a variable $name."
+    var = BibVariable(self.tags).parse(pos)
+    if self.quotes % 2 == 1:
+      # odd number of quotes; don't add spans in an attribute
+      var.removetag()
+    return var
+
+  def emptyvariables(self):
+    "Find out if there are only empty variables in the part."
+    for variable in self.searchall(BibVariable):
+      if not variable.empty():
+        return False
+    return True
+
+  def add(self, piece):
+    "Add a new piece to the current part."
+    if not piece:
+      return
+    if self.redundantdot(piece):
+      # remove extra dot
+      piece.string = piece.string[1:]
+    self.contents.append(piece)
+    piece.parent = self
+
+  def redundantdot(self, piece):
+    "Find out if there is a redundant dot in the next piece."
+    if not isinstance(piece, Constant):
+      return False
+    if not piece.string.startswith('.'):
+      return False
+    if len(self.contents) == 0:
+      return False
+    if not isinstance(self.contents[-1], BibVariable):
+      return False
+    if not self.contents[-1].extracttext().endswith('.'):
+      return False
+    return True
+
+class BibVariable(Container):
+  "A variable in a BibTeX template."
+  
+  def __init__(self, tags):
+    self.output = TaggedOutput()
+    self.contents = []
+    self.tags = tags
+
+  def parse(self, pos):
+    "Parse the variable name."
+    if not pos.checkskip('$'):
+      Trace.error('Missing $ in variable name.')
+      return self
+    self.key = pos.globalpha()
+    self.output.tag = 'span class="bib-' + self.key + '"'
+    self.processtags()
+    return self
+
+  def processtags(self):
+    "Find the tag with the appropriate key in the list of tags."
+    if not self.key in self.tags:
+      return
+    result = self.tags[self.key]
+    self.contents = [result]
+
+  def empty(self):
+    "Find out if the variable is empty."
+    if not self.contents:
+      return True
+    if self.extracttext() == '':
+      return True
+    return False
+
+  def removetag(self):
+    "Remove the output tag and leave just the contents."
+    self.output = ContentsOutput()
+
+  def __unicode__(self):
+    "Return a printable representation."
+    result = 'variable ' + self.key
+    if not self.empty():
+      result += ':' + self.extracttext()
+    return result
+
+BibEntry.instances += [PubEntry()]
 
 
 
@@ -5976,7 +8214,7 @@ class NewfangledChunk(Layout):
 
   def order(self):
     "Create the order number for the chunk."
-    return NumberGenerator.instance.generateunique('chunk')
+    return NumberGenerator.generator.generate('chunk')
 
   def createlinks(self):
     "Create back and forward links."
@@ -6143,151 +8381,218 @@ class NewfangledChunkRef(Inset):
 
 
 
-class MathMacro(object):
-  "A math macro: command, parameters, default values, definition."
+class CombiningFunction(OneParamFunction):
 
-  macros = dict()
-
-  def __init__(self):
-    self.newcommand = None
-    self.parameters = 0
-    self.defaults = []
-    self.definition = None
-
-  def instantiate(self):
-    "Return an instance of the macro."
-    return self.definition.clone()
-
-  def parsepreamble(self):
-    "Parse the LyX preamble, if needed."
-    if len(PreambleParser.preamble) == 0:
-      return
-    FormulaCommand.preambling = True
-    pos = TextPosition('\n'.join(PreambleParser.preamble))
-    while not pos.finished():
-      if self.detectdefinition(pos):
-        self.parsedefinition(pos)
-      else:
-        pos.globincluding('\n')
-    PreambleParser.preamble = []
-    FormulaCommand.preambling = False
-
-  def detectdefinition(self, pos):
-    "Detect a macro definition."
-    for function in FormulaConfig.definingfunctions:
-      if pos.checkfor(function):
-        return True
-    return False
-
-  def parsedefinition(self, pos):
-    "Parse a macro definition."
-    command = FormulaCommand()
-    command.factory = FormulaFactory()
-    bit = command.parsebit(pos)
-    if not isinstance(bit, DefiningFunction):
-      Trace.error('Did not define a macro with ' + unicode(bit))
-
-Formula.initializations.append(MathMacro().parsepreamble)
-
-class MacroParameter(FormulaBit):
-  "A parameter from a macro."
-
-  def detect(self, pos):
-    "Find a macro parameter: #n."
-    return pos.checkfor('#')
+  commandmap = FormulaConfig.combiningfunctions
 
   def parsebit(self, pos):
-    "Parse the parameter: #n."
-    if not pos.checkskip('#'):
-      Trace.error('Missing parameter start #.')
-      return
-    self.number = int(pos.currentskip())
-    self.original = '#' + unicode(self.number)
-    self.contents = [TaggedBit().constant('#' + unicode(self.number), 'span class="unknown"')]
+    "Parse a combining function."
+    self.type = 'alpha'
+    combining = self.translated
+    parameter = self.parsesingleparameter(pos)
+    if len(parameter.extracttext()) != 1:
+      Trace.error('Applying combining function ' + self.command + ' to invalid string "' + parameter.extracttext() + '"')
+    self.contents.append(Constant(combining))
 
-class DefiningFunction(HybridFunction):
-  "Read a function that defines a new command (a macro)."
+  def parsesingleparameter(self, pos):
+    "Parse a parameter, or a single letter."
+    if self.factory.detecttype(Bracket, pos) \
+        or self.factory.detecttype(FormulaCommand, pos):
+      return self.parseparameter(pos)
+    letter = FormulaConstant(pos.skipcurrent())
+    self.add(letter)
+    return letter
 
-  commandmap = FormulaConfig.definingfunctions
+class DecoratingFunction(OneParamFunction):
+  "A function that decorates some bit of text"
+
+  commandmap = FormulaConfig.decoratingfunctions
 
   def parsebit(self, pos):
-    "Parse a function with [] and {} parameters."
-    if Bracket().detect(pos):
-      newcommand = self.parseliteral(pos)
-    elif FormulaCommand().detect(pos):
-      newcommand = FormulaCommand().extractcommand(pos)
+    "Parse a decorating function"
+    self.type = 'alpha'
+    symbol = self.translated
+    self.symbol = TaggedBit().constant(symbol, 'span class="symbolover"')
+    self.parameter = self.parseparameter(pos)
+    self.output = TaggedOutput().settag('span class="withsymbol"')
+    self.contents.insert(0, self.symbol)
+    self.parameter.output = TaggedOutput().settag('span class="undersymbol"')
+    self.simplifyifpossible()
+
+class LimitCommand(EmptyCommand):
+  "A command which accepts limits above and below, in display mode."
+
+  commandmap = FormulaConfig.limitcommands
+
+  def parsebit(self, pos):
+    "Parse a limit command."
+    pieces = self.translated[1:]
+    if not DocumentParameters.displaymode or len(self.translated) == 1:
+      pieces = self.translated[0:1]
+    self.output = TaggedOutput().settag('span class="limits"')
+    for piece in pieces:
+      self.contents.append(TaggedBit().constant(piece, 'span class="limit"'))
+
+class LimitsProcessor(MathsProcessor):
+  "A processor for limits inside an element."
+
+  def process(self, contents, index):
+    "Process the limits for an element."
+    if self.checklimits(contents, index):
+      self.modifylimits(contents, index)
+    if self.checkscript(contents, index) and self.checkscript(contents, index + 1):
+      self.modifyscripts(contents, index)
+
+  def checklimits(self, contents, index):
+    "Check if the current position has a limits command."
+    if not DocumentParameters.displaymode:
+      return False
+    if not isinstance(contents[index], LimitCommand):
+      return False
+    return self.checkscript(contents, index + 1)
+
+  def modifylimits(self, contents, index):
+    "Modify a limits commands so that the limits appear above and below."
+    limited = contents[index]
+    subscript = self.getlimit(contents, index + 1)
+    limited.contents.append(subscript)
+    if self.checkscript(contents, index + 1):
+      superscript = self.getlimit(contents, index  + 1)
     else:
-      Trace.error('Unknown formula bit in defining function at ' + pos.identifier())
-    Trace.debug('New command: ' + newcommand)
-    HybridFunction.parsebit(self, pos)
-    macro = MathMacro()
-    macro.newcommand = newcommand
-    macro.parameters = self.readparameters()
-    macro.definition = self.params['$d'].value
-    for index in range(9):
-      value = self.extractdefault(index + 1)
-      if value:
-        macro.defaults.append(value)
-      else:
-        break
-    MathMacro.macros[newcommand] = macro
+      superscript = TaggedBit().constant(u' ', 'sup class="limit"')
+    limited.contents.insert(0, superscript)
 
-  def readparameters(self):
-    "Read the number of parameters in the macro."
-    if not self.params['$n'].literalvalue:
-      return 0
-    return int(self.params['$n'].literalvalue)
+  def getlimit(self, contents, index):
+    "Get the limit for a limits command."
+    limit = self.getscript(contents, index)
+    limit.output.tag = limit.output.tag.replace('script', 'limit')
+    return limit
 
-  def extractdefault(self, index):
-    "Extract the default value for parameter index."
-    value = self.params['$' + unicode(index)].value
-    if not value:
-      return None
-    if len(value.contents) == 0:
-      return FormulaConstant('')
-    return value.contents[0]
+  def modifyscripts(self, contents, index):
+    "Modify the super- and subscript to appear vertically aligned."
+    subscript = self.getscript(contents, index)
+    # subscript removed so instead of index + 1 we get index again
+    superscript = self.getscript(contents, index)
+    scripts = TaggedBit().complete([superscript, subscript], 'span class="scripts"')
+    contents.insert(index, scripts)
 
-class MacroFunction(CommandBit):
-  "A function that was defined using a macro."
+  def checkscript(self, contents, index):
+    "Check if the current element is a sub- or superscript."
+    if len(contents) <= index:
+      return False
+    return isinstance(contents[index], SymbolFunction)
 
-  commandmap = MathMacro.macros
+  def getscript(self, contents, index):
+    "Get the sub- or superscript."
+    bit = contents[index]
+    bit.output.tag += ' class="script"'
+    del contents[index]
+    return bit
+
+class BracketCommand(OneParamFunction):
+  "A command which defines a bracket."
+
+  commandmap = FormulaConfig.bracketcommands
 
   def parsebit(self, pos):
-    "Parse a number of input parameters."
-    self.values = []
-    macro = self.translated
-    while self.factory.detectbit(pos):
-      self.values.append(self.parseparameter(pos))
-    defaults = list(macro.defaults)
-    while len(self.values) < macro.parameters and len(defaults) > 0:
-      self.values.insert(0, defaults.pop())
-    if len(self.values) < macro.parameters:
-      Trace.error('Missing parameters in macro ' + unicode(self))
-    self.completemacro(macro)
+    "Parse the bracket."
+    OneParamFunction.parsebit(self, pos)
 
-  def completemacro(self, macro):
-    "Complete the macro with the parameters read."
-    self.contents = [macro.instantiate()]
-    for parameter in self.searchall(MacroParameter):
-      index = parameter.number - 1
-      parameter.contents = [self.values[index].clone()]
+class BracketProcessor(MathsProcessor):
+  "A processor for bracket commands."
 
-FormulaCommand.commandbits += [
-    DefiningFunction(), MacroFunction(),
+  directions = {'left': 1, 'right': -1}
+
+  def process(self, contents, index):
+    "Convert the bracket using Unicode pieces, if possible."
+    if not isinstance(contents[index], BracketCommand):
+      return
+    self.checkarray(contents, index, 'left')
+    self.checkarray(contents, index, 'right')
+
+  def checkarray(self, contents, index, direction):
+    "Check for the right command, and an array in the given direction."
+    command = contents[index]
+    if command.command != '\\' + direction:
+      return
+    newindex = index + self.directions[direction]
+    if newindex < 0 or newindex >= len(contents):
+      return
+    begin = contents[newindex]
+    if not isinstance(begin, BeginCommand):
+      return
+    array = begin.array
+    if not isinstance(array, MultiRowFormula):
+      Trace.error('BeginCommand does not contain a MultiRowFormula')
+      return False
+    self.processarray(command, array, direction)
+
+  def processarray(self, command, array, direction):
+    "Process a bracket command with an array next to it."
+    character = command.extracttext()
+    command.output = EmptyOutput()
+    bracket = BigBracket(len(array.rows), character)
+    for index, row in enumerate(array.rows):
+      cell = bracket.getcell(index, direction)
+      if self.directions[direction] == 1:
+        row.contents.insert(0, cell)
+      else:
+        row.contents.append(cell)
+
+class BinomialCell(CommandBit):
+  "A cell in a binomial function."
+
+  def setfactory(self, factory):
+    "Set the factory."
+    self.output = TaggedOutput().settag('span class="binomcell"', True)
+    return CommandBit.setfactory(self, factory)
+
+  def parsebit(self, pos):
+    "Parse a parameter and make it into a binomial cell."
+    self.parseparameter(pos)
+
+  def constant(self, constant):
+    "Set a constant as only contents."
+    self.contents = [FormulaConstant(constant)]
+
+class BinomialRow(CommandBit):
+  "A row for a binomial function."
+
+  def create(self, left, middle, right):
+    "Set the row contents."
+    self.output = TaggedOutput().settag('span class="binomrow"', True)
+    self.contents = [left, middle, right]
+    return self
+
+class BinomialFunction(CommandBit):
+  "A binomial function which needs pretty decorating."
+
+  commandmap = FormulaConfig.binomialfunctions
+
+  def parsebit(self, pos):
+    "Parse two parameters and decorate them."
+    self.output = TaggedOutput().settag('span class="binomial"', True)
+    leftbracket = BigBracket(3, self.translated[0])
+    rightbracket = BigBracket(3, self.translated[1])
+    for index in range(3):
+      left = leftbracket.getcell(index, 'l')
+      right = rightbracket.getcell(index, 'r')
+      cell = BinomialCell().setfactory(self.factory)
+      if index == 1:
+        cell.constant(u' ')
+      else:
+        cell.parsebit(pos)
+      self.add(BinomialRow().create(left, cell, right))
+
+
+FormulaCommand.types += [
+    DecoratingFunction, CombiningFunction, LimitCommand, BracketCommand,
+    BinomialFunction,
     ]
 
-FormulaFactory.bits += [ MacroParameter() ]
-
-class FormulaMacro(Formula):
-  "A math macro defined in an inset."
-
-  def __init__(self):
-    self.parser = MacroParser()
-    self.output = EmptyOutput()
-
-  def __unicode__(self):
-    "Return a printable representation."
-    return 'Math macro'
+FormulaProcessor.processors += [
+    LimitsProcessor(), BracketProcessor(),
+    ]
 
 
 
@@ -6307,9 +8612,7 @@ class ContainerFactory(object):
     if reader.currentline() == '':
       reader.nextline()
       return None
-    type = self.tree.find(reader)
-    container = type.__new__(type)
-    container.__init__()
+    container = Cloner.create(self.tree.find(reader))
     container.start = reader.currentline().strip()
     self.parse(container, reader)
     return container
@@ -6322,10 +8625,19 @@ class ContainerFactory(object):
     parser.factory = self
     container.header = parser.parseheader(reader)
     container.begin = parser.begin
-    container.contents = parser.parse(reader)
+    self.parsecontents(container, reader)
     container.parameters = parser.parameters
-    container.process()
     container.parser = None
+
+  def parsecontents(self, container, reader):
+    "Parse the contents of a container."
+    contents = container.parser.parse(reader)
+    if isinstance(contents, basestring):
+      # read a string, set as parsed
+      container.parsed = contents
+      container.contents = []
+    else:
+      container.contents = contents
 
   def getending(self, container):
     "Get the ending for a container"
@@ -6367,17 +8679,23 @@ class ParseTree(object):
 
   def find(self, reader):
     "Find the current sentence in the tree"
+    branches = self.matchline(reader.currentline())
+    while not ParseTree.default in branches[-1]:
+      branches.pop()
+    last = branches[-1]
+    return last[ParseTree.default]
+
+  def matchline(self, line):
+    "Match a given line against the tree, as deep as possible."
     branches = [self.root]
-    for piece in reader.currentline().split():
+    for piece in line.split(' '):
       current = branches[-1]
       piece = piece.rstrip('>')
       if piece in current:
         branches.append(current[piece])
-    while not ParseTree.default in branches[-1]:
-      Trace.error('Line ' + reader.currentline().strip() + ' not found')
-      branches.pop()
-    last = branches[-1]
-    return last[ParseTree.default]
+      else:
+        return branches
+    return branches
 
 
 
@@ -6388,77 +8706,68 @@ class ParseTree(object):
 class TOCEntry(Container):
   "A container for a TOC entry."
 
-  copied = [StringContainer, Constant, Space]
-  allowed = [
-      TextFamily, EmphaticText, VersalitasText, BarredText,
-      SizeText, ColorText, LangLine, Formula
-      ]
-  extracted = [
-      PlainLayout, TaggedText, Align, Caption
-      ]
-
-  def header(self, container):
-    "Create a TOC entry for header and footer (0 depth)."
-    self.depth = 0
-    self.output = EmptyOutput()
-    return self
+  def __init__(self):
+    Container.__init__(self)
+    self.branches = []
 
   def create(self, container):
     "Create the TOC entry for a container, consisting of a single link."
-    self.entry = container.entry
-    self.branches = []
-    text = container.entry + ':'
+    if container.partkey.header:
+      return self.header(container)
+    self.contents = [self.createlink(container)]
+    self.output = TaggedOutput().settag('div class="toc"', True)
+    self.partkey = container.partkey
+    return self
+
+  def header(self, container):
+    "Create a TOC entry for header and footer (0 depth)."
+    self.partkey = container.partkey
+    self.output = EmptyOutput()
+    return self
+
+  def createlink(self, container):
+    "Create the link that will make the whole TOC entry."
     labels = container.searchall(Label)
+    link = Link()
     if len(labels) == 0 or Options.toc:
-      url = Options.toctarget + '#toc-' + container.type + '-' + container.number
-      link = Link().complete(text, url=url)
+      link.url = Options.toctarget + '#' + container.partkey.partkey
     else:
       label = labels[0]
-      link = Link().complete(text)
       link.destination = label
-    self.contents = [link]
-    if container.number == '':
-      link.contents.append(Constant(u' '))
-    link.contents += self.gettitlecontents(container)
-    self.output = TaggedOutput().settag('div class="toc"', True)
-    if hasattr(container, 'level'):
-      self.depth = container.level
-    if hasattr(container, 'partkey'):
-      self.partkey = container.partkey
-    return self
+    if container.partkey.tocentry:
+      link.complete(container.partkey.tocentry)
+    titlecontents = self.gettitlecontents(container)
+    if titlecontents:
+      if Options.notoclabels:
+        separator = u'. '
+      else:
+        separator = u': '
+      if container.partkey.tocentry:
+        link.contents.append(Constant(separator))
+      link.contents += titlecontents
+    return link
 
   def gettitlecontents(self, container):
     "Get the title of the container."
+    if not container.partkey.showtitle:
+      return None
     shorttitles = container.searchall(ShortTitle)
     if len(shorttitles) > 0:
-      contents = [Constant(u' ')]
+      contents = []
       for shorttitle in shorttitles:
         contents += shorttitle.contents
       return contents
-    return self.safecontents(container)
-
-  def safecontents(self, container):
-    "Extract the safe contents for the TOC from a container."
-    contents = []
-    for element in container.contents:
-      if element.__class__ in TOCEntry.copied:
-        contents.append(element)
-      elif element.__class__ in TOCEntry.allowed:
-        contents.append(self.safeclone(element))
-      elif element.__class__ in TOCEntry.extracted:
-        contents += self.safecontents(element)
-    return contents
-
-  def safeclone(self, container):
-    "Return a new container with contents only in a safe list, recursively."
-    clone = Cloner.clone(container)
-    clone.output = container.output
-    clone.contents = self.safecontents(container)
-    return clone
+    extractor = ContainerExtractor(TOCConfig.extracttitle)
+    captions = container.searchall(Caption)
+    if len(captions) == 1:
+      return extractor.extract(captions[0])
+    return extractor.extract(container)
 
   def __unicode__(self):
     "Return a printable representation."
-    return 'TOC entry: ' + self.entry
+    if not self.partkey.tocentry:
+      return 'Unnamed TOC entry'
+    return 'TOC entry: ' + self.partkey.tocentry
 
 class Indenter(object):
   "Manages and writes indentation for the TOC."
@@ -6489,6 +8798,17 @@ class Indenter(object):
       indent += '</div>\n'
     return indent
 
+class IndentedEntry(Container):
+  "An entry with an indentation."
+
+  def __init__(self):
+    self.output = ContentsOutput()
+
+  def create(self, indent, entry):
+    "Create the indented entry."
+    self.contents = [indent, entry]
+    return self
+
 class TOCTree(object):
   "A tree that contains the full TOC."
 
@@ -6498,10 +8818,10 @@ class TOCTree(object):
 
   def store(self, entry):
     "Place the entry in a tree of entries."
-    while len(self.tree) < entry.depth:
+    while len(self.tree) < entry.partkey.level:
       self.tree.append(None)
-    if len(self.tree) > entry.depth:
-      self.tree = self.tree[:entry.depth]
+    if len(self.tree) > entry.partkey.level:
+      self.tree = self.tree[:entry.partkey.level]
     stem = self.findstem()
     if len(self.tree) == 0:
       self.branches.append(entry)
@@ -6526,26 +8846,28 @@ class TOCConverter(object):
   def __init__(self):
     self.indenter = Indenter()
 
-  def translate(self, container):
-    "Translate a container to TOC entry + indentation."
+  def convertindented(self, container):
+    "Convert a container into an indented TOC entry."
     entry = self.convert(container)
     if not entry:
-      return []
-    indent = self.indenter.getindent(entry.depth)
-    return [indent, entry]
+      return BlackBox()
+    return self.indent(entry)
+
+  def indent(self, entry):
+    "Indent a TOC entry."
+    indent = self.indenter.getindent(entry.partkey.level)
+    return IndentedEntry().create(indent, entry)
 
   def convert(self, container):
     "Convert a container to a TOC entry."
-    if container.__class__ in [LyXHeader, LyXFooter]:
-      return TOCEntry().header(container)
-    if not hasattr(container, 'partkey'):
+    if not container.partkey:
       return None
-    if container.partkey in self.cache:
-      return TOCConverter.cache[container.partkey]
-    if container.level > LyXHeader.tocdepth:
+    if container.partkey.partkey in self.cache:
+      return TOCConverter.cache[container.partkey.partkey]
+    if container.partkey.level > DocumentParameters.tocdepth:
       return None
     entry = TOCEntry().create(container)
-    TOCConverter.cache[container.partkey] = entry
+    TOCConverter.cache[container.partkey.partkey] = entry
     TOCConverter.tree.store(entry)
     return entry
 
@@ -6553,7 +8875,6 @@ class TOCConverter(object):
 
 
 
-import os.path
 
 
 class Basket(object):
@@ -6602,19 +8923,17 @@ class TOCBasket(Basket):
   def setwriter(self, writer):
     Basket.setwriter(self, writer)
     Options.nocopy = True
-    self.writer.write(LyXHeader().gethtml())
+    self.writer.write(LyXHeader().process().gethtml())
     return self
 
   def write(self, container):
     "Write the table of contents for a container."
-    entries = self.converter.translate(container)
-    for entry in entries:
-      self.writer.write(entry.gethtml())
+    entry = self.converter.convertindented(container)
+    self.writer.write(entry.gethtml())
 
   def finish(self):
     "Mark as finished."
     self.writer.write(LyXFooter().gethtml())
-
 
 
 
@@ -6641,31 +8960,19 @@ class IntegralProcessor(object):
     for container in self.storage:
       self.processeach(container)
 
-class IntegralLayout(IntegralProcessor):
-  "A processor for layouts that will appear in the TOC."
-
-  processedtype = Layout
-  tocentries = []
-
-  def processeach(self, layout):
-    "Keep only layouts that have an entry."
-    if not hasattr(layout, 'entry'):
-      return
-    IntegralLayout.tocentries.append(layout)
-
 class IntegralTOC(IntegralProcessor):
   "A processor for an integral TOC."
 
   processedtype = TableOfContents
+  tocentries = []
 
   def processeach(self, toc):
     "Fill in a Table of Contents."
-    toc.output = TaggedOutput().settag('div class="fulltoc"', True)
     converter = TOCConverter()
-    for container in IntegralLayout.tocentries:
-      toc.contents += converter.translate(container)
+    for container in PartKeyGenerator.partkeyed:
+      toc.add(converter.convertindented(container))
     # finish off with the footer to align indents
-    toc.contents += converter.translate(LyXFooter())
+    toc.add(converter.convertindented(LyXFooter()))
 
   def writetotoc(self, entries, toc):
     "Write some entries to the TOC."
@@ -6679,12 +8986,14 @@ class IntegralBiblioEntry(IntegralProcessor):
 
   def processeach(self, entry):
     "Process each entry."
-    number = NumberGenerator.instance.generateunique('integralbib')
-    link = Link().complete(number, 'biblio-' + number, type='biblioentry')
+    number = NumberGenerator.generator.generate('integralbib')
+    link = Link().complete('cite', 'biblio-' + number, type='biblioentry')
+    link.contents = entry.citeref
     entry.contents = [Constant('['), link, Constant('] ')]
     if entry.key in BiblioCite.cites:
       for cite in BiblioCite.cites[entry.key]:
-        cite.complete(number, anchor = 'cite-' + number)
+        cite.contents = entry.citeref
+        cite.anchor = 'cite-' + number
         cite.destination = link
 
 class IntegralFloat(IntegralProcessor):
@@ -6717,7 +9026,7 @@ class IntegralListOf(IntegralProcessor):
 
   def processfloat(self, float):
     "Get an entry for the list of floats."
-    if float.parentfloat:
+    if not float.isparent():
       return None
     return TOCEntry().create(float)
 
@@ -6740,8 +9049,8 @@ class MemoryBasket(KeeperBasket):
     "Create all processors in one go."
     KeeperBasket.__init__(self)
     self.processors = [
-        IntegralLayout(), IntegralTOC(), IntegralBiblioEntry(),
-        IntegralFloat(), IntegralListOf(), IntegralReference()
+        IntegralTOC(), IntegralBiblioEntry(),
+        IntegralFloat(), IntegralListOf(), IntegralReference(),
         ]
 
   def finish(self):
@@ -6791,84 +9100,153 @@ class SplitPartLink(IntegralProcessor):
     "Process each link and add the current page."
     link.page = self.page
 
-class SplitPartHeader(object):
-  "The header that comes with a new split page."
+class UpAnchor(Link):
+  "An anchor to the top of the page for the up links."
 
-  upanchors = []
-  prev = TranslationConfig.constants['prev']
-  next = TranslationConfig.constants['next']
-  up = TranslationConfig.constants['up']
+  def create(self, container):
+    "Create the up anchor based on the first container."
+    if not container.partkey:
+      Trace.error('No part key for ' + unicode(container))
+      return None
+    return self.createliteral(container.partkey.tocentry)
 
-  def __init__(self, firstbasket):
-    "Set the first basket as last basket."
+  def createmain(self):
+    "Create the up anchor for the main page."
+    return self.createliteral(Translator.translate('main-page'))
+
+  def createliteral(self, literal):
+    "Create the up anchor based on a literal string."
+    self.complete('', '')
+    self.output = EmptyOutput()
+    self.partkey = PartKey().createanchor(literal)
+    return self
+
+class SplitPartNavigation(object):
+  "Used to create the navigation links for a new split page."
+
+  def __init__(self):
+    self.upanchors = []
     self.lastcontainer = None
     self.nextlink = None
-    firstbasket.write(self.insertupanchor())
+    self.lastnavigation = None
 
-  def create(self, basket, container):
+  def writefirstheader(self, basket):
+    "Write the first header to the basket."
+    anchor = self.createmainanchor()
+    basket.write(anchor)
+    basket.write(self.createnavigation(anchor))
+
+  def writeheader(self, basket, container):
     "Write the header to the basket."
-    basket.write(LyXHeader())
-    basket.write(self.createupanchor(container))
-    basket.write(self.createheader(container))
+    basket.write(LyXHeader().process())
+    basket.write(self.currentupanchor(container))
+    basket.write(self.createnavigation(container))
 
-  def createheader(self, container):
-    "Create the header with all links."
+  def writefooter(self, basket):
+    "Write the footer to the basket."
+    if self.lastnavigation:
+      basket.write(self.lastnavigation)
+    basket.write(LyXFooter())
+
+  def createnavigation(self, container):
+    "Create the navigation bar with all links."
     prevlink = Link().complete(' ', 'prev', type='prev')
     if self.nextlink:
-      self.setlinkname(prevlink, SplitPartHeader.prev, self.lastcontainer)
-      self.setlinkname(self.nextlink, SplitPartHeader.next, container)
+      self.setlinkname(prevlink, Translator.translate('prev'), self.lastcontainer)
+      self.setlinkname(self.nextlink, Translator.translate('next'), container)
       prevlink.setmutualdestination(self.nextlink)
-    nextlink = Link().complete(' ', SplitPartHeader.next, type='next')
-    uplink = Link().complete(SplitPartHeader.up, url='', type='up')
+    self.nextlink = Link().complete(' ', Translator.translate('next'), type='next')
+    uplink = Link().complete(Translator.translate('up'), url='', type='up')
+    self.setlinkname(uplink, Translator.translate('up'), self.getupdestination(container))
     uplink.destination = self.getupdestination(container)
     prevcontainer = TaggedText().complete([prevlink], 'span class="prev"')
-    nextcontainer = TaggedText().complete([nextlink], 'span class="next"')
+    nextcontainer = TaggedText().complete([self.nextlink], 'span class="next"')
     upcontainer = TaggedText().complete([uplink], 'span class="up"')
     contents = [prevcontainer, Constant('\n'), upcontainer, Constant('\n'), nextcontainer]
     header = TaggedText().complete(contents, 'div class="splitheader"', True)
-    self.nextlink = nextlink
     self.lastcontainer = container
+    self.lastnavigation = header
     return header
   
-  def createupanchor(self, container):
-    "Create the up anchor for the up links."
+  def currentupanchor(self, container):
+    "Update the internal list of up anchors, and return the current one."
     level = self.getlevel(container)
-    while len(SplitPartHeader.upanchors) > level:
-      del SplitPartHeader.upanchors[-1]
-    while len(SplitPartHeader.upanchors) < level:
-      SplitPartHeader.upanchors.append(SplitPartHeader.upanchors[-1])
-    return self.insertupanchor()
-
-  def insertupanchor(self):
-    "Insert the up anchor into the list of anchors."
-    upanchor = Link().complete('', '')
-    upanchor.output = EmptyOutput()
-    SplitPartHeader.upanchors.append(upanchor)
+    while len(self.upanchors) > level:
+      del self.upanchors[-1]
+    while len(self.upanchors) < level:
+      self.upanchors.append(self.upanchors[-1])
+    upanchor = UpAnchor().create(container)
+    self.upanchors.append(upanchor)
     return upanchor
+
+  def createmainanchor(self):
+    "Create the up anchor to the main page."
+    mainanchor = UpAnchor().createmain()
+    self.upanchors.append(mainanchor)
+    return mainanchor
 
   def getupdestination(self, container):
     "Get the name of the up page."
     level = self.getlevel(container)
-    if len(SplitPartHeader.upanchors) < level:
-      uppage = SplitPartHeader.upanchors[-1]
+    if len(self.upanchors) < level:
+      uppage = self.upanchors[-1]
     else:
-      uppage = SplitPartHeader.upanchors[level - 1]
+      uppage = self.upanchors[level - 1]
     return uppage
 
   def getlevel(self, container):
     "Get the level of the container."
-    if not hasattr(container, 'level'):
+    if not container.partkey:
       return 1
     else:
-      return container.level + 1
+      return container.partkey.level + 1
 
   def setlinkname(self, link, type, container):
     "Set the name on the link."
-    if hasattr(container, 'mustsplit'):
-      entry = container.mustsplit
-    else:
-      entry = container.entry
-    link.contents = [Constant(type + ': ' + entry)]
+    if not container.partkey:
+      Trace.error('No part key for link name ' + unicode(container))
+      return
+    link.contents = [Constant(type + ': ' + container.partkey.tocentry)]
+
+class SplitTOCBasket(MemoryBasket):
+  "A memory basket which contains a split table of contents."
+
+  def __init__(self):
+    MemoryBasket.__init__(self)
+    self.entrycount = 0
+    self.root = None
+    self.converter = TOCConverter()
+
+  def write(self, container):
+    "Keep track of numbered layouts."
+    MemoryBasket.write(self, container)
+    if not container.partkey:
+      return
+    if container.partkey.header:
+      return
+    entry = self.converter.convert(container)
+    if not entry:
+      return
+    self.entrycount += 1
+    self.root = entry
+
+  def addtoc(self):
+    "Add the table of contents if necessary."
+    if self.entrycount != 1:
+      return
+    if self.root.branches == []:
+      return
+    text = Translator.translate('toc-for') + self.root.partkey.tocentry
+    toc = TableOfContents().create(text)
+    self.addbranches(self.root, toc)
+    toc.add(self.converter.convertindented(LyXFooter()))
+    self.write(toc)
+
+  def addbranches(self, entry, toc):
+    "Add an entry and all of its branches to the table of contents."
+    for branch in entry.branches:
+      toc.add(self.converter.indent(branch))
+      self.addbranches(branch, toc)
   
 class SplitPartBasket(Basket):
   "A basket used to split the output in different files."
@@ -6895,19 +9273,26 @@ class SplitPartBasket(Basket):
     "Process the whole basket, create page baskets and flush all of them."
     self.basket.process()
     basket = self.firstbasket()
-    header = SplitPartHeader(basket)
+    navigation = SplitPartNavigation()
     for container in self.basket.contents:
       if self.mustsplit(container):
         filename = self.getfilename(container)
         Trace.debug('New page ' + filename)
-        basket.write(LyXFooter())
+        basket.addtoc()
+        navigation.writefooter(basket)
         basket = self.addbasket(filename)
-        header.create(basket, container)
+        navigation.writeheader(basket, container)
       basket.write(container)
+      if self.afterheader(container):
+        navigation.writefirstheader(basket)
     for basket in self.baskets:
       basket.process()
     for basket in self.baskets:
       basket.flush()
+
+  def afterheader(self, container):
+    "Find out if this is the header on the file."
+    return isinstance(container, LyXHeader)
 
   def firstbasket(self):
     "Create the first basket."
@@ -6917,7 +9302,7 @@ class SplitPartBasket(Basket):
     "Add a new basket."
     if not writer:
       writer = LineWriter(filename)
-    basket = MemoryBasket()
+    basket = SplitTOCBasket()
     basket.setwriter(writer)
     self.baskets.append(basket)
     # set the page name everywhere
@@ -6929,127 +9314,17 @@ class SplitPartBasket(Basket):
 
   def mustsplit(self, container):
     "Find out if the oputput file has to be split at this entry."
-    if self.splitalone(container):
-      return True
-    if not hasattr(container, 'entry'):
+    if not container.partkey:
       return False
-    entry = self.converter.convert(container)
-    if not entry:
+    if not container.partkey.filename:
       return False
-    return entry.depth <= Options.splitpart
-
-  def splitalone(self, container):
-    "Find out if the container must be split in its own page."
-    found = []
-    container.locateprocess(
-        lambda container: container.__class__ in [PrintNomenclature, PrintIndex],
-        lambda container: found.append(container.__class__.__name__))
-    if not found:
-      return False
-    container.depth = 0
-    container.mustsplit = found[0].lower().replace('print', '')
     return True
 
   def getfilename(self, container):
     "Get the new file name for a given container."
-    if hasattr(container, 'mustsplit'):
-      partname = container.mustsplit
-    else:
-      if container.level == Options.splitpart and container.number != '':
-        partname = container.number
-      else:
-        if container.number == '':
-          partname = container.partkey.replace('toc-', '').replace('*', '-')
-        else:
-          partname = container.type + '-' + container.number
+    partname = container.partkey.filename
     base, extension = os.path.splitext(self.filename)
     return base + '-' + partname + extension
-
-
-
-
-
-
-class PostTable(object):
-  "Postprocess a table"
-
-  processedclass = Table
-
-  def postprocess(self, last, table, next):
-    "Postprocess a table: long table, multicolumn rows"
-    self.longtable(table)
-    for row in table.contents:
-      index = 0
-      while index < len(row.contents):
-        self.checkforplain(row, index)
-        self.checkmulticolumn(row, index)
-        index += 1
-    return table
-
-  def longtable(self, table):
-    "Postprocess a long table, removing unwanted rows"
-    if not 'features' in table.parameters:
-      return
-    features = table.parameters['features']
-    if not 'islongtable' in features:
-      return
-    if features['islongtable'] != 'true':
-      return
-    if self.hasrow(table, 'endfirsthead'):
-      self.removerows(table, 'endhead')
-    if self.hasrow(table, 'endlastfoot'):
-      self.removerows(table, 'endfoot')
-
-  def hasrow(self, table, attrname):
-    "Find out if the table has a row of first heads"
-    for row in table.contents:
-      if attrname in row.parameters:
-        return True
-    return False
-
-  def removerows(self, table, attrname):
-    "Remove the head rows, since the table has first head rows."
-    for row in table.contents:
-      if attrname in row.parameters:
-        row.output = EmptyOutput()
-
-  def checkforplain(self, row, index):
-    "Make plain layouts visible if necessary."
-    cell = row.contents[index]
-    plainlayouts = cell.searchall(PlainLayout)
-    if len(plainlayouts) <= 1:
-      return
-    for plain in plainlayouts:
-      plain.makevisible()
-
-  def checkmulticolumn(self, row, index):
-    "Process a multicolumn attribute"
-    cell = row.contents[index]
-    if not hasattr(cell, 'parameters') or not 'multicolumn' in cell.parameters:
-      return
-    mc = cell.parameters['multicolumn']
-    if mc != '1':
-      Trace.error('Unprocessed multicolumn=' + unicode(multicolumn) +
-          ' cell ' + unicode(cell))
-      return
-    total = 1
-    index += 1
-    while self.checkbounds(row, index):
-      del row.contents[index]
-      total += 1
-    cell.setmulticolumn(total)
-
-  def checkbounds(self, row, index):
-    "Check if the index is within bounds for the row"
-    if index >= len(row.contents):
-      return False
-    if not 'multicolumn' in row.contents[index].parameters:
-      return False
-    if row.contents[index].parameters['multicolumn'] != '2':
-      return False
-    return True
-
-Postprocessor.stages.append(PostTable)
 
 
 
@@ -7066,8 +9341,6 @@ class PostFormula(object):
     if Options.jsmath or Options.mathjax:
       return formula
     self.postnumbering(formula)
-    self.postcontents(formula.contents)
-    self.posttraverse(formula)
     return formula
 
   def postnumbering(self, formula):
@@ -7092,17 +9365,16 @@ class PostFormula(object):
   def createlabel(self, formula, function = None):
     "Create a new label for a formula."
     "Add a label to a formula."
-    number = NumberGenerator.instance.generatechaptered('formula')
-    entry = '(' + number + ')'
-    if not hasattr(formula, number) or not formula.number:
-      formula.number = number
-      formula.entry = entry
+    number = NumberGenerator.chaptered.generate('formula')
+    partkey = PartKey().createformula(number)
+    if not formula.partkey:
+      formula.partkey = partkey
     if not function:
       label = Label()
-      label.create(entry + ' ', 'eq-' + number, type="eqnumber")
+      label.create(partkey.tocentry + ' ', 'eq-' + number, type="eqnumber")
     else:
       label = function.label
-      label.complete(entry + ' ')
+      label.complete(partkey.tocentry + ' ')
     return label
 
   def searchrow(self, function):
@@ -7110,79 +9382,6 @@ class PostFormula(object):
     if isinstance(function.parent, Formula) or isinstance(function.parent, FormulaRow):
       return function.parent
     return self.searchrow(function.parent)
-
-  def postcontents(self, contents):
-    "Search for sum or integral"
-    for index, bit in enumerate(contents):
-      self.checklimited(contents, index)
-      if isinstance(bit, FormulaBit):
-        self.postcontents(bit.contents)
-
-  def checklimited(self, contents, index):
-    "Check for a command with limits"
-    bit = contents[index]
-    if not isinstance(bit, EmptyCommand):
-      return
-    if not bit.command in FormulaConfig.limits['commands']:
-      return
-    limits = self.findlimits(contents, index + 1)
-    limits.reverse()
-    if len(limits) == 0:
-      return
-    tagged = TaggedBit().complete(limits, 'span class="limits"')
-    contents.insert(index + 1, tagged)
-
-  def findlimits(self, contents, index):
-    "Find the limits for the command"
-    limits = []
-    while index < len(contents):
-      if not self.checklimits(contents, index):
-        return limits
-      limits.append(contents[index])
-      del contents[index]
-    return limits
-
-  def checklimits(self, contents, index):
-    "Check for a command making the limits"
-    bit = contents[index]
-    if not isinstance(bit, SymbolFunction):
-      return False
-    if not bit.command in FormulaConfig.limits['operands']:
-      return False
-    bit.output.tag += ' class="bigsymbol"'
-    return True
-
-  def posttraverse(self, formula):
-    "Traverse over the contents to alter variables and space units."
-    flat = self.flatten(formula)
-    last = None
-    for bit, contents in self.traverse(flat):
-      if bit.type == 'alpha':
-        self.italicize(bit, contents)
-      elif bit.type == 'font' and last and last.type == 'number':
-        bit.contents.insert(0, FormulaConstant(u' '))
-        # last.contents.append(FormulaConstant(u' '))
-      last = bit
-
-  def flatten(self, bit):
-    "Return all bits as a single list of (bit, list) pairs."
-    flat = []
-    for element in bit.contents:
-      if element.type:
-        flat.append((element, bit.contents))
-      elif isinstance(element, FormulaBit):
-        flat += self.flatten(element)
-    return flat
-
-  def traverse(self, flattened):
-    "Traverse each (bit, list) pairs of the formula."
-    for element in flattened:
-      yield element
-
-  def italicize(self, bit, contents):
-    "Italicize the given bit of text."
-    index = contents.index(bit)
-    contents[index] = TaggedBit().complete([bit], 'i')
 
 Postprocessor.stages.append(PostFormula)
 
@@ -7217,7 +9416,6 @@ class eLyXerConverter(object):
     self.filtering = True
     self.reader = reader
     self.basket = MemoryBasket()
-    self.writer = NullWriter()
     return self
 
   def convert(self):
@@ -7235,27 +9433,26 @@ class eLyXerConverter(object):
   def processcontents(self):
     "Parse the contents and write it by containers"
     factory = ContainerFactory()
-    self.postproc = Postprocessor()
+    processor = Processor(self.filtering)
     while not self.reader.finished():
       container = factory.createcontainer(self.reader)
-      if container and not self.filtered(container):
-        result = self.postproc.postprocess(container)
-        if result:
-          self.basket.write(result)
-    # last round: clear the pipeline
-    result = self.postproc.postprocess(None)
-    if result:
-      self.basket.write(result)
+      result = processor.process(container)
+      self.writecontainer(result)
+    result = processor.postprocess(None)
+    self.writecontainer(result)
     if not self.filtering:
       self.basket.finish()
 
-  def filtered(self, container):
-    "Find out if the container is a header or footer and must be filtered."
-    if not self.filtering:
-      return False
-    if container.__class__ in [LyXHeader, LyXFooter]:
-      return True
-    return False
+  def writecontainer(self, container):
+    "Write each container to the correct basket."
+    if not container:
+      return
+    includes = container.searchremove(IncludeInset)
+    self.basket.write(container)
+    # recursive processing for IncludeInset
+    for include in includes:
+      for element in include.contents:
+        self.basket.write(element)
 
   def getcontents(self):
     "Return the contents of the basket."

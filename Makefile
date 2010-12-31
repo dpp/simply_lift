@@ -6,16 +6,18 @@ html	:
 	@echo [Building HTML]
 	rm -rf Simply_Lift
 	mkdir Simply_Lift
-	cp -r templates/* Simply_Lift
-	python elyxer.py --splitpart 2 Simply_Lift.lyx Simply_Lift/index.html
+	cp -R templates/css Simply_Lift/
+	cp -R templates/scripts Simply_Lift/
+	python elyxer.py --splitpart 2 --defaultbrush "scala" --template templates/template.html Simply_Lift.lyx Simply_Lift/index.html
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
 
 htmlblob	: 
 	@echo [Building HTML]
 	rm -rf Simply_Lift
 	mkdir Simply_Lift
-	cp -r templates/* Simply_Lift
-	python elyxer.py Simply_Lift.lyx Simply_Lift/index.html
+	cp -R templates/css Simply_Lift/
+	cp -R templates/scripts Simply_Lift/
+	python elyxer.py --defaultbrush "scala" --template templates/template.html Simply_Lift.lyx Simply_Lift/index.html
 	tar cvzf Simply_Lift.html.tgz Simply_Lift/
 
 pdf	: Simply_Lift.pdf
