@@ -27,7 +27,11 @@ class Boot {
 
     // Build SiteMap
     def sitemap(): SiteMap = SiteMap(
-      Menu.i("Home") / "index" // the simple way to declare a menu
+      Menu.i("Home") / "index", // the simple way to declare a menu
+      Menu.i("Dumb Form") / "dumb",
+      Menu.i("On Submit") / "onsubmit",
+      Menu.i("Query") / "query" >>
+      If(() => S.param("q").isDefined, "No Query Param")
     )
 
     // set the sitemap.  Note if you don't want access control for

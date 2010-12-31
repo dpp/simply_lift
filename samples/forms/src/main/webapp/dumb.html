@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <title>Dumb Form</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" class="lift:surround?with=default&at=content">
+      <div>
+	This is the simplest type of form processing... plain old
+	mechanism of naming form elements and processing the form elements
+	in a post-back.
+      </div>
+      
+      <div>
+	<form action="/dumb" method="post" class="lift:DumbForm">
+	  Name: <input name="name"><br>
+	  Age: <input name="age"><br>
+	  <input type="submit" value="Submit">
+	</form>
+      </div>
+    </div>
+  </body>
+</html>
+
