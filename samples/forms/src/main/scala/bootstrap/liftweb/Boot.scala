@@ -30,6 +30,11 @@ class Boot {
       Menu.i("Home") / "index", // the simple way to declare a menu
       Menu.i("Dumb Form") / "dumb",
       Menu.i("On Submit") / "onsubmit",
+      Menu.i("Better Error Handling") / "stateful",
+      Menu.i("RequestVars") / "requestvar",
+      Menu.i("Field Error") / "fielderror",
+      Menu.i("Screen") / "screen",
+      Menu.i("Wizard") / "wizard",
       Menu.i("Query") / "query" >>
       If(() => S.param("q").isDefined, "No Query Param")
     )
