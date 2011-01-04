@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
-    <title>On Submit</title>
-  </head>
-  <body class="lift:content_id=main">
-    <div id="main" class="lift:surround?with=default&at=content">
-      <div>
-	Using Lift's SHtml.onSubmit, we've got better control
-	over the form processing.
-      </div>
-      
-      <div>
-	<form class="lift:FieldErrorExample?form=post">
-	  Name: <input name="name"><br>
-	  Age: <span class="lift:Msg?id=age&errorClass=error">error</span><input name="age" id="the_age" value="0"><br>
-	  <input type="submit" value="Submit">
-	</form>
-      </div>
+<div id="main" class="lift:surround?with=default&at=content">
+  <div>
+    Let's get granular about error messages
+  </div>
+  
+  <div>
+    <div class="lift:FieldErrorExample?form=post">
+      Name: <input name="name"><br>
+      Age: <span class="lift:Msg?id=age&errorClass=error">error</span>
+      <input name="age" id="the_age" value="0"><br>
+      <input type="submit" value="Submit">
     </div>
-  </body>
-</html>
+  </div>
+</div>
 

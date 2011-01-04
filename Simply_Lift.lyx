@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-12/30/2010
+1/3/2011
 \end_layout
 
 \begin_layout Standard
@@ -4246,6 +4246,12 @@ Questions and Answers
 \end_layout
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:Scaling"
+
+\end_inset
+
 Scaling
 \end_layout
 

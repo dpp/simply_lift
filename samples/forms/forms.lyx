@@ -51,5 +51,953 @@ theorems-ams
 Forms
 \end_layout
 
+\begin_layout Standard
+In this chapter, we'll see how Lift processes templates.
+ We'll start with form processing the old fashioned way (where the designer
+ names the inputs and the application maps those names to variables) through
+ multi-page input forms and Ajax form support.
+\end_layout
+
+\begin_layout Section
+Old Fashioned Dumb Forms
+\end_layout
+
+\begin_layout Standard
+Let's take a look at the HTML for a form:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/dumb.html"
+lstparams "caption={dumb.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Okay...
+ looks pretty normal...
+ we define a form.
+ The only thing we do is associate the behavior with the form with the 
+\family typewriter
+class="lift:DumbForm"
+\family default
+ attribute on the 
+\family typewriter
+<form>
+\family default
+ tag.
+ The page is a post-back which means that the form is posted to the same
+ URL that served the original content.
+\end_layout
+
+\begin_layout Standard
+Let's see the code to process the form:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/DumbForm.scala"
+lstparams "caption={DumbForm.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It's pretty simple.
+ If the request is a post and the query parameters exist, then display notices
+ with the name and age and redirect back the application's home page.
+\end_layout
+
+\begin_layout Standard
+There are plenty of reasons not to do things this way.
+\end_layout
+
+\begin_layout Standard
+First, if there's a naming mis-match between the HTML and the Scala code,
+ you might miss a form field...
+ and keeping the naming aligned is not always easy.
+\end_layout
+
+\begin_layout Standard
+Second, forms with predictable names lead to replay attacks.
+ If an attacker can capture the form submits you've made and substitute
+ new values for import fields, they can more easily hack your application.
+\end_layout
+
+\begin_layout Standard
+Third, keeping state around becomes very difficult with manual forms.
+ You have to resort to hidden fields that contain primary keys or other
+ information that can be tampered with.
+\end_layout
+
+\begin_layout Standard
+Lift provides you with much more powereful and secure mechanisms for dealing
+ with HTML forms.
+\end_layout
+
+\begin_layout Section
+OnSubmit
+\end_layout
+
+\begin_layout Standard
+Some of Lift's design reflects VisualBasic...
+ associating user behavior with a user interface element.
+ It's a simple, yet very powerful concept.
+ Each form element is associated with a function on the server
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Before you get all upset about statefulness and such, please read about
+ Lift and State (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "cha:Scaling"
+
+\end_inset
+
+).
+\end_layout
+
+\end_inset
+
+.
+ Further, because functions in Scala close over scope (capture the variables
+ currently in scope), it's both easy and secure to keep state around without
+ exposing that state to the web client.
+\end_layout
+
+\begin_layout Standard
+So, let's see how it works.
+ First, the HTML:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/onsubmit.html"
+lstparams "caption={onsubmit.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The only different thing in this HTML is 
+\family typewriter
+<form class="lift:OnSubmit?form=post">
+\family default
+.
+ The snippet, behavior, of the form is to invoke 
+\family typewriter
+OnSubmit.render
+\family default
+.
+ The 
+\family typewriter
+form=post
+\family default
+ attribute makes the form into a post-back.
+ It sets the 
+\family typewriter
+method
+\family default
+ and 
+\family typewriter
+action
+\family default
+ attributes on the 
+\family typewriter
+<form>
+\family default
+ tag: 
+\family typewriter
+<form method="post" action="/onsubmit">
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Let's look at the snippet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/OnSubmit.scala"
+lstparams "caption={OnSubmit.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Like 
+\family typewriter
+DumbForm.scala
+\family default
+, the snippet is implemented as a singleton.
+ The render method declares two variables: 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+age
+\family default
+.
+ Let's skip the 
+\family typewriter
+process()
+\family default
+ method and look at the was we're associating behavior with the form elements.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+"name=name" #> SHtml.onSubmit(name = _)
+\family default
+ takes the incoming HTML elements with the 
+\family typewriter
+name
+\family default
+ attribute equal to 
+\begin_inset Quotes eld
+\end_inset
+
+name
+\begin_inset Quotes erd
+\end_inset
+
+ and, via the 
+\family typewriter
+SHtml.onSubmit
+\family default
+ method, associating a function with the form element.
+ The function takes a 
+\family typewriter
+String
+\family default
+ parameter and sets the value of the 
+\family typewriter
+name
+\family default
+ variable to the 
+\family typewriter
+String
+\family default
+.
+ The resulting HTML is 
+\family typewriter
+<input name="F10714412223674KM">
+\family default
+.
+ The new 
+\family typewriter
+name
+\family default
+ attribute is a GUID (globally unique identifier) that associates the function
+ (set the name to the input) with the form element.
+ When the form is submitted, via normal HTTP post or via Ajax, the function
+ will be executed with the value of the form element.
+ On form submit, perform this function.
+\end_layout
+
+\begin_layout Standard
+Let's see about the age form field: 
+\family typewriter
+"name=age" #> SHtml.onSubmit(s => asInt(s).foreach(age = _))
+\family default
+.
+ The function that's executed uses 
+\family typewriter
+Helpers.asInt
+\family default
+ to try to parse the 
+\family typewriter
+String
+\family default
+ to an 
+\family typewriter
+Int
+\family default
+.
+ If the parsing is successful, the 
+\family typewriter
+age
+\family default
+ variable is set to the parsed 
+\family typewriter
+Int
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Finally, we associate a function with the submit button: 
+\family typewriter
+"type=submit" #> SHtml.onSubmitUnit(process)
+\family default
+.
+ 
+\family typewriter
+SHtml.onSubmitUnit
+\family default
+ method takes a function that takes no parameters (rather than a function
+ that takes a single 
+\family typewriter
+String
+\family default
+ as a parameter) and applies that function when the form is submitted.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+process()
+\family default
+ method closes over the scope of the 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+age
+\family default
+ variables and when that method is lifted to a function, it still closes
+ over the variables...
+ that means that when the function is applied, it refers to the same instances
+ of the 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+age
+\family default
+ variables as the other functions in this method.
+ However, if we had 85 copies of the form open in 85 browsers, each would
+ be closing over different instances of the 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+age
+\family default
+ variables.
+ In this way, Lift allows your application to contain complex state without
+ exposing that complex state to the browser.
+\end_layout
+
+\begin_layout Standard
+The problem with this form example is that if you type an incorrect age,
+ the whole form is reset.
+ Let's see how we can do better error handling.
+\end_layout
+
+\begin_layout Section
+Stateful Snippets
+\end_layout
+
+\begin_layout Standard
+In order for us to give the user a better experience, we need to capture
+ the state of the name and age variables across the multiple form submissions.
+ The mechanism that Lift has for doing this is the Stateful Snippet
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+There are no stateless snippets.
+ A Stateful Snippet doesn't consume any more server-side resources than
+ does a form composed via 
+\family typewriter
+SHtml.onSubmit()
+\family default
+.
+ Oh, and state is not a barier to scalaing.
+ See 
+\begin_inset CommandInset ref
+LatexCommand prettyref
+reference "cha:Scaling"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+.
+ A snippet that subclasses 
+\family typewriter
+StatefulSnippet
+\family default
+ has an extra hidden parameter automatically inserted into the form which
+ ensures that during processing of that form, the same instance of the StatefulS
+nippet will be used
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Earlier I talked about the security implications of hidden form parameters.
+ The hidden parameter mechanism is not vulnerable to the same issues because
+ the hidden parameter itself is just a GUID that causes a function to be
+ invoked on the server.
+ No state is exposed to the client, so there's nothing for a hacker to capture
+ or mutate that would allow for the exploitation of a vulnerability.
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let's look at the HTML template:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/stateful.html"
+lstparams "caption={stateful.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The template looks pretty much like the template in 
+\family typewriter
+onsubmit.html
+\family default
+.
+ Let's look at the snippet itself:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/Stateful.scala"
+lstparams "caption={Stateful.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There's a fair amount different here.
+ First, the class definition: 
+\family typewriter
+class Stateful extends StatefulSnippet
+\family default
+.
+ Because the snippet instance itself contains state, it can't be an object
+ singleton.
+ It must be declared as a class so there are multiple instances.
+\end_layout
+
+\begin_layout Standard
+We capture state (
+\family typewriter
+name
+\family default
+, 
+\family typewriter
+age
+\family default
+ and 
+\family typewriter
+from
+\family default
+ whence the user came), in instance variables.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+StatefulSnippet
+\family default
+s require a 
+\family typewriter
+dispatch
+\family default
+ method which does method dispatching explicitly rather than 
+\begin_inset Quotes eld
+\end_inset
+
+by-convention.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The render method uses familiar CSS Selector Transforms to associate markup
+ with behavior.
+ However, rather than using 
+\family typewriter
+SHtml.onSubmit
+\family default
+, we're using 
+\family typewriter
+SHtml.text
+\family default
+ to explicitly generate an HTML 
+\family typewriter
+<input>
+\family default
+ element with both the 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+value
+\family default
+ attributes set.
+ In the case of the first input, we're also explicitly setting the 
+\family typewriter
+id
+\family default
+ attribute.
+ We're not using it in the application, but it's a way to demonstrate how
+ to add extra attributes.
+\end_layout
+
+\begin_layout Standard
+Finally, the 
+\family typewriter
+process()
+\family default
+ method attempts to covert the age 
+\family typewriter
+String
+\family default
+ into an 
+\family typewriter
+Int
+\family default
+.
+ If it's an 
+\family typewriter
+Int
+\family default
+, but less than 13, we present an error.
+ If the 
+\family typewriter
+String
+\family default
+ cannot be parsed to an 
+\family typewriter
+Int
+\family default
+, we present an error, otherwise we do notify the user and go back to the
+ page the user came from.
+\end_layout
+
+\begin_layout Standard
+Note in this example, we preserve the form values, so if you type something
+ wrong in the 
+\family typewriter
+name
+\family default
+ or 
+\family typewriter
+age
+\family default
+ fields, what you typed is presented to you again.
+\end_layout
+
+\begin_layout Standard
+The big difference between the resulting HTML for 
+\family typewriter
+StatefulSnippet
+\family default
+s and other snippets is the insertion of 
+\family typewriter
+<input name="F1071441222401LO3" type="hidden" value="true">
+\family default
+ in the form.
+ This hidden field associates the snippet named 
+\begin_inset Quotes eld
+\end_inset
+
+Stateful
+\begin_inset Quotes erd
+\end_inset
+
+ with the instance of 
+\family typewriter
+Stateful
+\family default
+ that was used to initially generate the form.
+\end_layout
+
+\begin_layout Standard
+Let's look at an alternative mechanism for creating a nice user experience.
+\end_layout
+
+\begin_layout Section
+
+\family typewriter
+RequestVar
+\family default
+s
+\end_layout
+
+\begin_layout Standard
+In this example, we're going to preserve state during the request by placing
+ state in 
+\family typewriter
+RequestVar
+\family default
+s (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:SessionVars-and-RequestVars"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Lift has type-safe containers for state called 
+\family typewriter
+XXXVar
+\family default
+s.
+ There are 
+\family typewriter
+SessionVar
+\family default
+s that have session scope, 
+\family typewriter
+WizardVar
+\family default
+s that are scoped to a Wizard and 
+\family typewriter
+RequestVar
+\family default
+s that are scoped to the current request
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+In this case, 
+\begin_inset Quotes eld
+\end_inset
+
+request
+\begin_inset Quotes erd
+\end_inset
+
+ means full HTML page load and all subsquent Ajax operations on that page.
+ There's also a 
+\family typewriter
+TransientRequestVar
+\family default
+ that has the scope of the current HTTP request.
+\end_layout
+
+\end_inset
+
+.
+ 
+\family typewriter
+Var
+\family default
+s are defined as singletons: 
+\family typewriter
+private object name extends RequestVar("")
+\family default
+.
+ They are typed (in this case, the type is 
+\family typewriter
+String
+\family default
+) and they have a default value.
+\end_layout
+
+\begin_layout Standard
+So, let's look at the HTML which looks shockingly like the HTML in the last
+ two examples:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/requestvar.html"
+lstparams "caption={requestvar.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, let's look at the snippet code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/ReqVar.scala"
+lstparams "caption={ReqVar.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The snippet is a singleton because the state is kept in the 
+\family typewriter
+RequestVar
+\family default
+s.
+\end_layout
+
+\begin_layout Standard
+We use 
+\family typewriter
+SHtml.textElem()
+\family default
+ to generate the 
+\family typewriter
+<input>
+\family default
+ tag.
+ We can pass the 
+\family typewriter
+RequestVar
+\family default
+ into the method and the function that gets/sets the 
+\family typewriter
+RequestVar
+\family default
+ is generated for us.
+\end_layout
+
+\begin_layout Standard
+The use of this mechanism for doing stateful forms versus the StatefulSnippet
+ mechanism is one of personal choice.
+ Neither one is better, they are just different.
+\end_layout
+
+\begin_layout Standard
+Next, let's look at how to get more granular with error messages.
+\end_layout
+
+\begin_layout Section
+Field Errors
+\end_layout
+
+\begin_layout Standard
+In the prior examples, we displayed an error to the user.
+ However, we didn't tell the user what field resulted in the error.
+ Let's be a little more granular about error reporting.
+\end_layout
+
+\begin_layout Standard
+First, let's look at the HTML:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/fielderror.html"
+lstparams "caption={fielderror.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This HTML is different.
+ Note: 
+\family typewriter
+Age: <span class="lift:Msg?id=age&errorClass=error">error</span>
+\family default
+.
+ We mark an area in the markup to put the error message.
+\end_layout
+
+\begin_layout Standard
+Let's look at our snippet code which is very similar to 
+\family typewriter
+Stateful.scala
+\family default
+ with a small, but important difference:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/FieldErrorExample.scala"
+lstparams "caption={FieldErrorExample.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The key difference is: 
+\family typewriter
+case Full(a) if a < 13 => S.error(
+\series bold
+"age"
+\series default
+, "Too young!")
+\family default
+.
+ Note that we pass "age" to 
+\family typewriter
+S.error
+\family default
+ and this corresponds to the 
+\family typewriter
+id
+\family default
+ in the 
+\family typewriter
+Msg
+\family default
+ snippet in markup.
+ This tells Lift how to associate the error message and the markup.
+\end_layout
+
+\begin_layout Standard
+But there's a better way to do complex forms in Lift: 
+\family typewriter
+LiftScreen
+\family default
+.
+\end_layout
+
+\begin_layout Section
+
+\family typewriter
+LiftScreen
+\end_layout
+
+\begin_layout Standard
+Much of what we do to build web applications is generating screens that
+ associate input with dynamic content.
+ Lift provides Screen and Wizard for building single page and multi-page
+ input forms with validation, back-button support, etc.
+\end_layout
+
+\begin_layout Standard
+So, let's look at the HTML for a screen:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/screen.html"
+lstparams "caption={screen.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We don't explicitly declare the form elements.
+ We just point to the snippet which looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/ScreenExample.scala"
+lstparams "caption={ScreenExample.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the screen, we define the fields and their validation rules and then
+ what to do when the screen is finished.
+ Lift takes care of the rest.
+\end_layout
+
+\begin_layout Standard
+The markup for generating the form, by default, is found in 
+\family typewriter
+/templates-hidden/wizard-all.html
+\family default
+.
+ You can also select templates on a screen-by-screen basis.
+\end_layout
+
+\begin_layout Section
+
+\family typewriter
+Wizard
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+LiftScreen
+\family default
+ is great for single screen applications.
+ If you've got input and validation that requires multiple screens, Wizard
+ is what you want.
+ We'll skip the markup 'cause it's just a snippet invocation.
+ Here's the wizard code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/WizardExample.scala"
+lstparams "caption={WizardExample.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It's declarative just like the screen example above.
+ The back button works.
+ You can have multiple wizards active in multiple tabs in your browser and
+ they don't intefer with each other.
+\end_layout
+
+\begin_layout Section
+Ajax
+\end_layout
+
+\begin_layout Standard
+In addition to full-page HTML, Lift support Ajax forms.
+\end_layout
+
+\begin_layout Section
+But sometimes Old Fashioned is good
+\end_layout
+
 \end_body
 \end_document

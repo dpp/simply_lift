@@ -35,6 +35,7 @@ class Boot {
       Menu.i("Field Error") / "fielderror",
       Menu.i("Screen") / "screen",
       Menu.i("Wizard") / "wizard",
+      Menu.i("Ajax") / "ajax",
       Menu.i("Query") / "query" >>
       If(() => S.param("q").isDefined, "No Query Param")
     )

@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
-    <title>On Submit</title>
-  </head>
-  <body class="lift:content_id=main">
-    <div id="main" class="lift:surround?with=default&at=content">
-      <div>
-	Using Lift's SHtml.onSubmit, we've got better control
-	over the form processing.
-      </div>
+<div id="main" class="lift:surround?with=default&at=content">
+  <div>
+    Using stateful snippets for a better
+    user experience
+  </div>
       
-      <div>
-	<form class="lift:Stateful?form=post">
-	  Name: <input name="name" style="border-color: green; border-style:solid; border-width:5px;"><br>
-	  Age: <input name="age" id="the_age" value="0"><br>
-	  <input type="submit" value="Submit">
-	</form>
-      </div>
+  <div>
+    <div class="lift:Stateful?form=post">
+      Name: <input name="name"><br>
+      Age: <input name="age" value="0"><br>
+      <input type="submit" value="Submit">
     </div>
-  </body>
-</html>
+  </div>
+</div>
 
