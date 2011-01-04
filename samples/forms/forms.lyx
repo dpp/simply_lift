@@ -993,10 +993,181 @@ Ajax
 
 \begin_layout Standard
 In addition to full-page HTML, Lift support Ajax forms.
+ Because Lift's forms are functions on the server-side associated with GUIDs
+ in the browser, switching a form from full page load to Ajax is, well,
+ pretty trivial.
+ Let's look at the markup:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/ajax.html"
+lstparams "caption={ajax.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The key difference is: 
+\family typewriter
+<form class="lift:form.ajax">
+\family default
+.
+ This invokes Lift's built-in 
+\family typewriter
+form
+\family default
+ snippet and designates the current form as an Ajax form.
+ Then the snippet does the following:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/AjaxExample.scala"
+lstparams "caption={AjaxExample.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The code looks a lot like the Stateful code.
+ Except that we don't bind to the submit button (the submit button is not
+ serialized over Ajax), so we have to add a hidden field to the age field
+ which does the processing.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+process()
+\family default
+ method returns a 
+\family typewriter
+JsCmd
+\family default
+ which is the JavaScript command to send back to the browser in response
+ to the Ajax form submission.
+ In this case, we're either using 
+\family typewriter
+S.error
+\family default
+ to display error notices followed by a 
+\family typewriter
+Noop
+\family default
+ or we're doing a redirect.
+\end_layout
+
+\begin_layout Standard
+We pause for 400 milliseconds in the 
+\family typewriter
+process()
+\family default
+ method so that the user can see the spinner in the browser indicating that
+ an Ajax operation is taking place.
+\end_layout
+
+\begin_layout Standard
+But the core take-away is that normal HTML processing and Ajax processing
+ are almost identical and both are super-easy.
 \end_layout
 
 \begin_layout Section
 But sometimes Old Fashioned is good
+\end_layout
+
+\begin_layout Standard
+In this chapter, we've explored Lift's form building and processing features
+ and demonstrated the power and value of associating GUIDs on the client
+ with functions on the server.
+ However, sometimes it's nice to have parameter processing via URL parameters...
+ and that's easy to do with Lift as well.
+\end_layout
+
+\begin_layout Standard
+Every page in the examples for this chapter contain:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=xml"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+	<form action="/query">
+\end_layout
+
+\begin_layout Plain Layout
+
+	  <input name="q">
+\end_layout
+
+\begin_layout Plain Layout
+
+	  <input type="submit" value="Search">
+\end_layout
+
+\begin_layout Plain Layout
+
+	</form>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a plain old form that generates a URL like: 
+\family typewriter
+http://localhost:8080/query?q=catfood
+\family default
+ This URL can be copied, pasted, shared, etc.
+\end_layout
+
+\begin_layout Standard
+Processing this URL is easy:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/Query.scala"
+lstparams "caption={Query.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using 
+\family typewriter
+S.param("param_name")
+\family default
+ we can extract the query parameter and do something with it.
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+Lift's form generation and processing tools offer a wide variety of mechanisms
+ to securely, simply and powerfully generate and process HTML forms either
+ as part of full HTTP requests or via Ajax requests.
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \end_body
