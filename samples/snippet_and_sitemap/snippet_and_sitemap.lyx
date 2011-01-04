@@ -2009,7 +2009,66 @@ Recursive
 \end_layout
 
 \begin_layout Standard
-FIXME example and discussion of recursive snippets
+Lift's snippets are evaluated lazily.
+ This means that the body of the snippet is not executed until the outer
+ snippet is executed which allows you to return markup from a snippet that
+ itself contains a snippet or alternatively, choose part of the snippet
+ body that itself contains a snippet invocation.
+ For example, in this markup:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/recurse.html"
+lstparams "caption={recurse.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+Recurse
+\family default
+ snippet chooses one of both of the 
+\family typewriter
+<div>
+\family default
+'s, each of which invokes a snippet themselves.
+ Here's the Scala:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/Recurse.scala"
+lstparams "caption={Recurse.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Depending on the value of 
+\family typewriter
+which
+\family default
+, one or both parts of the markup will be chosen.
+ And each part of the markup itself invokes a snippet which displays a notice
+ and passes the markup through.
+\end_layout
+
+\begin_layout Standard
+Using this technique, you can have a snippet that chooses one or many different
+ snippets or returns a 
+\family typewriter
+lift:embed
+\family default
+ snippet, thus allowing for very dynamic markup generation.
 \end_layout
 
 \begin_layout Subsection

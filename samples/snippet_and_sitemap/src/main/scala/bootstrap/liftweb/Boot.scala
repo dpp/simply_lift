@@ -47,6 +47,13 @@ class Boot {
       Menu.i("Dynamic") / "dynamic", // a page with dynamic content
 
       Param.menu,
+
+      Menu.param[Which]("Recurse", "Recurse",
+                        {case "one" => Full(First())
+                         case "two" => Full(Second())
+                         case "both" => Full(Both())
+                         case _ => Empty},
+                        w => w.toString) / "recurse",
       
       // more complex because this menu allows anything in the
       // /static path to be visible
