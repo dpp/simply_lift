@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-1/3/2011
+1/5/2011
 \end_layout
 
 \begin_layout Standard
@@ -4658,6 +4658,16 @@ Releases
 \begin_inset CommandInset include
 LatexCommand include
 filename "chapters/2_2-RC1.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/2_2-final.lyx"
 
 \end_inset
 
