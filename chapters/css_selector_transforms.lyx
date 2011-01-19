@@ -372,13 +372,51 @@ NodeSeq => NodeSeq -- a function that transforms the node (yes, it can be
 \end_layout
 
 \begin_layout Itemize
-Bindable -- something that implements the Bindable trait (e.g., MappedField
- and Record.Field)
+
+\family typewriter
+Bindable
+\family default
+ -- something that implements the 
+\family typewriter
+Bindable
+\family default
+ trait (e.g., 
+\family typewriter
+MappedField
+\family default
+ and 
+\family typewriter
+Record.Field
+\family default
+)
 \end_layout
 
 \begin_layout Itemize
-StringPromotable -- A constant that can be promoted to a String (Int, Symbol,
- Long or Boolean).
+
+\family typewriter
+StringPromotable
+\family default
+ -- A constant that can be promoted to a 
+\family typewriter
+String
+\family default
+ (
+\family typewriter
+Int
+\family default
+, 
+\family typewriter
+Symbol
+\family default
+, 
+\family typewriter
+Long
+\family default
+ or 
+\family typewriter
+Boolean
+\family default
+).
  There is an automatic (implicit) conversion from Int, Symbol, Long or Boolean
  to StringPromotable.
 \begin_inset Newline newline
@@ -390,10 +428,57 @@ StringPromotable -- A constant that can be promoted to a String (Int, Symbol,
 \end_layout
 
 \begin_layout Itemize
-IterableConst -- A Box, Seq, or Option of String, NodeSeq, or Bindable.
- Implicit conversions automatically promote the likes of Box[String], List[Strin
-g], List[NodeSeq], etc.
- to IterableConst.
+
+\family typewriter
+IterableConst
+\family default
+ -- A 
+\family typewriter
+Box
+\family default
+, 
+\family typewriter
+Seq
+\family default
+, or 
+\family typewriter
+Option
+\family default
+ of 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+, 
+\family typewriter
+String
+\family default
+, 
+\family typewriter
+NodeSeq
+\family default
+, or 
+\family typewriter
+Bindable
+\family default
+.
+ Implicit conversions automatically promote the likes of 
+\family typewriter
+Box[String]
+\family default
+, 
+\family typewriter
+List[String]
+\family default
+, 
+\family typewriter
+List[NodeSeq]
+\family default
+, etc.
+ to 
+\family typewriter
+IterableConst
+\family default
+.
 \begin_inset Newline newline
 \end_inset
 
@@ -410,15 +495,50 @@ g], List[NodeSeq], etc.
 \end_layout
 
 \begin_layout Itemize
-List[NodeSeq => NodeSeq], Box[NodeSeq => NodeSeq], Option[NodeSeq => NodeSeq]
- - 
+
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ -- A function that transforms the incoming 
+\family typewriter
+NodeSeq
+\family default
+ to another 
+\family typewriter
+NodeSeq
+\family default
+.
+ The supplied 
+\family typewriter
+NodeSeq
+\family default
+ will be the matched 
+\family typewriter
+Elem
+\family default
+ unless the selector is 
+\family typewriter
+*
+\family default
+ in which case the supplied 
+\family typewriter
+NodeSeq
+\family default
+ will be the children of the matched 
+\family typewriter
+Elem
+\family default
+.
 \end_layout
 
 \begin_layout Standard
 Note that if you bind to the children of a selected element, multiple copies
- of the element result from bind to an IterableConst (if the element has
- an id attribute, the id attribute will be stripped after the first element):
- 
+ of the element result from bind to an 
+\family typewriter
+IterableConst
+\family default
+ (if the element has an id attribute, the id attribute will be stripped
+ after the first element): 
 \end_layout
 
 \begin_layout Standard
@@ -485,7 +605,11 @@ You can chain CSS Selector Transforms with the
 
 \begin_layout Standard
 CSS Selector Transforms offer an alternative to Lift's traditional binding
- (See Helpers.bind()).
+ (See 
+\family typewriter
+Helpers.bind()
+\family default
+).
 \end_layout
 
 \end_body

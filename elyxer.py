@@ -3338,7 +3338,7 @@ class BulkFile(object):
     lines = filein.readlines()
     result = []
     for line in lines:
-      result.append(line.strip('\r\n') + '\n')
+      result.append(line.strip('\r\n')) # + '\n')
     filein.close()
     return result
 
