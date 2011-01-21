@@ -133,12 +133,12 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-1/19/2011
+1/21/2011
 \end_layout
 
 \begin_layout Standard
 \noindent
-Copyright © 2010 by David Pollak
+Copyright © 2010-2011 by David Pollak
 \begin_inset Newline newline
 \end_inset
 
@@ -224,6 +224,26 @@ The Lift Web Framework provides web application developers tools to make
  I have been writing Lift and Scala for 4 years, and even I learn new things
  about the language and the framework on a weekly basis.
  Please consider Lift an path and an exploration, rather than an end point.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+Yo, David, stop yer yappin'.
+ I'm coming from Rails|Spring|Struts|Django and I want to get started super
+ fast with Lift.
+\begin_inset Quotes erd
+\end_inset
+
+ See From MVC (
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "cha:From-MVC"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -372,6 +392,28 @@ http://simply.liftweb.net/Simply_Lift.pdf
 \end_inset
 
 .
+ The source code for this book is available at 
+\begin_inset CommandInset href
+LatexCommand href
+name "https://github.com/dpp/simply_lift"
+target "https://github.com/dpp/simply_lift"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If you've got questions, feedback, or improvements to this document, please
+ join the conversation on the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Lift Google Group"
+target "http://groups.google.com/group/liftweb"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -398,6 +440,12 @@ smack in the face
 \end_layout
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:The-ubiquitous-Chat"
+
+\end_inset
+
 The ubiquitous Chat app
 \end_layout
 
@@ -2879,7 +2927,7 @@ The most difficult issue relating to integration of external modules into
  
 \begin_inset CommandInset ref
 LatexCommand prettyref
-reference "sec:SiteMap"
+reference "sec:SiteMap-1"
 
 \end_inset
 
@@ -3403,6 +3451,12 @@ SiteMap
 \end_layout
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:REST"
+
+\end_inset
+
 REST
 \end_layout
 
@@ -3997,6 +4051,16 @@ lastname
 
 \begin_layout Chapter
 MVC (If you really want it)
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "samples/from_mvc/from_mvc.lyx"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part

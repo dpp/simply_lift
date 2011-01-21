@@ -48,6 +48,12 @@ theorems-ams
 \begin_body
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:Forms"
+
+\end_inset
+
 Forms
 \end_layout
 

@@ -48,6 +48,12 @@ theorems-ams
 \begin_body
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:Snippets-and-SiteMap"
+
+\end_inset
+
 Snippets and SiteMap
 \end_layout
 
@@ -418,6 +424,14 @@ status open
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:SiteMap-1"
+
+\end_inset
+
+
+\family typewriter
 SiteMap
 \end_layout
 

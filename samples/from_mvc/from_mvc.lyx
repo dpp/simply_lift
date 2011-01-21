@@ -1,0 +1,588 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\begin_modules
+eqs-within-sections
+figs-within-sections
+theorems-ams
+\end_modules
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:From-MVC"
+
+\end_inset
+
+From MVC
+\end_layout
+
+\begin_layout Standard
+Okay, so you're coming from MVC-land and you're used to defining routes,
+ defining controlers and defining views.
+\end_layout
+
+\begin_layout Standard
+Lift is different.
+ For HTML requests, Lift loads the view first and builds your page from
+ the view.
+ Lift also supports REST style requests for non-HTML data.
+ (See 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "cha:REST"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+Why?
+\begin_inset Quotes erd
+\end_inset
+
+ Because complex HTML pages rarely contain a dominant piece of logic...
+ a single controller...
+ but contain many different components.
+ Some of those components interact and some do not.
+ In Lift, you define the collection of components to be rendered in the
+ resulting HTML page in the view.
+\end_layout
+
+\begin_layout Standard
+So, to create a page that has dynamic content, we need to do three things:
+\end_layout
+
+\begin_layout Itemize
+Make a SiteMap entry for the page
+\end_layout
+
+\begin_layout Itemize
+Create the view (the HTML)
+\end_layout
+
+\begin_layout Itemize
+Create the behavior (the Snippet that transforms the incoming HTML to the
+ dynamically generated HTML)
+\end_layout
+
+\begin_layout Section
+First things first
+\end_layout
+
+\begin_layout Standard
+The first step to using Lift is to make sure you've got Java 1.6 or better
+ installed on your machine...
+ you'll need tar or zip as well.
+\end_layout
+
+\begin_layout Standard
+Download the 
+\begin_inset CommandInset href
+LatexCommand href
+name "TAR"
+target "https://github.com/lift/lift_22_sbt/tarball/2.2"
+
+\end_inset
+
+ or 
+\begin_inset CommandInset href
+LatexCommand href
+name "Zip"
+target "https://github.com/lift/lift_22_sbt/zipball/2.2"
+
+\end_inset
+
+ version of the Lift templates and extract the files.
+\end_layout
+
+\begin_layout Standard
+Copy the 
+\family typewriter
+lift_basic
+\family default
+ project into another directory called 
+\family typewriter
+first_lift
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+cd
+\family default
+ into 
+\family typewriter
+first_lift
+\family default
+ and type 
+\family typewriter
+sbt
+\family default
+.
+ It will take a few minutes for 
+\family typewriter
+sbt
+\family default
+, the Simple Build Tool, to download all the depedencies.
+ At the 
+\family typewriter
+>
+\family default
+ prompt type 
+\family typewriter
+update
+\family default
+ which will download Lift and everything else you need to get started.
+ Once all that stuff is downloaded, type 
+\family typewriter
+jetty-run
+\family default
+ and point your browser to 
+\family typewriter
+http://localhost:8080
+\family default
+ and you'll see a live application.
+ To continuously update your running application as you to code, enter 
+\family typewriter
+~prepare-webapp
+\family default
+ at the sbt prompt.
+\end_layout
+
+\begin_layout Section
+Making a 
+\family typewriter
+SiteMap
+\family default
+ entry
+\end_layout
+
+\begin_layout Standard
+Every page on the site needs a 
+\family typewriter
+SiteMap
+\family default
+ entry.
+ For more on 
+\family typewriter
+SiteMap
+\family default
+, see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:SiteMap-1"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:SiteMap"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Open the 
+\family typewriter
+Boot.scala
+\family default
+ file (
+\family typewriter
+src/main/scala/bootstrap/liftweb/Boot.scala
+\family default
+) and update the 
+\family typewriter
+SiteMap
+\family default
+ definition:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // Build SiteMap
+\end_layout
+
+\begin_layout Plain Layout
+
+    def sitemap(): SiteMap = SiteMap(
+\end_layout
+
+\begin_layout Plain Layout
+
+      Menu("Home") / "index",
+\end_layout
+
+\begin_layout Plain Layout
+
+      Menu("Second Page") / "second"
+\end_layout
+
+\begin_layout Plain Layout
+
+    )
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Creating the view
+\end_layout
+
+\begin_layout Standard
+Next you have to create a file that corresponds to the path defined in the
+ 
+\family typewriter
+SiteMap
+\family default
+.
+ So, let's look at the 
+\family typewriter
+src/main/webapp/index.html
+\family default
+ file:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/index.html"
+lstparams "caption={index.html}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The page is valid HTML5.
+ 
+\family typewriter
+<body class="lift:content_id=main">
+\family default
+ says 
+\begin_inset Quotes eld
+\end_inset
+
+ignore everything on this page except the Element with id 'main'.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<div id="main" class="lift:surround?with=default&at=content">
+\family default
+ says 
+\begin_inset Quotes eld
+\end_inset
+
+Wrap the default page chrome around this Element.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<span class="lift:TimeNow">??? some time</span>
+\family default
+ says 
+\begin_inset Quotes eld
+\end_inset
+
+Find the 
+\family typewriter
+TimeNow
+\family default
+ snippet and transform this Element with the rules contained in that snippet.
+\begin_inset Quotes erd
+\end_inset
+
+ See 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Snippets"
+
+\end_inset
+
+.
+ The result will be 
+\family typewriter
+<span>Fri Jan 21 11:30:34 PST 2011</span>
+\end_layout
+
+\begin_layout Standard
+So, that's simple.
+ You tell Lift what Snippet to use to transform your static content into
+ dynamic content.
+\end_layout
+
+\begin_layout Section
+Creating the Snippet
+\end_layout
+
+\begin_layout Standard
+Next you have to tell Lift what the rules are for transforming the section
+ of your template based on dynamic rules.
+ This is a Snippet...
+ it's a function that transforms 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+.
+ Let's look at the 
+\family typewriter
+TimeNow
+\family default
+ snippet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/TimeNow.scala"
+lstparams "caption={TimeNow.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This snippet must be in the 
+\family typewriter
+snippet
+\family default
+ package so Lift knows how to find it by convention.
+\end_layout
+
+\begin_layout Standard
+It is an 
+\family typewriter
+object
+\family default
+ which is a singleton because the snippet has no state.
+\end_layout
+
+\begin_layout Standard
+Lift calls the 
+\family typewriter
+render
+\family default
+ method on a snippet unless you specify another method when you invoke your
+ snippet.
+\end_layout
+
+\begin_layout Standard
+The snippet generates a function, 
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+, that uses Lift's CSS Selector Transforms (See 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:CSS-Selector-Transforms"
+
+\end_inset
+
+) to insert the current time into the body of all HTML Elements: 
+\family typewriter
+def render = "* *" #> now.toString
+\end_layout
+
+\begin_layout Section
+Getting Ajaxy
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+ClickMe
+\family default
+ snippet is a little more complex, but it demonstrates, especially on the
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Second Page
+\begin_inset Quotes erd
+\end_inset
+
+ the power of Lift's View First in which no particular component on the
+ page is the dominant component.
+ Here's the 
+\family typewriter
+ClickMe
+\family default
+ code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/ClickMe.scala"
+lstparams "caption={ClickMe.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define two 
+\family typewriter
+RequestVar
+\family default
+s that hold request-scoped values.
+ For Lift, the scope of a request is the initial full HTML page load plus
+ any Ajax requests associated with that page.
+\end_layout
+
+\begin_layout Standard
+When the snippet's 
+\family typewriter
+render
+\family default
+ method is called, we capture the current value for the 
+\family typewriter
+pos
+\family default
+ 
+\family typewriter
+RequestVar
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The snippet associates the invocation of an Ajax call with the button's
+ 
+\family typewriter
+onclick
+\family default
+ method.
+ When the button is clicked, the function is invoked.
+\end_layout
+
+\begin_layout Standard
+The function closed over the scope of the position of the button on the
+ page.
+ The buttons all share the 
+\family typewriter
+cnt
+\family default
+ 
+\family typewriter
+RequestVar
+\family default
+ and thus for a single page load, the number of button-presses are counted.
+ If you have 5 different browser tabs open to the same page, each tab will
+ have a unique page count.
+\end_layout
+
+\begin_layout Standard
+This demonstrates the component nature of Lift and why having complex items
+ on a page means not having a front-controller, but having lots of behaviors
+ associated with lots of HTML elements.
+\end_layout
+
+\begin_layout Section
+Next Steps
+\end_layout
+
+\begin_layout Standard
+If you want to see more of Lift's snazzy Ajax and Comet, check out 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "cha:The-ubiquitous-Chat"
+
+\end_inset
+
+.
+ If you want to see more of the basics of 
+\family typewriter
+SiteMap
+\family default
+ and snippets, check out 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "cha:Snippets-and-SiteMap"
+
+\end_inset
+
+.
+ If you want to see how Lift does forms, check out 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "cha:Forms"
+
+\end_inset
+
+.
+\end_layout
+
+\end_body
+\end_document
