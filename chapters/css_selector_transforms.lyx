@@ -220,6 +220,96 @@ element_name
  - selects all elements
 \end_layout
 
+\begin_layout Itemize
+
+\family typewriter
+@name
+\family default
+ - selects all elements with 
+\family typewriter
+the specified name
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:button
+\family default
+ - selects all the elements with 
+\family typewriter
+type="button"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:checkbox
+\family default
+ - selects all the elements with 
+\family typewriter
+type="checkbox"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:file
+\family default
+ - selects all the elements with 
+\family typewriter
+type="file"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:password
+\family default
+ - selects all the elements with 
+\family typewriter
+type="password"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:radio
+\family default
+ - selects all the elements with 
+\family typewriter
+type="radio"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:reset
+\family default
+ - selects all the elements with 
+\family typewriter
+type="reset"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:submit
+\family default
+ - selects all the elements with 
+\family typewriter
+type="submit"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+:text
+\family default
+ - selects all the elements with 
+\family typewriter
+type="text"
+\end_layout
+
 \begin_layout Standard
 You can put replacement rules after the selector:
 \end_layout
@@ -239,11 +329,7 @@ none (e.g.,
 \end_layout
 
 \begin_layout Itemize
-
-\family typewriter
-*
-\family default
- (e.g., "
+* (e.g., "
 \family typewriter
 #id *
 \family default
@@ -255,6 +341,40 @@ none (e.g.,
 \family typewriter
 "#name *" #> "David" // <span><span id="name"/></span> -> <span><span id="name>D
 avid</span></span>
+\end_layout
+
+\begin_layout Itemize
+*+ (e.g., "
+\family typewriter
+#id *
+\family default
++") appends the value to the the content children nodes
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name *+" #> "David" // <span><span id="name"/>Name: </span> -> <span><span
+ id="name>Name: David</span></span>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+*-
+\family default
+ (e.g., "
+\family typewriter
+#id -*
+\family default
+") appends the value to the the content children nodes
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"#name -*" #> "David" // <span><span id="name"/> Pollak</span> -> <span><span
+ id="name>David Pollak</span></span>
 \end_layout
 
 \begin_layout Itemize
