@@ -37,6 +37,7 @@ Simply_Lift.aux	: Simply_Lift.tex
 
 clean:
 	rm -f *.tex images/*.eps *.toc *.aux *.dvi *.idx *.lof *.log *.out *.toc *.lol Simply_Lift.pdf *.ilg *.ind *.tgz
+	rm -f */*.tex  */*.toc */*.aux */*.dvi */*.idx */*.lof */*.log */*.out */*.toc */*.lol */*.ilg */*.ind */*.tgz
 	rm -rf Simply_Lift/
 
 #install: pdf html

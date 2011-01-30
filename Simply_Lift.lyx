@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-1/25/2011
+1/30/2011
 \end_layout
 
 \begin_layout Standard
@@ -4071,6 +4071,16 @@ Recipes
 \begin_inset CommandInset include
 LatexCommand include
 filename "chapters/Recipes.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "chapters/Recipes2.lyx"
 
 \end_inset
 

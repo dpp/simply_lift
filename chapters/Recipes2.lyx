@@ -1,0 +1,644 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+URI-based locale selection
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Standard
+I'm evaluating Lift and one thing I miss, or cannot see how toimplement,
+ is the ability to have the locale determined from an URI-pattern.
+ In Struts2 I have:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+namespace="/{request_locale}"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So I can have an action (restful) invoked on an 
+\family typewriter
+URI=/no/companies/company/1
+\family default
+ and it will call my CompanyAction with 
+\family typewriter
+id=1
+\family default
+ and the locale
+\end_layout
+
+\begin_layout Standard
+set to 
+\family typewriter
+no
+\family default
+ If called from 
+\family typewriter
+URI=/en/companies/company/1
+\family default
+ it will callthe same 
+\family typewriter
+CompanyAction
+\family default
+ but the locale will be set to "
+\family typewriter
+en
+\family default
+".
+\end_layout
+
+\begin_layout Standard
+So my question is: Is it possible to teach Lift to retrieve the locale based
+ on some uri-pattern, so that it will try to resolve my 
+\family typewriter
+*.xhtml
+\family default
+ after the 
+\family typewriter
+/{request_locale}
+\family default
+ part?
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+/no/index.xhtml
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+/en/index.xhtml
+\end_layout
+
+\begin_layout Standard
+Should then map to the same templates but with different locale.
+\end_layout
+
+\begin_layout Section
+Solution
+\end_layout
+
+\begin_layout Standard
+This is an ideal use of URL rewriting.
+\end_layout
+
+\begin_layout Standard
+Here's the code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object UrlLocalizer {
+\end_layout
+
+\begin_layout Plain Layout
+
+  // capture the old localization function
+\end_layout
+
+\begin_layout Plain Layout
+
+  val oldLocalizeFunc = LiftRules.localeCalculator
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   * What are the available locales?
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  object currentLocale extends RequestVar(Locale.getDefault)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Extract the locale
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def unapply(in: String): Option[Locale] = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    if (currentLocale.set_?) None // don't duplicate
+\end_layout
+
+\begin_layout Plain Layout
+
+  else locales.get(in) // if it's a valid locale, it matches
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Calculate the Locale
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def calcLocale(in: Box[HTTPRequest]): Locale = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    if (currentLocale.set_?) currentLocale.get
+\end_layout
+
+\begin_layout Plain Layout
+
+  else oldLocalizeFunc(in)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Initialize the locale
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def init() {
+\end_layout
+
+\begin_layout Plain Layout
+
+    // hook into Lift
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.localeCalculator = calcLocale
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // rewrite requests with a locale at the head
+\end_layout
+
+\begin_layout Plain Layout
+
+    // of the path
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.statelessRewrite.append {
+\end_layout
+
+\begin_layout Plain Layout
+
+      case RewriteRequest(ParsePath(UrlLocalizer(locale) :: rest,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                    _, _, _), _, _) => {
+\end_layout
+
+\begin_layout Plain Layout
+
+        currentLocale.set(locale)
+\end_layout
+
+\begin_layout Plain Layout
+
+        RewriteResponse(rest)
+\end_layout
+
+\begin_layout Plain Layout
+
+      }
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}package code
+\end_layout
+
+\begin_layout Plain Layout
+
+package lib
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+import net.liftweb._
+\end_layout
+
+\begin_layout Plain Layout
+
+import http._
+\end_layout
+
+\begin_layout Plain Layout
+
+import provider._
+\end_layout
+
+\begin_layout Plain Layout
+
+import common._
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+import java.util.Locale
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+object UrlLocalizer {
+\end_layout
+
+\begin_layout Plain Layout
+
+  // capture the old localization function
+\end_layout
+
+\begin_layout Plain Layout
+
+  val oldLocalizeFunc = LiftRules.localeCalculator
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * What are the available locales?
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  val locales: Map[String, Locale] = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    Map(Locale.getAvailableLocales.map(l => l.toString -> l) :_*)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  object currentLocale extends RequestVar(Locale.getDefault)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Extract the locale
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def unapply(in: String): Option[Locale] = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    if (currentLocale.set_?) None // don't duplicate
+\end_layout
+
+\begin_layout Plain Layout
+
+  else locales.get(in) // if it's a valid locale, it matches
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Calculate the Locale
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def calcLocale(in: Box[HTTPRequest]): Locale = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    if (currentLocale.set_?) currentLocale.get
+\end_layout
+
+\begin_layout Plain Layout
+
+  else oldLocalizeFunc(in)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Initialize the locale
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def init() {
+\end_layout
+
+\begin_layout Plain Layout
+
+    // hook into Lift
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.localeCalculator = calcLocale
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // rewrite requests with a locale at the head
+\end_layout
+
+\begin_layout Plain Layout
+
+    // of the path
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.statelessRewrite.append {
+\end_layout
+
+\begin_layout Plain Layout
+
+      case RewriteRequest(ParsePath(UrlLocalizer(locale) :: rest,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                    _, _, _), _, _) => {
+\end_layout
+
+\begin_layout Plain Layout
+
+        currentLocale.set(locale)
+\end_layout
+
+\begin_layout Plain Layout
+
+        RewriteResponse(rest)
+\end_layout
+
+\begin_layout Plain Layout
+
+      }
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You have to hook up the module in 
+\family typewriter
+Boot.scala
+\family default
+ with: 
+\family typewriter
+UrlLocalizer.init()
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+You can see a complete runnable example at 
+\begin_inset CommandInset href
+LatexCommand href
+name "DPP's GitHub Starting Point"
+target "https://github.com/dpp/starting_point/tree/localize_url"
+
+\end_inset
+
+.
+\end_layout
+
+\end_body
+\end_document
