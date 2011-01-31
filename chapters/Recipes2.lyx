@@ -60,6 +60,7 @@ I'm evaluating Lift and one thing I miss, or cannot see how toimplement,
 
 \family typewriter
 \begin_inset listings
+lstparams "language=XML"
 inline false
 status open
 
@@ -143,216 +144,42 @@ This is an ideal use of URL rewriting.
 \end_layout
 
 \begin_layout Standard
+You have to hook up the module in 
+\family typewriter
+Boot.scala
+\family default
+ with: 
+\family typewriter
+UrlLocalizer.init()
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+You can see a complete runnable example at 
+\begin_inset CommandInset href
+LatexCommand href
+name "DPP's GitHub Starting Point"
+target "https://github.com/dpp/starting_point/tree/localize_url"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 Here's the code:
 \end_layout
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "float,language=scala"
 inline false
 status open
 
 \begin_layout Plain Layout
 
-object UrlLocalizer {
-\end_layout
-
-\begin_layout Plain Layout
-
-  // capture the old localization function
-\end_layout
-
-\begin_layout Plain Layout
-
-  val oldLocalizeFunc = LiftRules.localeCalculator
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-   * What are the available locales?
-\end_layout
-
-\begin_layout Plain Layout
-
-   */
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-  object currentLocale extends RequestVar(Locale.getDefault)
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-   * Extract the locale
-\end_layout
-
-\begin_layout Plain Layout
-
-   */
-\end_layout
-
-\begin_layout Plain Layout
-
-  def unapply(in: String): Option[Locale] = 
-\end_layout
-
-\begin_layout Plain Layout
-
-    if (currentLocale.set_?) None // don't duplicate
-\end_layout
-
-\begin_layout Plain Layout
-
-  else locales.get(in) // if it's a valid locale, it matches
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-   * Calculate the Locale
-\end_layout
-
-\begin_layout Plain Layout
-
-   */
-\end_layout
-
-\begin_layout Plain Layout
-
-  def calcLocale(in: Box[HTTPRequest]): Locale = 
-\end_layout
-
-\begin_layout Plain Layout
-
-    if (currentLocale.set_?) currentLocale.get
-\end_layout
-
-\begin_layout Plain Layout
-
-  else oldLocalizeFunc(in)
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-   * Initialize the locale
-\end_layout
-
-\begin_layout Plain Layout
-
-   */
-\end_layout
-
-\begin_layout Plain Layout
-
-  def init() {
-\end_layout
-
-\begin_layout Plain Layout
-
-    // hook into Lift
-\end_layout
-
-\begin_layout Plain Layout
-
-    LiftRules.localeCalculator = calcLocale
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    // rewrite requests with a locale at the head
-\end_layout
-
-\begin_layout Plain Layout
-
-    // of the path
-\end_layout
-
-\begin_layout Plain Layout
-
-    LiftRules.statelessRewrite.append {
-\end_layout
-
-\begin_layout Plain Layout
-
-      case RewriteRequest(ParsePath(UrlLocalizer(locale) :: rest,
-\end_layout
-
-\begin_layout Plain Layout
-
-                                    _, _, _), _, _) => {
-\end_layout
-
-\begin_layout Plain Layout
-
-        currentLocale.set(locale)
-\end_layout
-
-\begin_layout Plain Layout
-
-        RewriteResponse(rest)
-\end_layout
-
-\begin_layout Plain Layout
-
-      }
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-}package code
+package code
 \end_layout
 
 \begin_layout Plain Layout
@@ -614,30 +441,6 @@ object UrlLocalizer {
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-You have to hook up the module in 
-\family typewriter
-Boot.scala
-\family default
- with: 
-\family typewriter
-UrlLocalizer.init()
-\family default
-.
-\end_layout
-
-\begin_layout Standard
-You can see a complete runnable example at 
-\begin_inset CommandInset href
-LatexCommand href
-name "DPP's GitHub Starting Point"
-target "https://github.com/dpp/starting_point/tree/localize_url"
-
-\end_inset
-
-.
 \end_layout
 
 \end_body
