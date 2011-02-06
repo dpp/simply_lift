@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-1/30/2011
+2/6/2011
 \end_layout
 
 \begin_layout Standard
@@ -795,7 +795,7 @@ Vector[String]
 \family typewriter
 msgs
 \family default
- so you do not have the explicitly define it.
+ so you do not have to explicitly define it.
 \end_layout
 
 \begin_layout Standard
@@ -1115,7 +1115,7 @@ name "sec:Box/Option"
 Scala has a ton of nice features.
  One of the features that I was slow to adopt, until Burak Emir gently reminded
  me a bunch of times, is "Options".
- Read on about Options, Boxes, and how Lift makes good use of the to make
+ Read on about Options, Boxes, and how Lift makes good use of them to make
  clean, error resistant code.
  If you come from an imperative (Java, Ruby) background, you'll probably
  recognize the following code:
