@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-2/6/2011
+2/7/2011
 \end_layout
 
 \begin_layout Standard
@@ -1070,16 +1070,6 @@ filename "samples/forms/forms.lyx"
 \begin_inset CommandInset include
 LatexCommand include
 filename "samples/http_rest/http_rest.lyx"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "chapters/wiring.lyx"
 
 \end_inset
 
