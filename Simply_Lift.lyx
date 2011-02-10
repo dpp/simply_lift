@@ -55,7 +55,7 @@ eqs-within-sections
 figs-within-sections
 \end_modules
 \language english
-\inputencoding latin2
+\inputencoding auto
 \font_roman palatino
 \font_sans default
 \font_typewriter courier

@@ -4,7 +4,7 @@
 \begin_header
 \textclass book
 \use_default_options true
-\language czech
+\language english
 \inputencoding auto
 \font_roman default
 \font_sans default
@@ -219,22 +219,22 @@ status open
 
 \begin_layout Plain Layout
 
-  <res name="hello">Ahoj</res>
+  <res name="welcome">Benvenuto</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="my_lang">Můj jazyk: </res>
+  <res name="thank.you">Grazie</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="set_locale">Nastavit <b>Národní</b></res>
+  <res name="locale">Località</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="change">Změnit</res>
+  <res name="change">Cambia</res>
 \end_layout
 
 \begin_layout Plain Layout
@@ -289,11 +289,6 @@ status open
 
 \begin_layout Plain Layout
 
-  <res name="hello" lang="cs">Ahoj</res>
-\end_layout
-
-\begin_layout Plain Layout
-
   <res name="hello" lang="en" default="true">Hello</res>
 \end_layout
 
@@ -304,32 +299,37 @@ status open
 
 \begin_layout Plain Layout
 
-  <res name="my_lang" lang="cs">Můj jazyk: </res>
+  <res name="hello" lang="it">Benvenuto</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="my_lang" lang="en" default="true">My Language: </res>
+  <res name="thank.you" lang="en" default="true">Thank You</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="set_locale" lang="cs">Nastavit Národní</res>
+  <res name="thank.you" lang="it">Grazie</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="set_locale" lang="en" default="true">Set Locale</res>
+  <res name="locale" lang="en" default="true">Locale</res>
 \end_layout
 
 \begin_layout Plain Layout
 
-  <res name="change" lang="cs">Změnit</res>
+  <res name="locale" lang="it">Località</res>
 \end_layout
 
 \begin_layout Plain Layout
 
   <res name="change" lang="en" default="true">Change</res>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <res name="change" lang="it">Cambia</res>
 \end_layout
 
 \begin_layout Plain Layout
