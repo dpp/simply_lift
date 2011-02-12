@@ -18,7 +18,7 @@ class Cart {
   /**
    * The contents of the cart
    */
-  val contents = ValueCell[List[CartItem]](Nil)
+  val contents = ValueCell[Vector[CartItem]](Vector())
 
   /**
    * The subtotal

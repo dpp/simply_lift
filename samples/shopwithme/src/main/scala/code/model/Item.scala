@@ -2,6 +2,7 @@ package code
 package model
 
 import net.liftweb._
+import util._
 import common._
 import json._
 /**
@@ -49,6 +50,8 @@ object Item {
   },
 ]
 """
+
+  def randomItem: Item = items(Helpers.randomInt(items.length))
 
   def find(id: String): Box[Item] = items.find(_.id == id)
 

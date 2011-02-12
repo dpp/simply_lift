@@ -6,12 +6,17 @@
   </head>
   <body class="lift:content_id=main">
     <div id="main" class="lift:surround?with=default;at=content">
-      <h2>Welcome to your project!</h2>
-      <p>
-	<span class="lift:helloWorld.howdy">
-	  Welcome to your Lift app at <span id="time">Time goes here</span>
-	</span>
-      </p>
+      <div lift="comet?type=CometCart">
+	Contents:
+	<table id="contents">
+	  <tr><td>an item</td></tr>
+	</table>
+
+	Subtotal: <span id="total">0</span>
+      </div>
+
+      <div lift="AddRandom">Add something</div>
+      
     </div>
   </body>
 </html>

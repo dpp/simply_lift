@@ -26,7 +26,6 @@ object ItemSpecs extends Specification {
       
 
       val ret = compact(JsonAST.render(Extraction.decompose(i)))
-      println(ret)
 
       ret.length must be > 100
       ret.indexOf("BigD") must_== -1
@@ -51,6 +50,14 @@ object ItemSpecs extends Specification {
 
     "items must be okay" in {
       Item.items.head.id must_== "1234"
+    }
+
+    "items must be findable" in {
+      Item.search("foOD").length must be >= 4
+    }
+
+    "items must be findable or not" in {
+      Item.search("f#$%%oOD").length must_== 0
     }
   }
 }
