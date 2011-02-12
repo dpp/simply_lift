@@ -7,8 +7,8 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
   // val scalatoolsSnapshot = ScalaToolsSnapshots
 
   // The local maven repo to get immediate fixes
-  val mavenLocal = "Local Maven Repository" at
-  "file://"+Path.userHome+"/.m2/repository"
+  // val mavenLocal = "Local Maven Repository" at
+  // "file://"+Path.userHome+"/.m2/repository"
 
   // If you're using JRebel for Lift development, uncomment
   // this line
