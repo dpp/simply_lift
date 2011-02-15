@@ -7,6 +7,7 @@ import net.liftweb._
 import http._
 import util._
 import js._
+import js.jquery._
 import JsCmds._
 import scala.xml.NodeSeq
 import Helpers._
@@ -18,60 +19,30 @@ class CometCart extends CometActor {
 
   def render = Noop
 
-  override def fixedRender = 
+  override def fixedRender = {
     ("#contents" #> (
       "tbody" #> 
       Helpers.findOrCreateId(id => 
         WiringUI.history(cart.contents) {
           (old, nw, ns) => {
-            val ol = old.map(_.toList) openOr Nil
-            val nwl = nw.toList
+            val theTR = ("tr ^^" #> "**")(ns)
 
             def html(ci: CartItem): NodeSeq = 
-              ("tr ^^" #> "**" andThen "tr [id]" #> ci.id & "td *" #> ci.name)(ns)
-
-            Helpers.delta(ol, nwl) {
-              case RemoveDelta(ci) => new JsCmd {
-                def toJsCmd = "jQuery('#'+"+ci.id.encJs+").remove();"
-                }
-
-              case AppendDelta(ci) => 
-                new JsCmd {
-                  val toJsCmd = 
-                    fixHtmlFunc("inline", html(ci)) {
-                      "jQuery('#'+"+id.encJs+").append("+
-                      _+
-                      ");"}
-                }
-
-              case InsertAtStartDelta(ci) => 
-                new JsCmd {
-                  val toJsCmd = 
-                    fixHtmlFunc("inline", html(ci)) {
-                      "jQuery('#'+"+id.encJs+").prepend("+
-                      _+
-                      ");"}
-                }
-
-              case InsertAfterDelta(ci, prior) => 
-                new JsCmd {
-                  val toJsCmd = 
-                    fixHtmlFunc("inline", html(ci)) {
-                      "jQuery('#'+"+prior.id.encJs+").after("+
-                      _+
-                      ");"}
-                }
-            }
+              ("tr [id]" #> ci.id & "td *" #> ci.name)(theTR)
+            
+            JqWiringSupport.calculateDeltas(old, nw, id)(_.id, html _)
           }
         })) &
-     "#total" #> WiringUI.asText(cart.subtotal))(defaultHtml)
-     
+     "#total" #> WiringUI.asText(cart.subtotal))
+  }
+
   override def lowPriority = {
 
     // if someone sends up a new cart
     case SetNewCart(newCart) => {
       // unregister from the old cart
       unregisterFromAllDepenencies()
+      theSession.clearPostPageJavaScriptForThisPage()
 
       // set the new cart
       cart = newCart
