@@ -42,7 +42,7 @@ class Cart {
 /**
  * An item in the cart
  */
-case class CartItem(item: Item, qnty: Int)
+case class CartItem(item: Item, qnty: Int, id: String = Helpers.nextFuncName)
 
 /**
  * The CartItem companion object
