@@ -13,11 +13,8 @@ import JsCmds._
 
 object AddRandom {
   def render = "* *+" #> SHtml.ajaxButton("Add Random", () => {
-    for {
-      sess <- S.session
-      ca <- sess.findComet("CometCart")
-    } ca ! AddToCart(CartItem(Item.randomItem, 1))
-
+    TheCart.get.contents.set(TheCart.get.contents.get :+ 
+                             CartItem(Item.randomItem, 1))
     Noop
   })
 }

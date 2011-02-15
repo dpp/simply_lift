@@ -15,11 +15,11 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
   override def scanDirectories = Nil
 
   override def libraryDependencies = Set(
-    "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
-    "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
-    "junit" % "junit" % "4.5" % "test->default",
+    "net.liftweb" %% "lift-webkit" % liftVersion % "compile",
+    "org.mortbay.jetty" % "jetty" % "6.1.22" % "test",
+    "junit" % "junit" % "4.5" % "test",
     "ch.qos.logback" % "logback-classic" % "0.9.26",
-    "org.scala-tools.testing" %% "specs" % "1.6.6" % "test->default",
+    "org.scala-tools.testing" %% "specs" % "1.6.6" % "test",
     "com.h2database" % "h2" % "1.2.138"
   ) ++ super.libraryDependencies
 }
