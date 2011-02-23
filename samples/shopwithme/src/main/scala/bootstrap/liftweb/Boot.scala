@@ -9,6 +9,8 @@ import http._
 import sitemap._
 import Loc._
 
+import code.snippet._
+
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -21,7 +23,11 @@ class Boot {
 
     // Build SiteMap
     def sitemap = SiteMap(
-      Menu.i("Home") / "index")
+      Menu.i("Home") / "index",
+      SearchPage.menu,
+      AllItemsPage.menu,
+      AnItemPage.menu
+    )
 
     // set the sitemap.  Note if you don't want access control for
     // each page, just comment this line out.

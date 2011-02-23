@@ -21,24 +21,34 @@ class ListPages extends CometActor {
    * Draw yourself
    */
   def render = {
-    "#listPagesContents" #> (
-      "tbody" #> 
-      Helpers.findOrCreateId(id =>  // make sure tbody has an id
-        // when the cart contents updates
-        WiringUI.history(SessionPresenceInfo.pages) {
-          (old, nw, ns) => {
-            // capture the tr part of the template
-            val theTR = ("tr ^^" #> "**")(ns)
-            
-            // build a row out of the page view info
-            def html(ci: (String, ParsePath)): NodeSeq = 
-              ("tr [id]" #> ci._1 & "td *" #> ci._2.toString)(theTR)
-            
-            // calculate the delta between the lists and
-            // based on the deltas, emit the current jQuery
-            // stuff to update the display
-            JqWiringSupport.calculateDeltas(old, nw, id)(_._1, html _)
-          }
-        }))
+    "tbody *" #> SessionPresenceInfo.pages.map{
+      _._2.wholePath.mkString("/", "/", "")
+    }.map {
+      path => "td *" #> path
+    }
+  }
+
+  override def localSetup() {
+    // make sure we're a dependent on the ValueCell
+    // by default, the dependency info will be removed
+    // on a reRender
+    SessionPresenceInfo.pages.addDependent(this)
+  }    
+
+  /**
+   * By default, Lift deals with managing wiring dependencies.
+   * This means on each full render (a full render will
+   * happen on reRender() or on a page load if there have been
+   * partial updates.) You may want to manually deal with
+   * wiring dependencies.  If you do, override this method
+   * and return true
+   */
+  override protected def manualWiringDependencyManagement = true
+
+  // we'll be poked on the predicate update.  reRender
+  // rather than the partial update which is oriented toward
+  // the WiringUI world
+  override def poke() {
+    reRender(false)
   }
 }
