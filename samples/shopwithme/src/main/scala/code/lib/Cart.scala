@@ -10,6 +10,16 @@ import util._
  * The shopping cart
  */
 class Cart {
+  def zero = BigDecimal(0)
+
+  def addItem(item: Item) {
+    contents.atomicUpdate(v => v.find(_.item == item) match {
+      case Some(ci) => v.map(ci => ci.copy(qnty = ci.qnty + 
+                                           (if (ci.item == item) 1 else 0)))
+      case _ => v :+ CartItem(item, 1)
+    })
+  }
+
   /**
    * The current tax rate
    */
@@ -23,18 +33,21 @@ class Cart {
   /**
    * The subtotal
    */
-  val subtotal = contents.lift(_.foldLeft(BigDecimal(0))(_ + _.price))
+  val subtotal = contents.lift(_.foldLeft(zero)(_ + 
+                                                _.qMult(_.price)))
 
   /**
    * The taxable subtotal
    */
   val taxableSubtotal = contents.lift(_.filter(_.taxable).
-                                      foldLeft(BigDecimal(0))(_ + _.price))
+                                      foldLeft(zero)(_ + 
+                                                     _.qMult(_.price)))
 
   /**
    * The weight of the cart
    */
-  val weight = contents.lift(_.foldLeft(0)(_ + _.weightInGrams))
+  val weight = contents.lift(_.foldLeft(zero)(_ +
+                                              _.qMult(_.weightInGrams)))
 
 
 }
@@ -42,7 +55,10 @@ class Cart {
 /**
  * An item in the cart
  */
-case class CartItem(item: Item, qnty: Int, id: String = Helpers.nextFuncName)
+case class CartItem(item: Item, qnty: Int, 
+                    id: String = Helpers.nextFuncName) {
+  def qMult(f: Item => BigDecimal): BigDecimal = f(item) * qnty
+}
 
 /**
  * The CartItem companion object

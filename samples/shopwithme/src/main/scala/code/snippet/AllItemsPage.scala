@@ -2,6 +2,7 @@ package code
 package snippet
 
 import model.Item
+import comet._
 
 import net.liftweb._
 import http._
@@ -14,12 +15,15 @@ object AllItemsPage {
   lazy val menu = Menu.i("Items") / "all_items"
 
   def render =
-    "tbody *" #> Item.items.map(
-      item => {
-        "@name" #> ("a *" #> item.name & 
-                    "a [href]" #> Menu.ParamMenuable.toLoc(AnItemPage.menu).calcHref(item)) &
+    "tbody *" #> Item.items.map(item => {
+      "@name" #> ("a *" #> item.name &
+        "a [href]" #>
+        Menu.ParamMenuable.toLoc(AnItemPage.menu).calcHref(item)) &
         "@description *" #> item.description &
-        "
-        })
+        "@price *" #> item.price.toString &
+        "@add_to_cart [onclick]" #>
+        SHtml.ajaxInvoke(() => TheCart.addItem(item))
+    })
+
 }
 
