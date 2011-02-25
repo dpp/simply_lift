@@ -6,9 +6,12 @@
     <title class="lift:Menu.title">App: </title>
     <style class="lift:CSS.blueprint"></style>
     <style class="lift:CSS.fancyType"></style>
-    <script id="jquery" src="/classpath/jquery.js" type="text/javascript"></script>
-    <script id="json" src="/classpath/json.js" type="text/javascript"></script>
-    <style type="text/css">
+    <script id="jquery" src="/js/jquery-1.4.4.min.js" type="text/javascript"></script>
+    <script id="jqueryui" src="/js/jquery-ui-1.8.8.custom.min.js" type="text/javascript"></script>
+    <script src="/classpath/jlift.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+   <script id="json" src="/classpath/json.js" type="text/javascript"></script>
+   <style type="text/css">
 /* <![CDATA[ */
 .edit_error_class {
   display: block;
@@ -74,7 +77,10 @@
 	  Cart:
 	  <table id="contents">
 	    <tbody id="contents_tbody">
-	      <tr><td>an item</td></tr>
+	      <tr>
+		<td name="name">an item</td>
+		<td name="qnty">3</td>
+	      </tr>
 	    </tbody>
 	  </table>
 	  <hr/>
@@ -97,6 +103,10 @@
 
 	<br>
 
+	<div>
+	  <button lift="Link.request">Share Cart</button>
+	</div>
+
       </div>
 
       <div class="column span-17 last">
@@ -107,7 +117,7 @@
       <div class="column span-23 last" style="text-align: center">
         <h4 class="alt">
           <a href="http://www.liftweb.net"><i>Lift</i></a> 
-	  is Copyright 2007-2010 WorldWide Conferencing, LLC.
+	  is Copyright 2007-2011 WorldWide Conferencing, LLC.
 	  Distributed under an Apache 2.0 License.</h4>
       </div>
     </div>

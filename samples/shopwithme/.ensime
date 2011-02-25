@@ -4,7 +4,7 @@
 
 :project-name "Shop with Me"
 
-:server-root "/home/dpp/bin/ensime"
+:server-root "/Users/dpp/bin/ensime"
 
 :project-package ""
 

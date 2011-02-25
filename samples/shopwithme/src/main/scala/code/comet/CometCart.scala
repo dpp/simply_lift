@@ -43,14 +43,19 @@ class CometCart extends CometActor {
             // capture the tr part of the template
             val theTR = ("tr ^^" #> "**")(ns)
             
+            def ciToId(ci: CartItem): String = ci.id + "_" + ci.qnty
+
             // build a row out of a cart item
-            def html(ci: CartItem): NodeSeq = 
-              ("tr [id]" #> ci.id & "td *" #> ci.name)(theTR)
+            def html(ci: CartItem): NodeSeq = {
+              ("tr [id]" #> ciToId(ci) & 
+               "@name *" #> ci.name &
+               "@qnty *" #> ci.qnty)(theTR)
+            }
             
             // calculate the delta between the lists and
             // based on the deltas, emit the current jQuery
             // stuff to update the display
-            JqWiringSupport.calculateDeltas(old, nw, id)(_.id, html _)
+            JqWiringSupport.calculateDeltas(old, nw, id)(ciToId _, html _)
           }
         })) &
      "#total" #> WiringUI.asText(cart.subtotal)) // display the total
@@ -72,10 +77,6 @@ class CometCart extends CometActor {
       // do a full reRender including the fixed render piece
       reRender(true)
     }
-  }
-
-  override def localSetup() {
-    println("Me "+this+" name "+name)
   }
 }
 
