@@ -12,12 +12,34 @@ import util._
 class Cart {
   def zero = BigDecimal(0)
 
+  /**
+   * Add an item to the cart.  If it's already in the cart,
+   * then increment the quantity
+   */
   def addItem(item: Item) {
     contents.atomicUpdate(v => v.find(_.item == item) match {
       case Some(ci) => v.map(ci => ci.copy(qnty = ci.qnty + 
                                            (if (ci.item == item) 1 else 0)))
       case _ => v :+ CartItem(item, 1)
     })
+  }
+
+  /**
+   * Set the item quantity.  If zero or negative, remove
+   */
+  def setItemCnt(item: Item, qnty: Int) {
+    if (qnty <= 0) removeItem(item)
+    else contents.atomicUpdate(v => v.find(_.item == item) match {
+      case Some(ci) => v.map(ci => ci.copy(qnty =
+                                           (if (ci.item == item) qnty 
+                                            else ci.qnty)))
+      case _ => v :+ CartItem(item, qnty)
+    })
+
+  }
+
+  def removeItem(item: Item) {
+    contents.atomicUpdate(_.filterNot(_.item == item))
   }
 
   /**
@@ -42,6 +64,16 @@ class Cart {
   val taxableSubtotal = contents.lift(_.filter(_.taxable).
                                       foldLeft(zero)(_ + 
                                                      _.qMult(_.price)))
+
+  /**
+   * The computed tax
+   */
+  val tax = taxableSubtotal.lift(_ * taxRate)
+
+  /**
+   * The total
+   */
+  val total = subtotal.lift(_ + tax.get)
 
   /**
    * The weight of the cart

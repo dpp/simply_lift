@@ -34,7 +34,7 @@ class CometCart extends CometActor {
    * Draw yourself
    */
   def render = {
-    ("#contents" #> (
+    "#contents" #> (
       "tbody" #> 
       Helpers.findOrCreateId(id =>  // make sure tbody has an id
         // when the cart contents updates
@@ -49,7 +49,15 @@ class CometCart extends CometActor {
             def html(ci: CartItem): NodeSeq = {
               ("tr [id]" #> ciToId(ci) & 
                "@name *" #> ci.name &
-               "@qnty *" #> ci.qnty)(theTR)
+               "@qnty *" #> SHtml.
+               ajaxText(ci.qnty.toString,
+                        s => {
+                          TheCart.
+                          setItemCnt(ci, 
+                                     Helpers.toInt(s))
+                        }, "style" -> "width: 20px;") &
+               "@del [onclick]" #> SHtml.
+             ajaxInvoke(() => TheCart.removeItem(ci)))(theTR)
             }
             
             // calculate the delta between the lists and
@@ -58,7 +66,9 @@ class CometCart extends CometActor {
             JqWiringSupport.calculateDeltas(old, nw, id)(ciToId _, html _)
           }
         })) &
-     "#total" #> WiringUI.asText(cart.subtotal)) // display the total
+    "#subtotal" #> WiringUI.asText(cart.subtotal) & // display the subttotal
+    "#tax" #> WiringUI.asText(cart.tax) & // display the tax
+    "#total" #> WiringUI.asText(cart.total) // display the total
   }
    
   /**

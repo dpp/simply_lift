@@ -10,6 +10,7 @@ import sitemap._
 import Loc._
 
 import code.snippet._
+import code.lib._
 
 
 /**
@@ -47,5 +48,7 @@ class Boot {
     // Use HTML5 for rendering
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))    
+
+    LiftRules.dispatch.append(ShareCart)
   }
 }

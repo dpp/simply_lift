@@ -21,10 +21,17 @@ object ShareCart extends RestHelper {
     ret
   }
 
+  /**
+   * Generate the right link to this cart
+   */
+  def generateLink(cart: Cart): String = {
+    S.hostAndPath + "/co_shop/"+codeForCart(cart)
+  }
+
   def unapply(code: String): Option[Cart] = synchronized {
     carts.get(code).map{
       case (_, cart) =>
-        carts -= code
+        // carts -= code
         cart
     }
   }
@@ -45,7 +52,10 @@ object ShareCart extends RestHelper {
     case "co_shop" :: ShareCart(cart) :: Nil Get _ =>
       for {
         sess <- S.session
-      } sess.sendCometActorMessage("CometCart", Empty, SetNewCart(cart))
+      } {
+        TheCart.set(cart)
+        sess.sendCometActorMessage("CometCart", Empty, SetNewCart(cart))
+      }
 
       RedirectResponse("/")
   }

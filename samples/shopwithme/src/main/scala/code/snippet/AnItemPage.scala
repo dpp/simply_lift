@@ -15,7 +15,7 @@ import scala.xml.Text
 object AnItemPage {
   // create a parameterized page
   def menu = Menu.param[Item]("Item", Loc.LinkText(i => Text(i.name)),
-                              Item.find _, _.id) / "item"
+                              Item.find _, _.id) / "item" / *
 }
 
 class AnItemPage(item: Item) {

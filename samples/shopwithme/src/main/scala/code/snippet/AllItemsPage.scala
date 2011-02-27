@@ -12,7 +12,7 @@ import util._
 import Helpers._
 
 object AllItemsPage {
-  lazy val menu = Menu.i("Items") / "all_items"
+  lazy val menu = Menu.i("Items") / "item"
 
   def render =
     "tbody *" #> Item.items.map(item => {
