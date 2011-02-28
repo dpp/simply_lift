@@ -16,7 +16,7 @@ import scala.xml.NodeSeq
  * A simple presence CometActor
  */
 class WhatPage extends CometActor {
-  private var thePath: Box[ParsePath] = Empty
+  private var thePath: Box[String] = Empty
   private var lastToken = Helpers.nextFuncName
   
   override def lifespan = Full(3 seconds)
@@ -47,7 +47,7 @@ class WhatPage extends CometActor {
    * the keeping the whole Req reference.
    */
   override protected def captureInitialReq(initialReq: Box[Req]) {
-    thePath = initialReq.map(_.path)
+    thePath = initialReq.map(_.uri)
     this.addPresence()
   }
 
@@ -126,7 +126,7 @@ private case class HeartBeat()
  * are being viewed
  */
 class PresenceInfo {
-  val pages = ValueCell[Set[(String, ParsePath)]](Set())
+  val pages = ValueCell[Set[(String, String)]](Set())
 }
 
 

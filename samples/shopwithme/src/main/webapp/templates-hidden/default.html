@@ -57,8 +57,14 @@
   </head>
   <body>
     <div class="container">
-      <div class="column span-12 last" style="text-align: right">
-        <h1 class="alt">app<img alt="" id="ajax-loader" style="display:none; margin-bottom: 0px; margin-left: 5px" src="/images/ajax-loader.gif"></h1>
+      <div class="column span-12" style="text-align: right">
+        <h1 class="alt">Shop with Me<img alt="" id="ajax-loader"
+  style="display:none; margin-bottom: 0px; margin-left: 5px"
+  src="/images/ajax-loader.gif"></h1>
+      </div>
+      <div class="column span-11 last">
+	<span style="float: right"><form action="/search"><input
+  name="q"><input type="submit" value="search"></form></span>
       </div>
 
       <hr>
@@ -98,20 +104,6 @@
 	</div>
 	
 	<br/>
-
-	<div style="border: 1px solid #ccc">
-	  I'm on pages:
-	  
-	  <div lift="comet?type=ListPages" >
-	    <table id="listPagesContents">
-	      <tbody id="page_list_tbody">
-		<tr><td>an item</td></tr>
-	      </tbody>
-	    </table>
-	  </div>
-	</div>
-
-	<br>
 
 	<div>
 	  <button lift="Link.request">Share Cart</button>

@@ -12,18 +12,19 @@ import util._
 import Helpers._
 
 object AllItemsPage {
-  lazy val menu = Menu.i("Items") / "item"
+  lazy val menu = Menu.i("Items") / "item" >>
+  Loc.Snippet("Items", render)
 
   def render =
-    "tbody *" #> Item.items.map(item => {
-      "@name" #> ("a *" #> item.name &
-        "a [href]" #>
-        Menu.ParamMenuable.toLoc(AnItemPage.menu).calcHref(item)) &
-        "@description *" #> item.description &
-        "@price *" #> item.price.toString &
-        "@add_to_cart [onclick]" #>
-        SHtml.ajaxInvoke(() => TheCart.addItem(item))
-    })
+    "tbody *" #> renderItems(Item.items)
 
+  def renderItems(in: Seq[Item]) =
+    "tr" #> in.map(item => {
+      "a *" #> item.name &
+      "@description *" #> item.description &
+      "@price *" #> item.price.toString &
+      "a [href]" #> AnItemPage.menu.calcHref(item) &
+      "@add_to_cart [onclick]" #>
+      SHtml.ajaxInvoke(() => TheCart.addItem(item))})
 }
 

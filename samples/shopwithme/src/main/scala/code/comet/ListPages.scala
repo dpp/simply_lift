@@ -22,9 +22,7 @@ class ListPages extends CometActor {
    */
   def render = {
     "tbody *" #> SessionPresenceInfo.pages.map{
-      _._2.wholePath.mkString("/", "/", "")
-    }.map {
-      path => "td *" #> path
+      path => "td *" #> path._2
     }
   }
 

@@ -45,12 +45,12 @@ class Cart {
   /**
    * The current tax rate
    */
-  val taxRate = ValueCell(BigDecimal("0.5"))
+  val taxRate = ValueCell(BigDecimal("0.07"))
 
   /**
    * The contents of the cart
    */
-  val contents = ValueCell[Vector[CartItem]](Vector(CartItem(Item.items(2), 1), CartItem(Item.items(1), 2)))
+  val contents = ValueCell[Vector[CartItem]](Vector())
 
   /**
    * The subtotal
