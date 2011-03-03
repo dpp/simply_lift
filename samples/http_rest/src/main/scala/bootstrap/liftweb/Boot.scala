@@ -9,50 +9,21 @@ import http._
 import sitemap._
 import Loc._
 
-import code.snippet._
+import code.lib._
 
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
  */
 class Boot {
-  /**
-   * Calculate if the page should be displayed.
-   * In this case, it will be visible every other minute
-   */
-  def displaySometimes_? : Boolean = 
-    (millis / 1000L / 60L) % 2 == 0
-
   def boot {
     // where to search snippet
     LiftRules.addToPackages("code")
 
     // Build SiteMap
     def sitemap() = SiteMap(
-      Menu.i("Home") / "index", // the simple way to declare a menu
-
-      Menu.i("Sometimes") / "sometimes" >> If(displaySometimes_? _,
-                                            "Can't view now"), 
-
-      // A menu with submenus
-      Menu.i("Info") / "info" submenus(
-        Menu.i("About") / "about" >> Hidden >> LocGroup("bottom"),
-        Menu.i("Contact") / "contact",
-        Menu.i("Feedback") / "feedback" >> LocGroup("bottom")
-      ),
-      
-      Menu.i("Dynamic") / "dynamic", // a page with dynamic content
-
-      // Create a menu for /param/somedata
-      Menu.param[ParamInfo]("Param", "Param", 
-                            s => Full(ParamInfo(s)), 
-                            pi => pi.theParam) / "param" ,
-      
-      
-
-      // more complex because this menu allows anything in the
-      // /static path to be visible
-      Menu.i("Static") / "static" / **)
+      Menu.i("Home") / "index" // the simple way to declare a menu
+      )
 
     // set the sitemap.  Note if you don't want access control for
     // each page, just comment this line out.
@@ -72,5 +43,12 @@ class Boot {
     // Use HTML5 for rendering
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))    
+
+    // the REST handlers
+    LiftRules.statelessDispatchTable.append(BasicExample.findItem)
+    LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
+
+    LiftRules.statelessDispatchTable.append(BasicWithHelper)
+
   }
 }

@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -344,7 +344,11 @@ avid</span></span>
 \end_layout
 
 \begin_layout Itemize
-*+ (e.g., "
+*+ or 
+\family typewriter
+*<
+\family default
+ (e.g., "
 \family typewriter
 #id *
 \family default
@@ -361,7 +365,11 @@ avid</span></span>
 \begin_layout Itemize
 
 \family typewriter
-*-
+-*
+\family default
+ or
+\family typewriter
+ >*
 \family default
  (e.g., "
 \family typewriter
@@ -432,6 +440,16 @@ Dogscape</a>
  making it possible to choose an element from a template
 \end_layout
 
+\begin_layout Itemize
+
+\family typewriter
+^*
+\family default
+ - lifts the selected element's children to the root of the elements that
+ are returned making it possible to choose an element's children from a
+ template
+\end_layout
+
 \begin_layout Standard
 The right hand side of the CSS Selector Transform can be one of the following:
 \end_layout
@@ -479,8 +497,11 @@ span>
 \end_layout
 
 \begin_layout Itemize
-NodeSeq => NodeSeq -- a function that transforms the node (yes, it can be
- a CssBindFunc):
+
+\family typewriter
+NodeSeq => NodeSeq
+\family default
+ -- a function that transforms the node (yes, it can be a CssBindFunc):
 \begin_inset Newline newline
 \end_inset
 
@@ -602,6 +623,8 @@ IterableConst
 \begin_inset Newline newline
 \end_inset
 
+
+\family typewriter
 "#id" #> (Empty: Box[String]) // <span><span id="id">Hi</span></span> ->
  <span/>
 \begin_inset Newline newline
@@ -612,43 +635,6 @@ IterableConst
 \end_inset
 
 "#id [href]" #> (None: Option[String]) <a id="id" href="dog"/> -> <a id="id"/>
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-NodeSeq => NodeSeq
-\family default
- -- A function that transforms the incoming 
-\family typewriter
-NodeSeq
-\family default
- to another 
-\family typewriter
-NodeSeq
-\family default
-.
- The supplied 
-\family typewriter
-NodeSeq
-\family default
- will be the matched 
-\family typewriter
-Elem
-\family default
- unless the selector is 
-\family typewriter
-*
-\family default
- in which case the supplied 
-\family typewriter
-NodeSeq
-\family default
- will be the children of the matched 
-\family typewriter
-Elem
-\family default
-.
 \end_layout
 
 \begin_layout Standard

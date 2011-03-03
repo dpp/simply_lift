@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -49,6 +49,21 @@ HTTP and REST
 \begin_layout Standard
 We explored Lift's HTML generation features.
  Let's dive down to a lower level and handle HTTP requests REST-style.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Lift gives you access to low level HTTP requests, either within the scope
+ of an session or outside the scope of a session.
+\end_layout
+
+\begin_layout Standard
+Lift makes use of Scala's pattern matching to allow you match incoming HTTP
+ requests, extract values as part of the pattern matching process and return
+ the results.
 \end_layout
 
 \begin_layout Standard
