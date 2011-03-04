@@ -40,7 +40,7 @@ object BasicExample {
    */
   lazy val extractFindItem: LiftRules.DispatchPF = {
     // path with extractor
-    case Req("simple2" :: "item" :: FindItem(item) :: Nil, 
+    case Req("simple2" :: "item" :: Item(item) :: Nil, 
              suffix, GetRequest) =>
                // a function that returns the response
                () => Full(toResponse(suffix, item))

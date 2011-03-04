@@ -17,14 +17,6 @@ case class Item(id: String, name: String,
                 weightInGrams: Int, qnty: Int)
 
 /**
- * An object with a helpful extractor
- * useful for pattern matching
- */
-object FindItem {
-  def unapply(id: String): Option[Item] = Item.find(id)
-}
-
-/**
  * The Item companion object
  */
 object Item {
@@ -39,6 +31,40 @@ object Item {
    * an Item can be returned easily from a JSON call
    */
   implicit def toJson(item: Item): JValue = Extraction.decompose(item)
+
+  /**
+   * Convert a JValue to an Item if possible
+   */
+  def apply(in: JValue): Box[Item] = Helpers.tryo{in.extract[Item]}
+
+  /**
+   * Extract a String (id) to an Item
+   */
+  def unapply(id: String): Option[Item] = Item.find(id)
+
+  /**
+   * Extract a JValue to an Item
+   */
+  def unapply(in: JValue): Option[Item] = apply(in)
+
+  /**
+   * The default unapply method for the case class.
+   * We needed to replicate it here because we
+   * have overloaded unapply methods
+   */
+  def unapply(in: Any): Option[(String, String, 
+                                String,
+                                BigDecimal, Boolean,
+                                Int, Int)] = {
+    in match {
+      case i: Item => Some((i.id, i.name, i.description,
+                            i.price, i.taxable,
+                            i.weightInGrams, i.qnty))
+      case _ => None
+    }
+  }
+                                  
+
 
   /**
    * Convert an item to XML
@@ -115,14 +141,8 @@ object Item {
    */
   def add(item: Item): Item = {
     synchronized {
-      find(item.id) match {
-        case Full(oldItem) => {
-          val newItem = item.copy(qnty = item.qnty + oldItem.qnty)
-          items = newItem :: items.filter(_ ne oldItem)
-          newItem
-        }
-        case _ => items ::= item; item
-      }
+      items = item :: items.filterNot(_.id == item.id)
+      item
     }
   }
 
@@ -136,6 +156,25 @@ object Item {
     items.filter(i =>
       i.name.toLowerCase.indexOf(strLC) >= 0 ||
                  i.description.toLowerCase.indexOf(strLC) >= 0)
+  }
+
+  /**
+   * Deletes the item with id and returns the
+   * deleted item or Empty if there's no match
+   */
+  def delete(id: String): Box[Item] = synchronized {
+    var ret: Box[Item] = Empty
+
+    val Id = id // an upper case stable ID for pattern matching
+
+    items = items.filter {
+      case i@Item(Id, _, _, _, _, _, _) => 
+        ret = Full(i) // side effect
+        false
+      case _ => true
+    }
+
+    ret
   }
     
 }

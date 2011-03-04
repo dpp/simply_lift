@@ -49,6 +49,7 @@ class Boot {
     LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
 
     LiftRules.statelessDispatchTable.append(BasicWithHelper)
+    LiftRules.statelessDispatchTable.append(FullRest)
 
   }
 }
