@@ -49,6 +49,15 @@ HTTP and REST
 \begin_layout Standard
 We explored Lift's HTML generation features.
  Let's dive down to a lower level and handle HTTP requests REST-style.
+ The code for this chapter can be found at 
+\begin_inset CommandInset href
+LatexCommand href
+name "https://github.com/dpp/simply_lift/tree/master/samples/http_rest"
+target "https://github.com/dpp/simply_lift/tree/master/samples/http_rest"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -66,7 +75,58 @@ Lift makes use of Scala's pattern matching to allow you match incoming HTTP
  the results.
 \end_layout
 
+\begin_layout Section
+REST the hard way
+\end_layout
+
 \begin_layout Standard
+The 
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/lib/BasicExample.scala"
+lstparams "caption={BasicExample.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Making it easier with 
+\family typewriter
+RestHelper
+\end_layout
+
+\begin_layout Standard
+blasdasd
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/lib/BasicWithHelper.scala"
+lstparams "caption={BasicWithHelper.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+A complete REST example
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/lib/FullRest.scala"
+lstparams "caption={FullRest.scala}"
+
+\end_inset
+
 
 \end_layout
 

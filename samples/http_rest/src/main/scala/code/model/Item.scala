@@ -3,6 +3,7 @@ package model
 
 import net.liftweb._
 import util._
+import Helpers._
 import common._
 import json._
 
@@ -24,6 +25,8 @@ object Item {
     net.liftweb.json.DefaultFormats + BigDecimalSerializer
 
   private var items: List[Item] = parse(data).extract[List[Item]]
+
+  private var listeners: List[Item => Unit] = Nil
 
   /**
    * Convert the item to JSON format.  This is
@@ -63,8 +66,6 @@ object Item {
       case _ => None
     }
   }
-                                  
-
 
   /**
    * Convert an item to XML
@@ -95,6 +96,7 @@ object Item {
    */
   def inventoryItems: Seq[Item] = items
 
+  // The raw data
   private def data = 
 """[
   {"id": "1234", "name": "Cat Food",
@@ -128,10 +130,16 @@ object Item {
 ]
 """
 
+  /**
+   * Select a random Item
+   */
   def randomItem: Item = synchronized {
     items(Helpers.randomInt(items.length))
   }
 
+  /**
+   * Find an item by id
+   */
   def find(id: String): Box[Item] = synchronized {
     items.find(_.id == id)
   }
@@ -142,7 +150,7 @@ object Item {
   def add(item: Item): Item = {
     synchronized {
       items = item :: items.filterNot(_.id == item.id)
-      item
+      updateListeners(item)
     }
   }
 
@@ -174,12 +182,37 @@ object Item {
       case _ => true
     }
 
-    ret
+    ret.map(updateListeners)
+  }
+
+  /**
+   * Update listeners when the data changes
+   */
+  private def updateListeners(item: Item): Item = {
+    synchronized {
+      listeners.foreach(f => 
+        Schedule.schedule(() => f(item), 0 seconds))
+
+      listeners = Nil
+    }
+    item
+  }
+
+  /**
+   * Add an onChange listener
+   */
+  def onChange(f: Item => Unit) {
+    synchronized {
+      // prepend the function to the list of listeners
+      listeners ::= f
+    }
   }
     
 }
 
-
+/**
+ * A helper that will JSON serialize BigDecimal
+ */
 object BigDecimalSerializer extends Serializer[BigDecimal] {
   private val Class = classOf[BigDecimal]
 

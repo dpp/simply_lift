@@ -7,6 +7,8 @@ import net.liftweb._
 import common._
 import http._
 import rest._
+import util._
+import Helpers._
 import json._
 import scala.xml._
 
@@ -45,5 +47,20 @@ object FullRest extends RestHelper {
     // the POST body and update the item
     case Item(item) :: Nil JsonPost json -> _ => 
       Item(mergeJson(item, json)).map(Item.add(_): JValue)
+
+    // Wait for a change to the Items
+    // But do it asynchronously
+    case "change" :: Nil JsonGet _ =>
+      RestContinuation.async {
+        f => {
+          // schedule a "Null" return if there's no other answer
+          // after 110 seconds
+          Schedule.schedule(() => f(JNull), 110 seconds)
+
+          // register for an "onChange" event.  When it
+          // fires, return the changed item as a response
+          Item.onChange(item => f(item: JValue))
+        }
+      }
   })
 }
