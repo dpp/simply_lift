@@ -44,9 +44,13 @@ class Boot {
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))    
 
-    // the REST handlers
+    // the stateless REST handlers
     LiftRules.statelessDispatchTable.append(BasicExample.findItem)
     LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
+
+    // stateful versions of the same
+    // LiftRules.statelessDispatchTable.append(BasicExample.findItem)
+    // LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
 
     LiftRules.statelessDispatchTable.append(BasicWithHelper)
     LiftRules.statelessDispatchTable.append(FullRest)

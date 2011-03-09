@@ -29,13 +29,6 @@ object Item {
   private var listeners: List[Item => Unit] = Nil
 
   /**
-   * Convert the item to JSON format.  This is
-   * implicit and in the companion object, so
-   * an Item can be returned easily from a JSON call
-   */
-  implicit def toJson(item: Item): JValue = Extraction.decompose(item)
-
-  /**
    * Convert a JValue to an Item if possible
    */
   def apply(in: JValue): Box[Item] = Helpers.tryo{in.extract[Item]}
@@ -72,6 +65,15 @@ object Item {
    */
   implicit def toXml(item: Item): Node = 
     <item>{Xml.toXml(item)}</item>
+
+
+  /**
+   * Convert the item to JSON format.  This is
+   * implicit and in the companion object, so
+   * an Item can be returned easily from a JSON call
+   */
+  implicit def toJson(item: Item): JValue = 
+    Extraction.decompose(item)
 
   /**
    * Convert a Seq[Item] to JSON format.  This is

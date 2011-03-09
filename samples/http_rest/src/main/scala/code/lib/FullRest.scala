@@ -52,14 +52,14 @@ object FullRest extends RestHelper {
     // But do it asynchronously
     case "change" :: Nil JsonGet _ =>
       RestContinuation.async {
-        f => {
+        satisfyRequest => {
           // schedule a "Null" return if there's no other answer
           // after 110 seconds
-          Schedule.schedule(() => f(JNull), 110 seconds)
+          Schedule.schedule(() => satisfyRequest(JNull), 110 seconds)
 
           // register for an "onChange" event.  When it
           // fires, return the changed item as a response
-          Item.onChange(item => f(item: JValue))
+          Item.onChange(item => satisfyRequest(item: JValue))
         }
       }
   })

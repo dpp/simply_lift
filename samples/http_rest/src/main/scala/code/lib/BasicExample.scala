@@ -29,10 +29,7 @@ object BasicExample {
     case Req("simple" :: "item" :: itemId :: Nil, //  path
              suffix, // suffix
              GetRequest) => 
-               () => 
-                 for {
-                   item <- Item.find(itemId)
-                 } yield toResponse(suffix, item)
+               () => Item.find(itemId).map(toResponse(suffix, _))
   }
 
   /**

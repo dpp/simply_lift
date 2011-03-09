@@ -43,6 +43,12 @@
 \begin_body
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "cha:HTTP-and-REST"
+
+\end_inset
+
 HTTP and REST
 \end_layout
 
@@ -67,12 +73,73 @@ Introduction
 \begin_layout Standard
 Lift gives you access to low level HTTP requests, either within the scope
  of an session or outside the scope of a session.
+ In sessionless or stateless mode, Lift does not use the container's session
+ management machinery to add a cookie to the 
+\family typewriter
+HTTP
+\family default
+ response and does not make 
+\family typewriter
+SessionVar
+\family default
+ or 
+\family typewriter
+ContainerVar
+\family default
+ available during the request.
+ Stateless REST requests do not require session affinity.
+ Authentication for stateless REST handling can be done via 
+\begin_inset CommandInset href
+LatexCommand href
+name "OAuth"
+target "http://oauth.net/"
+
+\end_inset
+
+.
+ If the requests are handled statefully, a container session will be created
+ if the 
+\family typewriter
+JSESSIONID
+\family default
+ cookie is not supplied as part of the request and the 
+\family typewriter
+JSESSIONID
+\family default
+ cookie will be included with the response.
 \end_layout
 
 \begin_layout Standard
 Lift makes use of Scala's pattern matching to allow you match incoming HTTP
  requests, extract values as part of the pattern matching process and return
  the results.
+ Scala's pattern matching is very, very powerful.
+ It allows both the declaration of a pattern that must be matched, wildcard
+ values (a sub-expression may match any supplied value), wildcard values
+ extracted into variables, and explicit extractors (imperative logic applied
+ to a value to determine if it should match and if it does, extract it into
+ a variable).
+ Lift tests a Scala 
+\family typewriter
+PartialFunction[Req, () => Box[LiftResponse]]
+\family default
+ to see if it is defined for a given 
+\family typewriter
+Req
+\family default
+, which represents an HTTP request.
+ If there is a match, Lift will take the resulting function, apply it to
+ get a 
+\family typewriter
+Box[LiftResponse]
+\family default
+ and if the 
+\family typewriter
+Box
+\family default
+ is full, the response will be sent back to the browser.
+ That's a mouth-full.
+ Let's look at examples.
 \end_layout
 
 \begin_layout Section
@@ -80,7 +147,13 @@ REST the hard way
 \end_layout
 
 \begin_layout Standard
-The 
+Let's take a look at the raw level of doing REST with Lift: taking an incoming
+ HTTP request and transforming it into a function that returns a 
+\family typewriter
+Box[LiftResponse]
+\family default
+ (and don't worry, it gets easier, but we're starting with the ugly verbose
+ stuff so you get an idea of what's happening under the covers):
 \end_layout
 
 \begin_layout Standard
@@ -94,6 +167,507 @@ lstparams "caption={BasicExample.scala}"
 
 \end_layout
 
+\begin_layout Standard
+One additional piece of the puzzle is hooking up the handlers to Lift.
+ This is done in 
+\family typewriter
+Boot.scala
+\family default
+ with the following lines:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // the stateless REST handlers
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.statelessDispatchTable.append(BasicExample.findItem)
+\end_layout
+
+\begin_layout Plain Layout
+
+    LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // stateful versions of the same
+\end_layout
+
+\begin_layout Plain Layout
+
+    // LiftRules.statelessDispatchTable.append(BasicExample.findItem)
+\end_layout
+
+\begin_layout Plain Layout
+
+    // LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's break down the code.
+ First, each handler is a 
+\family typewriter
+PartialFunction[Req, () => Box[LiftResponse]]
+\family default
+, but we can use a shorthand of 
+\family typewriter
+LiftRules.dispatchPF
+\family default
+ which is a Scala type that aliases the partial function.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+lazy val findItem: LiftRules.DispatchPF =
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+defines 
+\family typewriter
+findItem
+\family default
+ which has the type signature of a request dispatch handler.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    case Req("simple" :: "item" :: itemId :: Nil, //  path
+\end_layout
+
+\begin_layout Plain Layout
+
+             suffix, // suffix
+\end_layout
+
+\begin_layout Plain Layout
+
+             GetRequest) => 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Defines a pattern to match.
+ In this case, any 3 part path that has the first two parts 
+\family typewriter
+/simple/item
+\family default
+ will be matched.
+ The third part of the path will be extracted to the variable 
+\family typewriter
+itemId
+\family default
+.
+ The suffix of the last path item will be extracted to the variable 
+\family typewriter
+suffix
+\family default
+ and the request must be a GET.
+\end_layout
+
+\begin_layout Standard
+If the above criteria is met, then the partial function is defined and Lift
+ will apply the partial function to get the resulting 
+\family typewriter
+() => Box[LiftResponse]
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+               () => Item.find(itemId).map(toResponse(suffix, _))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a function that finds the 
+\family typewriter
+itemId
+\family default
+ and converts the resulting 
+\family typewriter
+Item
+\family default
+ to a response based on the request suffix.
+ The 
+\family typewriter
+toResponse
+\family default
+ method looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  /*
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Given a suffix and an item, make a LiftResponse
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  private def toResponse(suffix: String, item: Item) =
+\end_layout
+
+\begin_layout Plain Layout
+
+    suffix match {
+\end_layout
+
+\begin_layout Plain Layout
+
+      case "xml" => XmlResponse(item)
+\end_layout
+
+\begin_layout Plain Layout
+
+      case _ => JsonResponse(item)
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That's all pretty straight forward, if a little verbose.
+ Let's look at the other example in this file.
+ It uses an extractor to convert the 
+\family typewriter
+String
+\family default
+ of the third element of the request path to an 
+\family typewriter
+Item
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // path with extractor
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Req("simple2" :: "item" :: Item(item) :: Nil, 
+\end_layout
+
+\begin_layout Plain Layout
+
+             suffix, GetRequest) =>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case, the pattern will not be matched unless that third element
+ of the path is a valid 
+\family typewriter
+Item
+\family default
+.
+ If it is, the variable 
+\family typewriter
+item
+\family default
+ will contain the 
+\family typewriter
+Item
+\family default
+ for processing.
+ Converting this to a valid response looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+               // a function that returns the response
+\end_layout
+
+\begin_layout Plain Layout
+
+               () => Full(toResponse(suffix, item))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's look at the 
+\family typewriter
+object Item
+\family default
+'s unapply method to see how the extraction works:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Extract a String (id) to an Item
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def unapply(id: String): Option[Item] = Item.find(id)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In fact, let's look at the entire 
+\family typewriter
+Item
+\family default
+ code listing.
+ As promised, 
+\shape italic
+Simply Lift
+\shape default
+, does not explicitly cover persistence.
+ This class is an in-memory mock persistence class, but it behaves like
+ any other persistence mechanism in Lift.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/model/Item.scala"
+lstparams "caption={Item.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's take a look at what the resulting output is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "showlines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le/item/1234
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  "id":"1234",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "name":"Cat Food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "description":"Yummy, tasty cat food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "price":4.25,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "taxable":true,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "weightInGrams":1000,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "qnty":4
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le/item/1234.xml
+\end_layout
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Plain Layout
+
+<item>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <id>1234</id>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <name>Cat Food</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <description>Yummy, tasty cat food</description>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <price>4.25</price>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <taxable>true</taxable>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <weightInGrams>1000</weightInGrams>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <qnty>4</qnty>
+\end_layout
+
+\begin_layout Plain Layout
+
+</item>  
+\end_layout
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Making it easier with 
 \family typewriter
@@ -101,7 +675,15 @@ RestHelper
 \end_layout
 
 \begin_layout Standard
-blasdasd
+The above example shows you how Lift deals with REST calls.
+ However, it's a tad verbose.
+ Lift's 
+\family typewriter
+RestHelper
+\family default
+ trait contains a lot of very helpful shortcuts that make code more concise,
+ easier to read and easier to maintain.
+ Let's look at a bunch of examples and then we'll work through each one:
 \end_layout
 
 \begin_layout Standard
@@ -115,8 +697,1342 @@ lstparams "caption={BasicWithHelper.scala}"
 
 \end_layout
 
+\begin_layout Standard
+The first thing is how we declare and register the 
+\family typewriter
+RestHelper
+\family default
+-based service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+/**
+\end_layout
+
+\begin_layout Plain Layout
+
+ * A simple example of a REST style interface
+\end_layout
+
+\begin_layout Plain Layout
+
+ * using the basic Lift tools
+\end_layout
+
+\begin_layout Plain Layout
+
+ */
+\end_layout
+
+\begin_layout Plain Layout
+
+object BasicWithHelper extends RestHelper {
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Our 
+\family typewriter
+BaseicWithHelper
+\family default
+ singleton extends the 
+\family typewriter
+net.liftweb.http.rest.RestHelper
+\family default
+ trait.
+ We register the dispatch in 
+\family typewriter
+Boot.scala
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    LiftRules.statelessDispatchTable.append(BasicWithHelper)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This means that the whole 
+\family typewriter
+BasicWithHelper
+\family default
+ singleton is a 
+\family typewriter
+PartialFunction[Req, () => Box[LiftResponse]]
+\family default
+ that aggregates all the sub-patterns contained inside it.
+ We defined the sub-patterns in a 
+\family typewriter
+serve
+\family default
+ block which contains the pattern to match.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  serve {
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "simple3" :: "item" :: itemId :: Nil JsonGet _ =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      for {
+\end_layout
+
+\begin_layout Plain Layout
+
+        // find the item, and if it's not found,
+\end_layout
+
+\begin_layout Plain Layout
+
+        // return a nice message for the 404
+\end_layout
+
+\begin_layout Plain Layout
+
+        item <- Item.find(itemId) ?~ "Item Not Found"
+\end_layout
+
+\begin_layout Plain Layout
+
+      } yield item: JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "simple3" :: "item" :: itemId :: Nil XmlGet _ =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      for {
+\end_layout
+
+\begin_layout Plain Layout
+
+        item <- Item.find(itemId) ?~ "Item Not Found"
+\end_layout
+
+\begin_layout Plain Layout
+
+      } yield item: Node
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's break this down further:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+case "simple3" :: "item" :: itemId :: Nil JsonGet _ =>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above matches 
+\family typewriter
+/simple3/item/
+\family default
+xxx where xxx is extracted to the 
+\family typewriter
+itemId
+\family default
+ variable.
+ The request must also have an 
+\family typewriter
+Accepts
+\family default
+ header that calls for JSON.
+\end_layout
+
+\begin_layout Standard
+If the pattern matches, execute the following code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+      for {
+\end_layout
+
+\begin_layout Plain Layout
+
+        // find the item, and if it's not found,
+\end_layout
+
+\begin_layout Plain Layout
+
+        // return a nice message for the 404
+\end_layout
+
+\begin_layout Plain Layout
+
+        item <- Item.find(itemId) ?~ "Item Not Found"
+\end_layout
+
+\begin_layout Plain Layout
+
+      } yield item: JValue
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some things to notice, we didn't explicitly create a function that returns
+ a 
+\family typewriter
+Box[LiftResponse]
+\family default
+.
+ Instead, the type is 
+\family typewriter
+Box[JValue]
+\family default
+.
+ 
+\family typewriter
+RestHelper
+\family default
+ provides implicit conversions from 
+\family typewriter
+Box[JValue]
+\family default
+ to 
+\family typewriter
+() => Box[LiftResponse]
+\family default
+.
+ Specifically, if the 
+\family typewriter
+Box
+\family default
+ is a 
+\family typewriter
+Failure
+\family default
+, 
+\family typewriter
+RestHelper
+\family default
+ will generate a 404 response with the 
+\family typewriter
+Failure
+\family default
+ message as the 404's body.
+ If the 
+\family typewriter
+Box
+\family default
+ is 
+\family typewriter
+Full
+\family default
+, 
+\family typewriter
+RestHelper
+\family default
+ will create a 
+\family typewriter
+JsonResponse
+\family default
+ with the value in the payload.
+ Let's take a look at the two cases:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le3/item/12999
+\end_layout
+
+\begin_layout Plain Layout
+
+Item Not Found
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le3/item/1234
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  "id":"1234",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "name":"Cat Food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "description":"Yummy, tasty cat food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "price":4.25,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "taxable":true,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "weightInGrams":1000,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "qnty":4
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The XML example is pretty much the same, except we coerse the response to
+ 
+\family typewriter
+Box[Node]
+\family default
+ which 
+\family typewriter
+RestHelper
+\family default
+ converts into an 
+\family typewriter
+XmlResponse
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    case "simple3" :: "item" :: itemId :: Nil XmlGet _ =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      for {
+\end_layout
+
+\begin_layout Plain Layout
+
+        item <- Item.find(itemId) ?~ "Item Not Found"
+\end_layout
+
+\begin_layout Plain Layout
+
+      } yield item: Node
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which results in the following:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl -i -H "Accept: application
+/xml" http://localhost:8080/simple3/item/1234
+\end_layout
+
+\begin_layout Plain Layout
+
+HTTP/1.1 200 OK
+\end_layout
+
+\begin_layout Plain Layout
+
+Expires: Wed, 9 Mar 2011 01:48:38 UTC
+\end_layout
+
+\begin_layout Plain Layout
+
+Content-Length: 230
+\end_layout
+
+\begin_layout Plain Layout
+
+Cache-Control: no-cache; private; no-store
+\end_layout
+
+\begin_layout Plain Layout
+
+Content-Type: text/xml; charset=utf-8
+\end_layout
+
+\begin_layout Plain Layout
+
+Pragma: no-cache
+\end_layout
+
+\begin_layout Plain Layout
+
+Date: Wed, 9 Mar 2011 01:48:38 UTC
+\end_layout
+
+\begin_layout Plain Layout
+
+X-Lift-Version: Unknown Lift Version
+\end_layout
+
+\begin_layout Plain Layout
+
+Server: Jetty(6.1.22)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Plain Layout
+
+<item>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <id>1234</id>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <name>Cat Food</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <description>Yummy, tasty cat food</description>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <price>4.25</price>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <taxable>true</taxable>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <weightInGrams>1000</weightInGrams>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <qnty>4</qnty>
+\end_layout
+
+\begin_layout Plain Layout
+
+</item>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Okay...
+ that's simpler because we define stuff in the 
+\family typewriter
+serve
+\family default
+ block and the conversions from 
+\family typewriter
+JValue
+\family default
+ and 
+\family typewriter
+Node
+\family default
+ to the right response types is taken care of.
+ Just to be explicit about where the implicit conversions are defined, they're
+ in the 
+\family typewriter
+Item
+\family default
+ singleton:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Convert an item to XML
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  implicit def toXml(item: Item): Node = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    <item>{Xml.toXml(item)}</item>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Convert the item to JSON format.
+  This is
+\end_layout
+
+\begin_layout Plain Layout
+
+   * implicit and in the companion object, so
+\end_layout
+
+\begin_layout Plain Layout
+
+   * an Item can be returned easily from a JSON call
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  implicit def toJson(item: Item): JValue = 
+\end_layout
+
+\begin_layout Plain Layout
+
+    Extraction.decompose(item)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Okay, so, yippee skippy, we can do simpler REST.
+ Let's keep looking at examples of how we can make it even simpler.
+ This example uses extractors rather than doing the explicit 
+\family typewriter
+Item.find
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  serve {
+\end_layout
+
+\begin_layout Plain Layout
+
+    // Prefix notation
+\end_layout
+
+\begin_layout Plain Layout
+
+    case JsonGet("simple4" :: "item" :: Item(item) :: Nil, _) =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      // no need to explicitly create a LiftResponse
+\end_layout
+
+\begin_layout Plain Layout
+
+      // Just make it JSON and RestHelper does the rest
+\end_layout
+
+\begin_layout Plain Layout
+
+      item: JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // infix notation
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "simple4" :: "item" :: Item(item) :: Nil XmlGet _ =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      item: Node
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If you like DRY and don't want to keep repeating the same path prefixes,
+ you can use 
+\family typewriter
+prefix
+\family default
+, for example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  // serve a bunch of items given a single prefix
+\end_layout
+
+\begin_layout Plain Layout
+
+  serve ( "simple5" / "item" prefix {
+\end_layout
+
+\begin_layout Plain Layout
+
+    // all the inventory
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Nil JsonGet _ => Item.inventoryItems: JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Nil XmlGet _ => Item.inventoryItems: Node
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // a particular item
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Item(item) :: Nil JsonGet _ => item: JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Item(item) :: Nil XmlGet _ => item: Node
+\end_layout
+
+\begin_layout Plain Layout
+
+  })
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above code will list all the items in response to 
+\family typewriter
+/simple5/item
+\family default
+ and will serve a specific item in response to 
+\family typewriter
+/simple5/item/1234
+\family default
+, as we see in:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le5/item
+\end_layout
+
+\begin_layout Plain Layout
+
+[{
+\end_layout
+
+\begin_layout Plain Layout
+
+  "id":"1234",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "name":"Cat Food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "description":"Yummy, tasty cat food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "price":4.25,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "taxable":true,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "weightInGrams":1000,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "qnty":4
+\end_layout
+
+\begin_layout Plain Layout
+
+},
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+,{
+\end_layout
+
+\begin_layout Plain Layout
+
+  "id":"1237",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "name":"Sloth Food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "description":"Slow, slow sloth food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "price":18.33,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "taxable":true,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "weightInGrams":750,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "qnty":62
+\end_layout
+
+\begin_layout Plain Layout
+
+}]
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le5/item/1237
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  "id":"1237",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "name":"Sloth Food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "description":"Slow, slow sloth food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "price":18.33,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "taxable":true,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "weightInGrams":750,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "qnty":62
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the above examples, we've explicitly coersed the results into a 
+\family typewriter
+JValue
+\family default
+ or 
+\family typewriter
+Node
+\family default
+ depending on the request type.
+ With Lift, it's possible to define a conversion from a given type to response
+ types (the default response types are JSON and XML) based on the request
+ type and then define the request patterns to match and 
+\family typewriter
+RestHelper
+\family default
+ takes care of the rest (so to speak.) Let's define the conversion from 
+\family typewriter
+Item
+\family default
+ to 
+\family typewriter
+JValue
+\family default
+ and 
+\family typewriter
+Node
+\family default
+ (note the 
+\family typewriter
+implicit
+\family default
+ keyword, that says that the conversion is available to 
+\family typewriter
+serveJx
+\family default
+ statements:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  implicit def itemToResponseByAccepts: JxCvtPF[Item] = {
+\end_layout
+
+\begin_layout Plain Layout
+
+    case (JsonSelect, c, _) => c: JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+    case (XmlSelect, c, _) => c: Node
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is pretty straight forward.
+ If it's a 
+\family typewriter
+JsonSelect
+\family default
+, return a 
+\family typewriter
+JValue
+\family default
+ and if it's an 
+\family typewriter
+XmlSelect
+\family default
+, convert to a 
+\family typewriter
+Node
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+This is used in the 
+\family typewriter
+serveJx
+\family default
+ statement:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  serveJx[Item] {
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "simple6" :: "item" :: Item(item) :: Nil Get _ => item
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "simple6" :: "item" :: "other" :: item :: Nil Get _ => 
+\end_layout
+
+\begin_layout Plain Layout
+
+      Item.find(item) ?~ "The item you're looking for isn't here"
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So 
+\family typewriter
+/simple6/item/1234
+\family default
+ will match and result in an 
+\family typewriter
+Item
+\family default
+ being returned and based on the above implicit conversion, we turn the
+ 
+\family typewriter
+Item
+\family default
+ into a 
+\family typewriter
+JValue
+\family default
+ or 
+\family typewriter
+Node
+\family default
+ depending on the 
+\family typewriter
+Accepts
+\family default
+ header and then convert that to a 
+\family typewriter
+() => Box[LiftResponse]
+\family default
+.
+ Let's see what 
+\family typewriter
+curl
+\family default
+ has to say about it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl http://localhost:8080/simp
+le6/item/1237
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  "id":"1237",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "name":"Sloth Food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "description":"Slow, slow sloth food",
+\end_layout
+
+\begin_layout Plain Layout
+
+  "price":18.33,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "taxable":true,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "weightInGrams":750,
+\end_layout
+
+\begin_layout Plain Layout
+
+  "qnty":62
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+dpp@raptor:~/proj/simply_lift/samples/http_rest$ curl -H "Accept: application/xm
+l" http://localhost:8080/simple6/item/1234
+\end_layout
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Plain Layout
+
+<item>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <id>1234</id>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <name>Cat Food</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <description>Yummy, tasty cat food</description>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <price>4.25</price>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <taxable>true</taxable>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <weightInGrams>1000</weightInGrams>
+\end_layout
+
+\begin_layout Plain Layout
+
+  <qnty>4</qnty>
+\end_layout
+
+\begin_layout Plain Layout
+
+</item>  
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note also that 
+\family typewriter
+/simple6/item/other/1234
+\family default
+ does the right thing.
+ This is because the path is 4 elements long, so it won't match the first
+ part of the pattern, but does match the second part of the pattern.
+\end_layout
+
+\begin_layout Standard
+Finally, let's combine 
+\family typewriter
+serveJx
+\family default
+ and it's DRY helper, 
+\family typewriter
+prefixJx
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  serveJx[Item] {
+\end_layout
+
+\begin_layout Plain Layout
+
+    "simple7" / "item" prefixJx {
+\end_layout
+
+\begin_layout Plain Layout
+
+      case Item(item) :: Nil Get _ => item
+\end_layout
+
+\begin_layout Plain Layout
+
+      case "other" :: item :: Nil Get _ => 
+\end_layout
+
+\begin_layout Plain Layout
+
+        Item.find(item) ?~ "The item you're looking for isn't here"
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 A complete REST example
+\end_layout
+
+\begin_layout Standard
+The above code gives us the bits and pieces that we can combine into a full
+ fledged REST service.
+ Let's do that combination and see what such a service looks like:
 \end_layout
 
 \begin_layout Standard
@@ -128,6 +2044,496 @@ lstparams "caption={FullRest.scala}"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The whole service is JSON only and contained in a single 
+\family typewriter
+serve
+\family default
+ block and uses the 
+\family typewriter
+prefix
+\family default
+ helper to define all the requests under 
+\family typewriter
+/api/item
+\family default
+ as part of the service.
+\end_layout
+
+\begin_layout Standard
+The first couple of patterns are a re-hash of what we've already covered:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // /api/item returns all the items
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Nil JsonGet _ => Item.inventoryItems: JValue
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // /api/item/count gets the item count
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "count" :: Nil JsonGet _ => JInt(Item.inventoryItems.length)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    // /api/item/item_id gets the specified item (or a 404)
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Item(item) :: Nil JsonGet _ => item: JValue
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The next is a search feature at 
+\family typewriter
+/api/item/search
+\family default
+.
+ Using a little Scala library fun, we create a list of the request path
+ elements that come after the 
+\family typewriter
+search
+\family default
+ element and all the query parameters named 
+\family typewriter
+q
+\family default
+.
+ Based on these, we search for all the 
+\family typewriter
+Item
+\family default
+s that match the search term.
+ We wind up with a 
+\family typewriter
+List[Item]
+\family default
+ and we remove duplicates with 
+\family typewriter
+distinct
+\family default
+ and finally coerse the 
+\family typewriter
+List[Item]
+\family default
+ to a 
+\family typewriter
+JValue
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // /api/item/search/foo or /api/item/search?q=foo
+\end_layout
+
+\begin_layout Plain Layout
+
+    case "search" :: q JsonGet _ =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      (for {
+\end_layout
+
+\begin_layout Plain Layout
+
+        searchString <- q ::: S.params("q")
+\end_layout
+
+\begin_layout Plain Layout
+
+        item <- Item.search(searchString)
+\end_layout
+
+\begin_layout Plain Layout
+
+      } yield item).distinct: JValue
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Next, let's see how to delete an 
+\family typewriter
+Item
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // DELETE the item in question
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Item(item) :: Nil JsonDelete _ => 
+\end_layout
+
+\begin_layout Plain Layout
+
+      Item.delete(item.id).map(a => a: JValue)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The only real difference is we're looking for a 
+\family typewriter
+JsonDelete
+\family default
+ HTTP request.
+\end_layout
+
+\begin_layout Standard
+Let's see how we add an 
+\family typewriter
+Item
+\family default
+ with a PUT:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // PUT adds the item if the JSON is parsable
+\end_layout
+
+\begin_layout Plain Layout
+
+    case Nil JsonPut Item(item) -> _ => Item.add(item): JValue
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note the 
+\family typewriter
+Item(item) -> _
+\family default
+ after 
+\family typewriter
+JsonPut
+\family default
+.
+ The extraction signature for 
+\family typewriter
+JsonPut
+\family default
+ is 
+\family typewriter
+(List[String], (JValue, Req))
+\family default
+.
+ The 
+\family typewriter
+List[String]
+\family default
+ part is simple...
+ it's a 
+\family typewriter
+List
+\family default
+ that contains the request path.
+ The second part of the Pair is a Pair itself that contains the 
+\family typewriter
+JValue
+\family default
+ and the underlying 
+\family typewriter
+Req
+\family default
+ (in case you need to do something with the request itself).
+ Because there's a 
+\family typewriter
+def unapply(in: JValue): Option[Item]
+\family default
+ method in the 
+\family typewriter
+Item
+\family default
+ singleton, we can extract (pattern match) the 
+\family typewriter
+JValue
+\family default
+ that is built from the PUT request body.
+ This means if the user PUTs a JSON blob that can be turned into an 
+\family typewriter
+Item
+\family default
+ the pattern will match and we'll evaluate the right hand side of the case
+ statement which adds the 
+\family typewriter
+Item
+\family default
+ to inventory.
+ That's a big ole dense pile of information.
+ So, we'll try it again with POST.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    case Item(item) :: Nil JsonPost json -> _ => 
+\end_layout
+
+\begin_layout Plain Layout
+
+      Item(mergeJson(item, json)).map(Item.add(_): JValue)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case, we're match a POST on 
+\family typewriter
+/api/item/1234
+\family default
+ that has some parsable JSON in the POST body.
+ The 
+\family typewriter
+mergeJson
+\family default
+ method takes all the fields in the found 
+\family typewriter
+Item
+\family default
+ and replaces them with any of the fields in the JSON in the POST body.
+ So a POST body of 
+\family typewriter
+{"qnty": 123}
+\family default
+ would replace the 
+\family typewriter
+qnty
+\family default
+ field in the 
+\family typewriter
+Item
+\family default
+.
+ The 
+\family typewriter
+Item
+\family default
+ is then added back into the backing store.
+\end_layout
+
+\begin_layout Standard
+Cool.
+ So, we've got a variety of GET support in our REST service, a DELETE, PUT
+ and POST.
+ All using the patterns that 
+\family typewriter
+RestHelper
+\family default
+ gives us.
+\end_layout
+
+\begin_layout Standard
+Now we have some fun.
+\end_layout
+
+\begin_layout Standard
+One of the features of Lift's HTML side is support for Comet (server push
+ via long-polling.) If the web container supports it, Lift will automatically
+ use asynchronous support.
+ That means that during a long poll, while no computations are being performed
+ related to the servicing of the request, no threads will be consumed.
+ This allows lots and lots of open long polling clients.
+ Lift's REST support includes asynchronous support.
+ In this case, we'll demonstrate opening an HTTP request to 
+\family typewriter
+/api/item/change
+\family default
+ and wait for a change to the backing store.
+ The request will be satisfied with a change to the backing store or a JSON
+ JNull after 110 seconds:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    case "change" :: Nil JsonGet _ =>
+\end_layout
+
+\begin_layout Plain Layout
+
+      RestContinuation.async {
+\end_layout
+
+\begin_layout Plain Layout
+
+        satisfyRequest => {
+\end_layout
+
+\begin_layout Plain Layout
+
+          // schedule a "Null" return if there's no other answer
+\end_layout
+
+\begin_layout Plain Layout
+
+          // after 110 seconds
+\end_layout
+
+\begin_layout Plain Layout
+
+          Schedule.schedule(() => satisfyRequest(JNull), 110 seconds)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          // register for an "onChange" event.
+  When it
+\end_layout
+
+\begin_layout Plain Layout
+
+          // fires, return the changed item as a response
+\end_layout
+
+\begin_layout Plain Layout
+
+          Item.onChange(item => satisfyRequest(item: JValue))
+\end_layout
+
+\begin_layout Plain Layout
+
+        }
+\end_layout
+
+\begin_layout Plain Layout
+
+      }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we receive a GET request to 
+\family typewriter
+/api/item/change
+\family default
+, invoke 
+\family typewriter
+RestContinuation.async
+\family default
+.
+ We pass a closure that sets up the call.
+ We set up the call by scheduling a 
+\family typewriter
+JNull
+\family default
+ to be sent after 110 seconds.
+ We also register a function which is invoked when the backing store is
+ changed.
+ When either event (110 seconds elapses or the backing store changes), the
+ functions will be invoked and they will apply the 
+\family typewriter
+satifyRequest
+\family default
+ function which will invoke the continuation and send the response back
+ to the client.
+ Using this mechanism, you can create long polling services that do not
+ consume threads on the server.
+ Note too that the 
+\family typewriter
+satisfyRequest
+\family default
+ function is fire-once so you can call it lots of times, but only the first
+ time counts.
+\end_layout
+
+\begin_layout Section
+Wrap Up
+\end_layout
+
+\begin_layout Standard
+In this chapter, we've covered how you create web services in Lift.
+ While there is a lot of implicit conversion stuff going on under the covers
+ in 
+\family typewriter
+RestHelper
+\family default
+, the resulting code is pretty easy to read, create, and maintain.
+ At the core, you match an incoming request against a pattern, if the pattern
+ matches, evaluate the expression on the right hand side of the pattern.
 \end_layout
 
 \end_body
