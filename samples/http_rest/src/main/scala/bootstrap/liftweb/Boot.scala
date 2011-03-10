@@ -49,11 +49,15 @@ class Boot {
     LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
 
     // stateful versions of the same
-    // LiftRules.statelessDispatchTable.append(BasicExample.findItem)
-    // LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
+    // LiftRules.dispatch.append(BasicExample.findItem)
+    // LiftRules.dispatch.append(BasicExample.extractFindItem)
 
     LiftRules.statelessDispatchTable.append(BasicWithHelper)
     LiftRules.statelessDispatchTable.append(FullRest)
+
+    // stateful versions of the above
+    // LiftRules.dispatch.append(BasicWithHelper)
+    // LiftRules.dispatch.append(FullRest)
 
   }
 }

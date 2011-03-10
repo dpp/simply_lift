@@ -207,12 +207,12 @@ status open
 
 \begin_layout Plain Layout
 
-    // LiftRules.statelessDispatchTable.append(BasicExample.findItem)
+    // LiftRules.dispatch.append(BasicExample.findItem)
 \end_layout
 
 \begin_layout Plain Layout
 
-    // LiftRules.statelessDispatchTable.append(BasicExample.extractFindItem)
+    // LiftRules.dispatch.append(BasicExample.extractFindItem)
 \end_layout
 
 \end_inset
