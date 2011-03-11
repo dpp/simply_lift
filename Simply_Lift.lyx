@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -1079,7 +1079,7 @@ filename "samples/http_rest/http_rest.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "samples/wiring/wiring.lyx"
+filename "samples/shopwithme/wiring.lyx"
 
 \end_inset
 

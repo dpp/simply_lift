@@ -10,6 +10,50 @@ import util._
  * The shopping cart
  */
 class Cart {
+  /**
+   * The contents of the cart
+   */
+  val contents = ValueCell[Vector[CartItem]](Vector())
+
+  /**
+   * The subtotal
+   */
+  val subtotal = contents.lift(_.foldLeft(zero)(_ + 
+                                                _.qMult(_.price)))
+
+  /**
+   * The taxable subtotal
+   */
+  val taxableSubtotal = contents.lift(_.filter(_.taxable).
+                                      foldLeft(zero)(_ + 
+                                                     _.qMult(_.price)))
+
+  /**
+   * The current tax rate
+   */
+  val taxRate = ValueCell(BigDecimal("0.07"))
+
+  /**
+   * The computed tax
+   */
+  val tax = taxableSubtotal.lift(_ * taxRate)
+
+  /**
+   * The total
+   */
+  val total = subtotal.lift(_ + tax.get)
+
+  /**
+   * The weight of the cart
+   */
+  val weight = contents.lift(_.foldLeft(zero)(_ +
+                                              _.qMult(_.weightInGrams)))
+
+  // Helper methods
+
+  /**
+   * A nice constant zero
+   */
   def zero = BigDecimal(0)
 
   /**
@@ -38,50 +82,12 @@ class Cart {
 
   }
 
+  /**
+   * Removes an item from the cart
+   */
   def removeItem(item: Item) {
     contents.atomicUpdate(_.filterNot(_.item == item))
   }
-
-  /**
-   * The current tax rate
-   */
-  val taxRate = ValueCell(BigDecimal("0.07"))
-
-  /**
-   * The contents of the cart
-   */
-  val contents = ValueCell[Vector[CartItem]](Vector())
-
-  /**
-   * The subtotal
-   */
-  val subtotal = contents.lift(_.foldLeft(zero)(_ + 
-                                                _.qMult(_.price)))
-
-  /**
-   * The taxable subtotal
-   */
-  val taxableSubtotal = contents.lift(_.filter(_.taxable).
-                                      foldLeft(zero)(_ + 
-                                                     _.qMult(_.price)))
-
-  /**
-   * The computed tax
-   */
-  val tax = taxableSubtotal.lift(_ * taxRate)
-
-  /**
-   * The total
-   */
-  val total = subtotal.lift(_ + tax.get)
-
-  /**
-   * The weight of the cart
-   */
-  val weight = contents.lift(_.foldLeft(zero)(_ +
-                                              _.qMult(_.weightInGrams)))
-
-
 }
 
 /**
@@ -89,6 +95,11 @@ class Cart {
  */
 case class CartItem(item: Item, qnty: Int, 
                     id: String = Helpers.nextFuncName) {
+
+  /**
+   * Multiply the quantity times some calculation on the
+   * contained Item (e.g., getting its weight)
+   */
   def qMult(f: Item => BigDecimal): BigDecimal = f(item) * qnty
 }
 

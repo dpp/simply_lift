@@ -19,11 +19,6 @@ import Helpers._
 object TheCart extends SessionVar(new Cart())
 
 /**
- * The current instance of the CometCart
- */
-object CometCartInstance extends SessionVar[Box[CometCart]](Empty)
-
-/**
  * The CometCart is the CometActor the represents the shopping cart
  */
 class CometCart extends CometActor {
@@ -75,10 +70,13 @@ class CometCart extends CometActor {
    * Process messages from external sources
    */
   override def lowPriority = {
-    // if someone sends up a new cart
+    // if someone sends us a new cart
     case SetNewCart(newCart) => {
       // unregister from the old cart
       unregisterFromAllDepenencies()
+
+      // remove all the dependencies for the old cart
+      // from the postPageJavaScript
       theSession.clearPostPageJavaScriptForThisPage()
 
       // set the new cart

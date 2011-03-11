@@ -1,0 +1,1691 @@
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Wiring
+\end_layout
+
+\begin_layout Standard
+Interactive web applications have many interdependent components on a single
+ web page.
+ For example (and this is the example we'll use for this chapter), you may
+ have a shopping cart in your application.
+ The shopping cart will contain items and quantities.
+ As you add/remove items from the cart, the cart should update, along with
+ the sub-total, the tax, the shipping and the grand total.
+ Plus, the count of the items in the cart may be displayed on some pages
+ without the cart contents.
+ Keeping track of all of these dependencies for all the different page layouts
+ is pretty tough work.
+ When it comes to updating the site, the team must remember where all of
+ the items are and how to update them and if they get one wrong, the site
+ looks broken.
+\end_layout
+
+\begin_layout Standard
+Lift's Wiring provides a simply solution to managing complex dependencies
+ on a single page and on multiple tabs.
+ Lift's Wiring allows you to declare the formulaic relationships among cells
+ (like a spreadsheet) and then the user interface components (yes, there
+ can be more than one component) associated with each cell.
+ Lift will automatically update the dependent user interface components
+ based on change in the predicates.
+ Lift will do this on initial page render and with each Ajax or Comet update
+ to the page.
+ Put another way, Wiring is like a spreadsheet and the page will automatically
+ get updated when any of the predicate values change such that the change
+ results in a change in the display value.
+\end_layout
+
+\begin_layout Section
+Cells
+\end_layout
+
+\begin_layout Standard
+Like a spreadsheet, Lift's Wiring is based on Cells.
+ Cells come in three types: 
+\family typewriter
+ValueCell
+\family default
+, 
+\family typewriter
+DynamicCell
+\family default
+, and 
+\family typewriter
+FuncCell
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+A 
+\family typewriter
+ValueCell
+\family default
+ contains a value that is entered by a user or depends on some user action.
+ A 
+\family typewriter
+ValueCell
+\family default
+ may represent the items in our shopping cart or the tax rate.
+\end_layout
+
+\begin_layout Standard
+A 
+\family typewriter
+DynamicCell
+\family default
+ contains a value that changes every time the cell is accessed.
+ For example, a random number or the current time.
+\end_layout
+
+\begin_layout Standard
+A 
+\family typewriter
+FuncCell
+\family default
+ has a value based on a formula applied to the value or other cells.
+\end_layout
+
+\begin_layout Standard
+Let's see some code that demonstrates this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+val quantity = ValueCell(0)
+\end_layout
+
+\begin_layout Plain Layout
+
+val price = ValueCell(1d)
+\end_layout
+
+\begin_layout Plain Layout
+
+val total = price.lift(_ * quantity)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define two 
+\family typewriter
+ValueCell
+\family default
+s, one for 
+\family typewriter
+quantity
+\family default
+ and the other for 
+\family typewriter
+price
+\family default
+.
+ Next, define the 
+\family typewriter
+total
+\family default
+ by 
+\begin_inset Quotes eld
+\end_inset
+
+lifting
+\begin_inset Quotes erd
+\end_inset
+
+ the 
+\family typewriter
+price
+\family default
+ in a formula that multiplies it by 
+\family typewriter
+quantity
+\family default
+.
+ Let's see how it works in the console:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+scala> import net.liftweb._
+\end_layout
+
+\begin_layout Plain Layout
+
+import net.liftweb._
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> import util._
+\end_layout
+
+\begin_layout Plain Layout
+
+import util._
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> val quantity = ValueCell(0)
+\end_layout
+
+\begin_layout Plain Layout
+
+quantity: net.liftweb.util.ValueCell[Int] = ValueCell(0)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> val price = ValueCell(0d)
+\end_layout
+
+\begin_layout Plain Layout
+
+price: net.liftweb.util.ValueCell[Double] = ValueCell(0.0)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> val total = price.lift(_ * quantity)
+\end_layout
+
+\begin_layout Plain Layout
+
+total: net.liftweb.util.Cell[Double] = FuncCell1(ValueCell(0.0),<function1>)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> total.get
+\end_layout
+
+\begin_layout Plain Layout
+
+res1: Double = 0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> quantity.set(10)
+\end_layout
+
+\begin_layout Plain Layout
+
+res2: Int = 10
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> price.set(0.5d)
+\end_layout
+
+\begin_layout Plain Layout
+
+res3: Double = 0.5
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+scala> total.get       
+\end_layout
+
+\begin_layout Plain Layout
+
+res4: Double = 5.0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Okay...
+ pretty nifty...
+ we can define relationships that are arbitrarily complex between 
+\family typewriter
+Cell
+\family default
+s and they know how to calculate themselves.
+\end_layout
+
+\begin_layout Section
+Hooking it up to the UI
+\end_layout
+
+\begin_layout Standard
+Now that we can declare relationships among cells, how do we associate the
+ value of 
+\family typewriter
+Cell
+\family default
+s with the user interface?
+\end_layout
+
+\begin_layout Standard
+Turns out that it's pretty simple:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ "#total" #> WiringUI.asText(total)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We associate the element with 
+\family typewriter
+id="total"
+\family default
+ with a function that displays the value in 
+\family typewriter
+total
+\family default
+.
+ Here's the method definition:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Given a Cell register the
+\end_layout
+
+\begin_layout Plain Layout
+
+   * postPageJavaScript that will update the element with
+\end_layout
+
+\begin_layout Plain Layout
+
+   * a new value.
+\end_layout
+
+\begin_layout Plain Layout
+
+   *
+\end_layout
+
+\begin_layout Plain Layout
+
+   * @param cell the cell to associate with
+\end_layout
+
+\begin_layout Plain Layout
+
+   * 
+\end_layout
+
+\begin_layout Plain Layout
+
+   * @return a function that will mutate the NodeSeq (an id attribute may
+ be added if
+\end_layout
+
+\begin_layout Plain Layout
+
+   * there's none already defined)
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def asText[T](cell: Cell[T]): NodeSeq => NodeSeq = 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Huh? that's a lot of mumbo-jumbo...
+ what's a 
+\family typewriter
+postPageJavaScript
+\family default
+?
+\end_layout
+
+\begin_layout Standard
+So, here's the magic of 
+\family typewriter
+WiringUI
+\family default
+: Most web frameworks treat a page rendering as an event in time.
+ Maybe (in the case of Seaside), there are some side effects of rendering
+ that close over page rendering state such that when forms are submitted
+ back, you get page state back.
+ Lift treats a full HTML page render and subsequent Ajax requests on the
+ page as a single event that has a single scope.
+ This means that 
+\family typewriter
+RequestVar
+\family default
+s populated during a page render are available during subsequent Ajax requests
+ on that page.
+ Part of the state that results in a page render is the 
+\family typewriter
+postPageJavaScript
+\family default
+ which is a bucket of 
+\family typewriter
+() => JsCmd
+\family default
+ or a collection of functions that return JavaScript.
+ Before responding to any HTTP request associated with the page, Lift runs
+ all these functions and appends the resulting JavaScript to the response
+ sent back to the browser.
+ HTTP requests associated with the page include the initial page render,
+ subsequent Ajax request associated with the page and associated Comet (long
+ poll) requests generated by the page.
+\end_layout
+
+\begin_layout Standard
+For each 
+\family typewriter
+Cell
+\family default
+ that you wire up to the user interface, Lift captures the id of the DOM
+ node (and if there's no id, Lift will assign one) and the current value
+ of the 
+\family typewriter
+Cell
+\family default
+.
+ Lift generates a function that looks at the current 
+\family typewriter
+Cell
+\family default
+ value and if it's changed, Lift generates JavaScript that updates the DOM
+ node with the 
+\family typewriter
+Cell
+\family default
+'s current value.
+\end_layout
+
+\begin_layout Standard
+The result is that if an Ajax operation changes the value of a 
+\family typewriter
+ValueCell
+\family default
+, then all the dependent cells will update and the associated DOM updates
+ will be carried back with the HTTP response.
+\end_layout
+
+\begin_layout Standard
+You have a lot of control over the display of the value.
+ The 
+\family typewriter
+asText
+\family default
+ method creates a 
+\family typewriter
+Text(cell.toString)
+\family default
+.
+ However, 
+\family typewriter
+WiringUI.apply
+\family default
+ allows you to associate a function that converts the 
+\family typewriter
+Cell
+\family default
+'s type 
+\family typewriter
+T
+\family default
+ to a 
+\family typewriter
+NodeSeq
+\family default
+.
+ Further, you can control the transition in the browser with a 
+\family typewriter
+jsEffect
+\family default
+ (type signiture 
+\family typewriter
+(String, Boolean, JsCmd) => JsCmd
+\family default
+).
+ There are pre-build 
+\family typewriter
+jsEffects
+\family default
+ based on jQuery including my favorite, 
+\family typewriter
+fade
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  /**
+\end_layout
+
+\begin_layout Plain Layout
+
+   * Fade out the old value and fade in the new value
+\end_layout
+
+\begin_layout Plain Layout
+
+   * using jQuery fast fade.
+\end_layout
+
+\begin_layout Plain Layout
+
+   */
+\end_layout
+
+\begin_layout Plain Layout
+
+  def fade: (String, Boolean, JsCmd) => JsCmd = {
+\end_layout
+
+\begin_layout Plain Layout
+
+    (id: String, first: Boolean, cmd: JsCmd) => {
+\end_layout
+
+\begin_layout Plain Layout
+
+      if (first) cmd
+\end_layout
+
+\begin_layout Plain Layout
+
+      else {
+\end_layout
+
+\begin_layout Plain Layout
+
+        val sel = "jQuery('#'+"+id.encJs+")"
+\end_layout
+
+\begin_layout Plain Layout
+
+        Run(sel+".fadeOut('fast', function() {"+
+\end_layout
+
+\begin_layout Plain Layout
+
+            cmd.toJsCmd+" "+sel+".fadeIn('fast');})")
+\end_layout
+
+\begin_layout Plain Layout
+
+      }
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which you can use as: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ "#total" #> WiringUI.asText(total, JqWiringSupport.fade)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, when the total field updates, the old value will fade out and the new
+ value will fade in...
+ cool.
+\end_layout
+
+\begin_layout Section
+Shared Shopping
+\end_layout
+
+\begin_layout Standard
+Let's move onto a real code example.
+ You can find this code at 
+\begin_inset CommandInset href
+LatexCommand href
+name "Shop with Me source"
+target "https://github.com/dpp/simply_lift/tree/master/samples/shopwithme"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The example is going to be a simple shopping site.
+ There are a bunch of items that you can view.
+ You have a shopping cart.
+ You can add items to the cart.
+ If you're viewing the cart in multiple tabs or browser windows, the cart
+ in all tabs/windows will update when you change the cart.
+ Further, you can share your cart with someone else and any changes to the
+ cart will be propagated to all the different browsers sharing the same
+ cart.
+\end_layout
+
+\begin_layout Standard
+The data model is the same that we used in the REST chapter (see
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "item_model"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Let's look at the shopping cart definition:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/lib/Cart.scala"
+lstparams "caption={Cart.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Looks pretty straight forward.
+ You've got 2 
+\family typewriter
+ValueCell
+\family default
+s, the cart contents and the tax rate.
+ You've gota bunch of calculated 
+\family typewriter
+Cell
+\family default
+s.
+ At the bottom of the 
+\family typewriter
+Cart
+\family default
+ class definition are some helper methods that allow you to add, remove
+ and update cart contents.
+ We also define the 
+\family typewriter
+CartItem
+\family default
+ case class that contains the 
+\family typewriter
+Item
+\family default
+ and the 
+\family typewriter
+qnty
+\family default
+ (quantity).
+\end_layout
+
+\begin_layout Standard
+So far, so good.
+ Next, let's look at the way we display all the items:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/AllItemsPage.scala"
+lstparams "caption={AllItemsPage.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define our 
+\family typewriter
+SiteMap
+\family default
+ entry:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  lazy val menu = Menu.i("Items") / "item" >>
+\end_layout
+
+\begin_layout Plain Layout
+
+    Loc.Snippet("Items", render)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So, when the user browses to 
+\family typewriter
+/item
+\family default
+, they're presented with all the items in inventory.
+ 
+\end_layout
+
+\begin_layout Standard
+The template for displaying 
+\family typewriter
+Item
+\family default
+s looks like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/webapp/_items.html"
+lstparams "caption={_items.html},language=xml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Next, let's look at the code for displaying an 
+\family typewriter
+Item
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/AnItemPage.scala"
+lstparams "caption={AnItemPage.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This defines what happens when the user goes to 
+\family typewriter
+/item/1234
+\family default
+.
+ This is more 
+\begin_inset Quotes eld
+\end_inset
+
+controller-like
+\begin_inset Quotes erd
+\end_inset
+
+ than most of the other Lift code.
+ Let's look at the menu item definition:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+  def menu = Menu.param[Item]("Item", Loc.LinkText(i => Text(i.name)),
+\end_layout
+
+\begin_layout Plain Layout
+
+                              Item.find _, _.id) / "item" / *
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We are defining a parameterized 
+\family typewriter
+Menu
+\family default
+ entry.
+ The parameter type is 
+\family typewriter
+Item
+\family default
+.
+ That means that the page will display an 
+\family typewriter
+Item
+\family default
+ and that we must be able to calculate the 
+\family typewriter
+Item
+\family default
+ based on the request.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+"Item"
+\family default
+ is the name of the menu entry.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+Loc.LinkText(i => Text(i.name))
+\family default
+ takes an item and generates the display text for the menu entry.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+Item.find _
+\family default
+ is a function that takes a 
+\family typewriter
+String
+\family default
+ and converts it to 
+\family typewriter
+Box[Item]
+\family default
+.
+ It looks up the Item based on the parameter in the request that we're intereste
+d in.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+_.id
+\family default
+ is a function (
+\family typewriter
+Item => String
+\family default
+) that takes an 
+\family typewriter
+Item
+\family default
+ and returns a 
+\family typewriter
+String
+\family default
+ that represents how to build a URL that represents the Item page.
+ This is used by 
+\family typewriter
+"a [href]" #> AnItemPage.menu.calcHref(item)
+\family default
+ to convert an 
+\family typewriter
+Item
+\family default
+ to the HREF for the page that display the 
+\family typewriter
+Item
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Finally, the URL is defined by 
+\family typewriter
+/ "item" / *
+\family default
+ which is pretty much what it looks like.
+ It'll match an incoming request of the form 
+\family typewriter
+/item/xxx
+\family default
+ and 
+\family typewriter
+xxx
+\family default
+ is passed to the 
+\family typewriter
+String => Box[Item]
+\family default
+ function to determine the 
+\family typewriter
+Item
+\family default
+ associated with the URL.
+\end_layout
+
+\begin_layout Standard
+So, we can display all the items.
+ Navigate from all the items to a single item.
+ Each item has a button that allows you to add the 
+\family typewriter
+Item
+\family default
+ to the shopping cart.
+ The 
+\family typewriter
+Item
+\family default
+ is added to the cart with this code: 
+\family typewriter
+SHtml.ajaxInvoke(() => TheCart.addItem(item))})
+\family default
+.
+ The 
+\family typewriter
+TheCart.addItem(item)
+\family default
+ can be called from anywhere in the application without regard for what
+ needs to be updated when the cart is changed.
+\end_layout
+
+\begin_layout Standard
+Let's look at how the cart is displayed and managed:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/comet/CometCart.scala"
+lstparams "caption={CometCart.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's walk through the code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+object TheCart extends SessionVar(new Cart())
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define a 
+\family typewriter
+SessionVar
+\family default
+ that holds the shopping cart.
+\end_layout
+
+\begin_layout Standard
+Our 
+\family typewriter
+CometActor
+\family default
+ captures the the current cart from the 
+\family typewriter
+SessionVar
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+class CometCart extends CometActor {
+\end_layout
+
+\begin_layout Plain Layout
+
+  // our current cart
+\end_layout
+
+\begin_layout Plain Layout
+
+  private var cart = TheCart.get
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Next, let's see how to draw the 
+\family typewriter
+cart.total
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+"#total" #> WiringUI.asText(cart.total) // display the total
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That's pretty much the way it should be.
+\end_layout
+
+\begin_layout Standard
+Let's look at the gnarly piece...
+ how to draw or redraw the cart contents based on changes and only send
+ the JavaScript the will manipulate the browser DOM to add or remove items
+ from the cart:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+"#contents" #> (
+\end_layout
+
+\begin_layout Plain Layout
+
+      "tbody" #> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      Helpers.findOrCreateId(id =>  // make sure tbody has an id
+\end_layout
+
+\begin_layout Plain Layout
+
+        // when the cart contents updates
+\end_layout
+
+\begin_layout Plain Layout
+
+        WiringUI.history(cart.contents) {
+\end_layout
+
+\begin_layout Plain Layout
+
+          (old, nw, ns) => {
+\end_layout
+
+\begin_layout Plain Layout
+
+            // capture the tr part of the template
+\end_layout
+
+\begin_layout Plain Layout
+
+            val theTR = ("tr ^^" #> "**")(ns)
+\end_layout
+
+\begin_layout Plain Layout
+
+            
+\end_layout
+
+\begin_layout Plain Layout
+
+            def ciToId(ci: CartItem): String = ci.id + "_" + ci.qnty
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+            // build a row out of a cart item
+\end_layout
+
+\begin_layout Plain Layout
+
+            def html(ci: CartItem): NodeSeq = {
+\end_layout
+
+\begin_layout Plain Layout
+
+              ("tr [id]" #> ciToId(ci) & 
+\end_layout
+
+\begin_layout Plain Layout
+
+               "@name *" #> ci.name &
+\end_layout
+
+\begin_layout Plain Layout
+
+               "@qnty *" #> SHtml.
+\end_layout
+
+\begin_layout Plain Layout
+
+               ajaxText(ci.qnty.toString,
+\end_layout
+
+\begin_layout Plain Layout
+
+                        s => {
+\end_layout
+
+\begin_layout Plain Layout
+
+                          TheCart.
+\end_layout
+
+\begin_layout Plain Layout
+
+                          setItemCnt(ci, 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                     Helpers.toInt(s))
+\end_layout
+
+\begin_layout Plain Layout
+
+                        }, "style" -> "width: 20px;") &
+\end_layout
+
+\begin_layout Plain Layout
+
+               "@del [onclick]" #> SHtml.
+\end_layout
+
+\begin_layout Plain Layout
+
+             ajaxInvoke(() => TheCart.removeItem(ci)))(theTR)
+\end_layout
+
+\begin_layout Plain Layout
+
+            }
+\end_layout
+
+\begin_layout Plain Layout
+
+            
+\end_layout
+
+\begin_layout Plain Layout
+
+            // calculate the delta between the lists and
+\end_layout
+
+\begin_layout Plain Layout
+
+            // based on the deltas, emit the current jQuery
+\end_layout
+
+\begin_layout Plain Layout
+
+            // stuff to update the display
+\end_layout
+
+\begin_layout Plain Layout
+
+            JqWiringSupport.calculateDeltas(old, nw, id)(ciToId _, html _)
+\end_layout
+
+\begin_layout Plain Layout
+
+          }
+\end_layout
+
+\begin_layout Plain Layout
+
+        }))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+First, we make sure we know the 
+\family typewriter
+id
+\family default
+ of the 
+\family typewriter
+<tbody>
+\family default
+ element: 
+\family typewriter
+"tbody" #> Helpers.findOrCreateId(id =>
+\end_layout
+
+\begin_layout Standard
+Next, wire the 
+\family typewriter
+CometCart
+\family default
+ up to the 
+\family typewriter
+cart.contents
+\family default
+ such that when the contents change, we get the old value (
+\family typewriter
+old
+\family default
+), the new value (
+\family typewriter
+nw
+\family default
+) and the memoized 
+\family typewriter
+NodeSeq
+\family default
+ (the template used to do the rendering): 
+\family typewriter
+WiringUI.history(cart.contents) { (old, nw, ns) => {
+\end_layout
+
+\begin_layout Standard
+Capture the part of the template associated with the 
+\family typewriter
+<tr>
+\family default
+ element in the 
+\family typewriter
+theTR
+\family default
+ variable: 
+\family typewriter
+val theTR = ("tr ^^" #> "**")(ns)
+\end_layout
+
+\begin_layout Standard
+Based on a 
+\family typewriter
+CartItem
+\family default
+, return a stable id for the DOM node the represents the 
+\family typewriter
+CartItem
+\family default
+: 
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+html
+\family default
+ method converts a 
+\family typewriter
+CartItem
+\family default
+ to a 
+\family typewriter
+NodeSeq
+\family default
+ including Ajax controls for changing quantity and removing the item from
+ the cart.
+\end_layout
+
+\begin_layout Standard
+Finally, based on the deltas between the old list of 
+\family typewriter
+CartItem
+\family default
+ and the new list, generate the JavaScript that will manipulate the DOM
+ by inserting and removing the appropriate DOM elements: 
+\family typewriter
+JqWiringSupport.calculateDeltas(old, nw, id)(ciToId _, html _)
+\end_layout
+
+\begin_layout Standard
+Next, let's see how to change the cart.
+ If we want to share the shopping cart between two browser sessions...
+ two people shopping at their browser, but putting things in a single cart,
+ we need a way to change the cart.
+ We process the 
+\family typewriter
+SetNewCart
+\family default
+ message to 
+\family typewriter
+CometCart
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+    // if someone sends us a new cart
+\end_layout
+
+\begin_layout Plain Layout
+
+    case SetNewCart(newCart) => {
+\end_layout
+
+\begin_layout Plain Layout
+
+      // unregister from the old cart
+\end_layout
+
+\begin_layout Plain Layout
+
+      unregisterFromAllDepenencies()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+      // remove all the dependencies for the old cart
+\end_layout
+
+\begin_layout Plain Layout
+
+      // from the postPageJavaScript
+\end_layout
+
+\begin_layout Plain Layout
+
+      theSession.clearPostPageJavaScriptForThisPage()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+      // set the new cart
+\end_layout
+
+\begin_layout Plain Layout
+
+      cart = newCart
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+      // do a full reRender including the fixed render piece
+\end_layout
+
+\begin_layout Plain Layout
+
+      reRender(true)
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are two lines in the above code that hint at how Wiring interacts
+ with Lift's Comet support: 
+\family typewriter
+unregisterFromAllDepenencies()
+\family default
+ and 
+\family typewriter
+theSession.clearPostPageJavaScriptForThisPage()
+\end_layout
+
+\begin_layout Standard
+When a 
+\family typewriter
+CometActor
+\family default
+ depends on something in 
+\family typewriter
+WiringUI
+\family default
+, Lift generates a weak reference between the 
+\family typewriter
+Cell
+\family default
+ and the 
+\family typewriter
+CometActor
+\family default
+.
+ When the 
+\family typewriter
+Cell
+\family default
+ changes value, it pokes the 
+\family typewriter
+CometActor
+\family default
+.
+ The 
+\family typewriter
+CometActor
+\family default
+ then updates the browser's screen real estate associated with changes to
+ 
+\family typewriter
+Cell
+\family default
+s.
+ 
+\family typewriter
+unregisterFromAllDepenencies()
+\family default
+ disconnects the 
+\family typewriter
+CometActor
+\family default
+ from the 
+\family typewriter
+Cell
+\family default
+s.
+ 
+\family typewriter
+theSession.clearPostPageJavaScriptForThisPage()
+\family default
+ removes all the 
+\family typewriter
+postPageJavaScript
+\family default
+ associated with the 
+\family typewriter
+CometActor
+\family default
+.
+ Because the 
+\family typewriter
+CometActor
+\family default
+ is not associated with a single page, but can appear on many pages, it
+ has its own 
+\family typewriter
+postPageJavaScript
+\family default
+ context.
+\end_layout
+
+\begin_layout Standard
+The final piece of the puzzle is how we share a 
+\family typewriter
+Cart
+\family default
+ across sessions.
+ From the UI perspective, here's how we display the modal dialog when the
+ user presses the 
+\begin_inset Quotes eld
+\end_inset
+
+Share Cart
+\begin_inset Quotes erd
+\end_inset
+
+ button:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/snippet/Link.scala"
+lstparams "caption={Link.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Basically, we use jQuery's ModalDialog plugin to put a dialog up that contains
+ a link generated by the 
+\family typewriter
+ShareCart
+\family default
+ object.
+ Let's look at ShareCart.scala:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "src/main/scala/code/lib/ShareCart.scala"
+lstparams "caption={ShareCart.scala}"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The code manages the association between random IDs and 
+\family typewriter
+Cart
+\family default
+s.
+ If the user browses to 
+\family typewriter
+/co_shop/share_cart_id
+\family default
+, 
+\family typewriter
+ShareCart
+\family default
+ will set 
+\family typewriter
+TheCart
+\family default
+ to the shared 
+\family typewriter
+Cart
+\family default
+ and send a 
+\family typewriter
+SetNewCart
+\family default
+ message to the 
+\family typewriter
+CometCart
+\family default
+ instance associated with the session.
+\end_layout
+
+\begin_layout Section
+Wrap up
+\end_layout
+
+\begin_layout Standard
+In this chapter we've seen how Lift's Wiring can be used to create complex
+ inter-relationships.
+\end_layout
+
+\end_body
+\end_document

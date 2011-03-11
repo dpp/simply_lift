@@ -10,9 +10,12 @@ import rest.RestHelper
 import util._
 import Helpers._
 
+// it's a RestHelper
 object ShareCart extends RestHelper {
+  // private state
   private var carts: Map[String, (Long, Cart)] = Map()
 
+  // given a Cart, generate a unique sharing code
   def codeForCart(cart: Cart): String = synchronized {
     val ret = Helpers.randomString(12)
 
@@ -28,14 +31,13 @@ object ShareCart extends RestHelper {
     S.hostAndPath + "/co_shop/"+codeForCart(cart)
   }
 
+  // An extractor that converts a String to a Cart, if
+  // possible
   def unapply(code: String): Option[Cart] = synchronized {
-    carts.get(code).map{
-      case (_, cart) =>
-        // carts -= code
-        cart
-    }
+    carts.get(code).map(_._2)
   }
 
+  // remove any carts that are 10+ minutes old
   private def cleanup() {
     val now = Helpers.millis
     synchronized{
@@ -45,18 +47,24 @@ object ShareCart extends RestHelper {
     }
     Schedule.schedule(() => cleanup(), 5 seconds)
   }
-
+  
+  // clean up every 5 seconds
   cleanup()
 
+  // the REST part of the code
   serve {
-    case "co_shop" :: ShareCart(cart) :: Nil Get _ =>
-      for {
-        sess <- S.session
-      } {
-        TheCart.set(cart)
-        sess.sendCometActorMessage("CometCart", Empty, SetNewCart(cart))
-      }
+    // match the incoming URL
+    case "co_shop" :: ShareCart(cart) :: Nil Get _ => {
+      // set the cart
+      TheCart.set(cart)
+      
+      // send the SetNewCart message to the CometCart
+      S.session.foreach(
+        _.sendCometActorMessage("CometCart", Empty,
+                                SetNewCart(cart)))
 
+      // redirect the browser to /
       RedirectResponse("/")
+    }
   }
 }

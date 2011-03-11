@@ -21,7 +21,7 @@ object ItemSpecs extends Specification {
   "Item" should {
     "Serialize" in {
       val i = Item("123", "foo", "foo with extra bar and baz",
-                   4, false, 20)
+                   4, false, 20, 10)
 
       
 
@@ -41,7 +41,7 @@ object ItemSpecs extends Specification {
     "Round trip" in {
 
       val i = Item("123", "foo", "foo with extra bar and baz",
-                   4, false, 20)
+                   4, false, 20, 10)
 
       val ser = compact(render(Extraction.decompose(i)))
       
@@ -49,7 +49,7 @@ object ItemSpecs extends Specification {
     }
 
     "items must be okay" in {
-      Item.items.head.id must_== "1234"
+      Item.inventoryItems.head.id must_== "1234"
     }
 
     "items must be findable" in {

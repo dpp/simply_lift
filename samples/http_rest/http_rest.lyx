@@ -526,7 +526,7 @@ Simply Lift
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/scala/code/model/Item.scala"
-lstparams "caption={Item.scala}"
+lstparams "caption={Item.scala},label={item_model}"
 
 \end_inset
 
