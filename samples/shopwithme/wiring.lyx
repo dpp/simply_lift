@@ -831,7 +831,7 @@ s looks like:
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "src/main/webapp/_items.html"
-lstparams "caption={_items.html},language=xml"
+lstparams "caption={items.html},language=xml"
 
 \end_inset
 
@@ -1684,7 +1684,11 @@ Wrap up
 
 \begin_layout Standard
 In this chapter we've seen how Lift's Wiring can be used to create complex
- inter-relationships.
+ inter-relationships among values and then surface those relationships in
+ the web user interface.
+ Wiring can be used with Ajax or Comet.
+ Wiring makes it simple to build complex web pages that are user friendly
+ and easy to maintain.
 \end_layout
 
 \end_body
