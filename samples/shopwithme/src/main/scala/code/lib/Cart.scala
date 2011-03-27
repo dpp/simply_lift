@@ -36,12 +36,12 @@ class Cart {
   /**
    * The computed tax
    */
-  val tax = taxableSubtotal.lift(_ * taxRate)
+  val tax = taxableSubtotal.lift(taxRate)(_ * _)
 
   /**
    * The total
    */
-  val total = subtotal.lift(_ + tax.get)
+  val total = subtotal.lift(tax)(_ + _)
 
   /**
    * The weight of the cart

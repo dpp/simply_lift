@@ -19,7 +19,7 @@ object ShareCart extends RestHelper {
   def codeForCart(cart: Cart): String = synchronized {
     val ret = Helpers.randomString(12)
 
-    carts += ret -> ((millis + 10 minutes).millis -> cart)
+    carts += ret -> (10.minutes.later.millis -> cart)
 
     ret
   }
