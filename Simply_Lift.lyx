@@ -602,10 +602,6 @@ reference "sec:LiftActor"
 \end_inset
 
 ) provides a powerful state and concurrency model.
- 
-\family typewriter
-CometActors
-\family default
  This may all seem abstract, so let's look at the 
 \family typewriter
 Chat
@@ -666,7 +662,7 @@ The
 \family typewriter
 lowPriority
 \family default
- method define how to process incoming messages.
+ method defines how to process incoming messages.
  In this case, we're Pattern Matching (see 
 \begin_inset CommandInset ref
 LatexCommand prettyref
@@ -704,7 +700,7 @@ reference "sec:CSS-Selector-Transforms"
 \family typewriter
 <li>
 \family default
- tags the the template and for each message, create an 
+ tags of the template and for each message, create an 
 \family typewriter
 <li>
 \family default
@@ -759,7 +755,7 @@ object
 class
 \family default
 .
- This makes it a singleton which can be references by the name 
+ This makes it a singleton which can be referenced by the name 
 \family typewriter
 ChatServer
 \family default
@@ -1735,7 +1731,7 @@ A
 \family typewriter
 Box
 \family default
- 
+ can be 
 \family typewriter
 Full
 \family default
@@ -2147,7 +2143,7 @@ A core concept in Lift is GUIDs.
  GUIDs make Lift more secure because they make replay attacks very difficult
  and GUIDs make it easier to develop complex, stateful, interactive applications
  because the developer spends more time on business logic and less time
- on the plumbing of 
+ on the plumbing of it.
 \end_layout
 
 \begin_layout Subsection
@@ -2359,7 +2355,7 @@ The cake pattern only goes half way to giving a Java developer complete
  traits, but the cake pattern is less helpful in terms of allowing you to
  make dynamic choices about which combination of cake to vend in a given
  situation.
- Lift provides a extra features that complete the dependency injection puzzle.
+ Lift provides extra features that complete the dependency injection puzzle.
  
 \end_layout
 
@@ -4331,7 +4327,7 @@ Scaling
 
 \begin_layout Standard
 Lift is a web framework built on the Scala programming language.
- Lift takes advantage of many of Scala's features that allows developers
+ Lift takes advantage of many of Scala's features that allow developers
  to very concisely code secure, scalable, highly interactive web applications.
  Lift provides a full set of layered abstractions on top of HTTP and HTML
  from "close to the metal" REST abstractions up to transportation agnostic
@@ -4340,11 +4336,11 @@ Lift is a web framework built on the Scala programming language.
  the Java object model.
  Lift applications are typically deployed as WAR files in J/EE web containers...
  Lift apps run in Tomcat, Jetty, Glassfish, etc.
- just like any other J/EE web applications.
+ just like any other J/EE web application.
  Lift apps can generally be monitored and managed just like any Java web
  app.
- Web Applications, Sessions, and State All web applications are stateful
- in one way or another.
+ Web Applications, Sessions, and State.
+ All web applications are stateful in one way or another.
  Even a "static" web site is made up of the files that are served...
  the application's state is defined in those files.
  The site content may be served out of a database, but the content served
@@ -4357,7 +4353,8 @@ Lift is a web framework built on the Scala programming language.
  requests.
  News sites like the UK Guardian, MSNBC, and others are prototypical examples
  of this kind of site.
- Sessions Some applications are customized on a user-by-user basis.
+ Sessions.
+ Some applications are customized on a user-by-user basis.
  These applications include the likes of Foursquare and others where many
  HTTP requests make up a "session" in which the results of previous HTTP
  requests change the behavior of future HTTP requests.
@@ -4380,8 +4377,9 @@ Lift is a web framework built on the Scala programming language.
  application state.
  Further, for any moderately complex application, the amount of data the
  needs to be transferred as part of each request and response is huge.
- Migratory Sessions Many web application managers allow for server-managed
- sessions to migrate across a cluster of web application servers.
+ Migratory Sessions.
+ Many web application managers allow for server-managed sessions to migrate
+ across a cluster of web application servers.
  In some environments such as Ruby on Rails, this is a hard requirement
  because only one request at a time can be served per process, thus for
  any moderate traffic site, there must be multiple processes serving pages.
@@ -4393,25 +4391,28 @@ Lift is a web framework built on the Scala programming language.
  Web applications that support migratory state are often referred to as
  "stateless" because the session state does not reside in the same process
  as the web application.
- Session Affinity Some applications require that all requests related to
- a particular session are routed to the same process and that process keeps
- session-related content in local memory.
+ Session Affinity.
+ Some applications require that all requests related to a particular session
+ are routed to the same process and that process keeps session-related content
+ in local memory.
  In a cluster, there are multiple mechanisms for achieving session affinity...
  the two most popular being HAProxy and Nginx.
- Availability, Scalability, Security, Performance, and User Experience There
- are many vectors on which to measure the over-quality of a web applications.
+ Availability, Scalability, Security, Performance, and User Experience.
+ There are many vectors on which to measure the overall-quality of a web
+ application.
  Let's take a quick peek at each one.
- Availability Availability of an application is the amount of time it gives
- a meaningful response to a request.
+ Availability.
+ Availability of an application is the amount of time it gives a meaningful
+ response to a request.
  Highly available applications generally span multiple pieces of hardware
  and often multiple data centers.
  Highly available applications are also typically available during upgrades
  of part of the system that makes up the application.
  Highly available applications have very few single points of failure and
  those single points of failure are usually deployed on very reliable hardware.
- Scalability A scalable application can, within certain bounds, respond
- with similar performance to increased load by adding hardware to process
- more load.
+ Scalability.
+ A scalable application can, within certain bounds, respond with similar
+ performance to increased load by adding hardware to process more load.
  No system is infinitely or linearly scalable.
  However, many systems have grossly disproportionate load demands such that,
  for example, you can add a lot of web application front-ends to a Rails
@@ -4420,25 +4421,27 @@ Lift is a web framework built on the Scala programming language.
 \end_layout
 
 \begin_layout Standard
-Security The Internet is a dangerous place and no request that is received
- from the Internet can be trusted.
+Security.
+ The Internet is a dangerous place and no request that is received from
+ the Internet can be trusted.
  Applications, frameworks, systems and everything else must be designed
  to be secure and resist attacks.
  The most common attacks on web application are listed in the OWASP Top
  Ten.
- Performance Web application performance can be measured on two vectors:
- response time to a request and system resources required to service the
- request.
- These two vectors are inter-dependent User Experience The user experience
- of a web app is an important measure of its quality.
+ Performance.
+ Web application performance can be measured on two vectors: response time
+ to a request and system resources required to service the request.
+ These two vectors are inter-dependent.
+ User Experience.
+ The user experience of a web app is an important measure of its quality.
  User experience can be measured on many different vectors including perceived
  responsiveness, visual design, interactivity, lack of "hicups", etc.
  Ultimately, because we're building applications for users, the user experience
  is very important.
- Lift's trade-offs Given the number and complexity related to the quality
- of a web application, there are a lot of trade-offs, implicit and explicit,
- to building a framework that allows developers and business people to deliver
- a great user experience.
+ Lift's trade-offs.
+ Given the number and complexity related to the quality of a web application,
+ there are a lot of trade-offs, implicit and explicit, to building a framework
+ that allows developers and business people to deliver a great user experience.
  Let's talk for a minute about what Lift is and what it isn't.
  Lift is a web framework.
  It provides a set of abstractions over HTTP and HTML such that developers
@@ -4448,8 +4451,8 @@ Security The Internet is a dangerous place and no request that is received
  mule carts, etc.
  As long as you can materialize an object into the JVM where Lift is running,
  Lift can make use of that object.
- Lift sits on top of the JVM Lift applications execute in the Java Virtual
- Machine.
+ Lift sits on top of the JVM.
+ Lift applications execute in the Java Virtual Machine.
  The JVM is a very high performance computing system.
  There are raging debates as to the relative performance of JVM code and
  native machine code.
@@ -4459,8 +4462,9 @@ Security The Internet is a dangerous place and no request that is received
  requests per second on quad-core Intel hardware.
  Even very complex Lift apps that make many back-end calls per request can
  serve hundreds of requests per second on EC2 large instances.
- Lift as proxy Many web applications, typically REST applications, provide
- a very thin layer on top of a backing data store.
+ Lift as proxy.
+ Many web applications, typically REST applications, provide a very thin
+ layer on top of a backing data store.
  The web application serves a few basic functions to broker between the
  HTTP request and the backing store.
  These functions include: request and parameter validation, authentication,
@@ -4471,13 +4475,14 @@ Security The Internet is a dangerous place and no request that is received
  For more information on Lift's REST features, see Lift RestHelper.
  When running these kinds of services, Lift apps can be treated without
  regard for session affinity.
- Lift as HTML generator Lift has a power and secure templating mechanism.
+ Lift as HTML generator.
+ Lift has a powerful and secure templating mechanism.
  All Lift templates are expressed as valid XML and during the rendering
  process, Lift keeps the page in XML format.
  Pages rendered via Lift's templating mechanism are generally resistant
  to cross site scripting attacks and other attacks that insert malicious
  content in rendered pages.
- Lift's templating mechanism is designer friendly yet support complex and
+ Lift's templating mechanism is designer friendly yet supports complex and
  powerful substitution rules.
  Further, the rendered page can be evaluated and transformed during the
  final rendering phase to ensure that all script tags are at the bottom
@@ -4485,7 +4490,7 @@ Security The Internet is a dangerous place and no request that is received
  Lift's templating mechanism can be used to serve sessionless requests or
  serve requests within the context of a session.
  Further, pages can be marked as not requiring a session, yet will make
- session state available is the request was made in the context of a container
+ session state available if the request was made in the context of a container
  session.
  Lift page rendering can even be done in parallel such that if there are
  long off-process components on the page (e.g., advertising servers), those

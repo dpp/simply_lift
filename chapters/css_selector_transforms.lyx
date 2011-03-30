@@ -375,7 +375,7 @@ avid</span></span>
 \family typewriter
 #id -*
 \family default
-") appends the value to the the content children nodes
+") prepends the value to the the content children nodes
 \begin_inset Newline newline
 \end_inset
 
