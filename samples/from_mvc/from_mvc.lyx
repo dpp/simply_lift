@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -110,6 +110,17 @@ Create the behavior (the Snippet that transforms the incoming HTML to the
  dynamically generated HTML)
 \end_layout
 
+\begin_layout Standard
+You can find the source for this project at 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/dpp/simply_lift/tree/master/samples/from_mvc"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 First things first
 \end_layout
@@ -125,7 +136,7 @@ Download the
 \begin_inset CommandInset href
 LatexCommand href
 name "TAR"
-target "https://github.com/lift/lift_22_sbt/tarball/2.2"
+target "https://github.com/lift/lift_23_sbt/tarball/master"
 
 \end_inset
 
@@ -133,7 +144,7 @@ target "https://github.com/lift/lift_22_sbt/tarball/2.2"
 \begin_inset CommandInset href
 LatexCommand href
 name "Zip"
-target "https://github.com/lift/lift_22_sbt/zipball/2.2"
+target "https://github.com/lift/lift_23_sbt/zipball/master"
 
 \end_inset
 

@@ -133,7 +133,7 @@ David Pollak
 \end_layout
 
 \begin_layout Date
-3/30/2011
+4/5/2011
 \end_layout
 
 \begin_layout Standard
@@ -452,6 +452,17 @@ The ubiquitous Chat app
 \begin_layout Standard
 Writing a multi-user chat application in Lift is super-simple and illustrates
  many of Lift's core concepts.
+\end_layout
+
+\begin_layout Standard
+The Source Code can be found at 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/dpp/simply_lift/tree/master/chat"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
