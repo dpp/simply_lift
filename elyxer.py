@@ -6855,6 +6855,15 @@ class Listing(Container):
       if 'caption' in self.lstparams:
         text = self.lstparams['caption'][1:-1]
         self.contents.insert(0, Caption().create(text))
+
+    # If this is HTML or XML, we need to escape leading "<" characters
+    if "ml" in self.brush.lower():
+      for part in self.contents:
+        if isinstance(part, TaggedText):
+          for line in part.contents:
+            if isinstance(line, Constant):
+              line.string = line.string.replace("<", "&lt;")
+
     if Listing.processor:
       Listing.processor.postprocess(self)
 
