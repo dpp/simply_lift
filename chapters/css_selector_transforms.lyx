@@ -358,8 +358,8 @@ avid</span></span>
 
 
 \family typewriter
-"#name *+" #> "David" // <span><span id="name"/>Name: </span> -> <span><span
- id="name>Name: David</span></span>
+"#name *+" #> "David" // <span><span id="name">Name: </span></span> -> <span><sp
+an id="name>Name: David</span></span>
 \end_layout
 
 \begin_layout Itemize
@@ -381,8 +381,8 @@ avid</span></span>
 
 
 \family typewriter
-"#name -*" #> "David" // <span><span id="name"/> Pollak</span> -> <span><span
- id="name>David Pollak</span></span>
+"#name -*" #> "David" // <span><span id="name"> Pollak</span></span> ->
+ <span><span id="name>David Pollak</span></span>
 \end_layout
 
 \begin_layout Itemize
@@ -429,6 +429,28 @@ Dogscape</a>
 \end_inset
 
 // <span class"foo">Dogscape</span> -> <span class"foo error">Dogscape</span>
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+[attr!]
+\family default
+ (e.g., "#id 
+\family typewriter
+[class!]
+\family default
+") removes the matching value to the existing from.
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+"span [class!]" #> "error" 
+\begin_inset Newline newline
+\end_inset
+
+// <span class"error foo">Dogscape</span> -> <span class"foo">Dogscape</span>
 \end_layout
 
 \begin_layout Itemize

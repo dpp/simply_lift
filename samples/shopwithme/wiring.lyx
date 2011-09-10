@@ -64,7 +64,7 @@ Interactive web applications have many interdependent components on a single
 \end_layout
 
 \begin_layout Standard
-Lift's Wiring provides a simply solution to managing complex dependencies
+Lift's Wiring provides a simple solution to managing complex dependencies
  on a single page and on multiple tabs.
  Lift's Wiring allows you to declare the formulaic relationships among cells
  (like a spreadsheet) and then the user interface components (yes, there
