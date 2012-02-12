@@ -475,7 +475,7 @@ n changes.
 \end_inset
 
 .
- Typcially, you will define a function that returns a SiteMap instance:
+ Typically, you will define a function that returns a SiteMap instance:
 \end_layout
 
 \begin_layout Standard
