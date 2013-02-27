@@ -959,7 +959,11 @@ chat
 \family default
  directory and type 
 \family typewriter
-sbt update ~jetty-run
+sbt
+\family default
+and inside the sbt prompt, type
+\family typewriter
+container:start
 \family default
 .
  The Simple Build Tool will download all necessary dependencies, compile
